@@ -1,0 +1,22 @@
+{
+  "name": "d.messenger",
+  "version": "1.0.0",
+  "description": "distributed messenger over p2p",
+  "main": "index.js",
+  "dependencies": {
+    "@nodeutils/defaults-deep": "^1.1.0",
+    "async": "^2.6.1",
+    "libp2p": "^0.23.1",
+    "libp2p-tcp": "^0.13.0",
+    "libp2p-websockets": "^0.12.0",
+    "peer-info": "^0.14.1",
+    "pull-stream": "^3.6.9"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "node websocket.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Dumeni Vincenz",
+  "license": "ISC"
+}

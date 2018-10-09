@@ -21,8 +21,10 @@ class App extends React.Component<{}> {
           <img src={logo} className="App-logo" alt="logo" />
           <h1 className="App-title">Welcome to d.messanger</h1>
         </header>
-        <MessageDisplayer iotaApi={this.api} activeAddress={this.tempAddress} />
-        <Sender iotaApi={this.api} />
+        <div className="chatroom">
+          <MessageDisplayer iotaApi={this.api} activeAddress={this.tempAddress} />
+          <Sender iotaApi={this.api} />
+        </div>
       </div>
     );
   }

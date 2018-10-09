@@ -26,13 +26,13 @@ export class MessageDisplayer extends React.Component<IPorps, IState> {
         const messages = this.state.messages
         console.log(messages);
         return (
-            <div>
+            <ul className="chats">
                 {messages.map(
                     msg => {
                         return <MessageComponent key={msg.time} value={msg.message} />
                     }
                 )}
-            </div>
+            </ul>
 
         );
     }
@@ -46,6 +46,6 @@ export class MessageDisplayer extends React.Component<IPorps, IState> {
 }
 
 function MessageComponent(props: any){
-    return <li  >{props.value}</li>
+    return <li className="chat right" >{props.value}</li>
 }
 

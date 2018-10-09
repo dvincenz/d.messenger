@@ -65,18 +65,21 @@ export class Iota {
             provider: this.provider
           })
         this.api.getNodeInfo((error: any, success: any) =>{
-            console.log(success)
             if(error){
                 console.error(error);
             }
         });  
     }
 
-    private async getMessagesFromTrytes(trytes: string[]) {
+    private getMessagesFromTrytes(trytes: string[]) {
         const messages: Message[] = []
         trytes.forEach(
             (tryt: any) => {
+                
                 const transaction = asTransactionObject(tryt)
+                if(transaction.signatureMessageFragment.replace(/9+$/, '') === ''){
+                    return;
+                }
                 const message: Message = {
                     address: transaction.address,
                     message: trytesToAscii(transaction.signatureMessageFragment.replace(/9+$/, '')),
@@ -84,8 +87,9 @@ export class Iota {
                 }
                 messages.push(message);
             }
+            
         )
-        return messages;
+        return messages.sort((a, b) => a.time > b.time ? 1 : -1);
     }
 
 

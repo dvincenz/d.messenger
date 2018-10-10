@@ -18,6 +18,9 @@
       "timeEnd",
       "trace"
     ],
-    "ordered-imports": false
+    "ordered-imports": false,
+    "no-debugger": false,
+    "jsx-boolean-value": false,
+    "object-literal-sort-keys": false
   }
 }

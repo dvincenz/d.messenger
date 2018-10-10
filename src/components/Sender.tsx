@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Button, TextField} from '@material-ui/core';
-import { Iota } from '../services/IotaService';
+import { Iota } from '../services/iotaService';
 
 
 
@@ -34,7 +34,7 @@ export class Sender extends React.Component<IPorps, IState> {
 
     private handleSubmit = (): void => {
         const message = this.state.message;
-        this.props.iotaApi.sendMessage(message, 'LKVQLLCIWSFNRIY9YOHFNAMGHEZTPUEWDPWJWMCE9PRHMVWKIOPRCIMMTPCKEQH9GBQPKUNDBMODMMDMYNNISEAPYY');
+        this.props.iotaApi.sendTextMessage('LKVQLLCIWSFNRIY9YOHFNAMGHEZTPUEWDPWJWMCE9PRHMVWKIOPRCIMMTPCKEQH9GBQPKUNDBMODMMDMYNNISEAPYY', message);
         
     }
     private handleInputChange = (event: React.ChangeEvent<HTMLInputElement>): void => {

@@ -17,9 +17,9 @@ This repo contains an PoC of a distributed messenger. Messages are stored in the
 - [ ] ....and a lot more
 
 ### following NFR are on the task list
-- [] implement a suitable ui
-- [] encryption
-- [] security audit
+- [ ] implement a suitable ui
+- [ ] encryption
+- [ ] security audit
 
 
 

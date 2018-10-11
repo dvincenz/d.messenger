@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Button, TextField, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@material-ui/core';
 import { Iota } from '../services/iotaService';
+import { isValidChecksum } from '@iota/checksum';
 
 
 
@@ -11,21 +12,42 @@ interface IPorps {
 interface IState {
     open: boolean,
     address: string,
-    disableInput: boolean
+    disableInput: boolean,
+    error: string,
+    bevoreOpen:boolean,
+    
+
 }
 
 export class AddContact extends React.Component<IPorps, IState> {
+    public static getDerivedStateFromProps(props: IPorps, state: IState) {
+        if (state.open !== state.bevoreOpen){
+            return {
+                bevoreOpen: state.open,
+            }
+        }
+        if (props.open !== state.open) {
+          return {
+            open: props.open,
+            bevoreOpen: props.open
+          }; 
+        }
+        return null;
+      }
     constructor(props: IPorps) {
         super(props);
         this.state = {
             open: props.open,
+            bevoreOpen: props.open,
             address: '',
             disableInput: false,
+            error: ''
         }
     }
-    
+
+
+
     public render() {
-        console.log('props: ' + this.props.open + 'state: ' + this.state.open)
         return (
             <div>
                 <Dialog
@@ -43,10 +65,11 @@ export class AddContact extends React.Component<IPorps, IState> {
                             autoFocus
                             margin="dense"
                             id="address"
-                            label={this.state.disableInput ? 'save...' : 'Address'}
+                            label={this.state.error !== '' ? this.state.error : this.state.disableInput ? 'save...' : 'Address'}
                             type="text"
                             fullWidth
                             disabled={this.state.disableInput}
+                            error={this.state.error !== ''}
                         />
                     </DialogContent>
                     <DialogActions>
@@ -54,7 +77,7 @@ export class AddContact extends React.Component<IPorps, IState> {
                             Cancel
             </Button>
                         <Button onClick={this.handleSave} disabled={this.state.disableInput} color="primary">
-                            Subscribe
+                            Add Contact
             </Button>
                     </DialogActions>
                 </Dialog>
@@ -64,23 +87,36 @@ export class AddContact extends React.Component<IPorps, IState> {
     }
 
     private handleInputChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
-        this.setState({ address: event.target.value })
+        this.setState({ 
+            address: event.target.value,
+            error: ''
+         })
     }
-    private handleClose(){
+    private handleClose = () => {
+        console.log('should close')
         this.setState({
             open: false
         })
     }
-    private handleSave(){
+    private handleSave = () =>{
+        try{
+            isValidChecksum(this.state.address)
+        } catch {
+            this.setState({
+                error: 'Invalid Address - try again'
+            })
+            return;
+        }
         this.setState({
             disableInput: true,
         })
-        // todo check if address is a valid address
         this.props.iotaApi.sendContactRequest(this.state.address).then(
-            this.setState({
+            () => this.setState({ 
                 open: false,
+                disableInput: false, 
             })
-        )
+        );
+        
     }
 
 

@@ -18,56 +18,41 @@ export class Iota {
         this.connectWithNode();
     }
 
-    public getMessage(){
-        console.log('get messages for ' + this.seed + ' need to be implemented');
-        
-    }
-
     public sendTextMessage (address: string, text:string){
         const msg: ITextMessage = {
             mehtod: MessageMethod.Message,
             message: text,
             name: this.createChatName(),
         }
-        this.sendMessage(address, msg);
+        return this.sendMessage(address, msg);
     }
-    public sendMessage(address: string, message: IBaseMessage){
+    public async sendMessage (addr: string, message: IBaseMessage) {
         const trytesMessage = asciiToTrytes(JSON.stringify(message));
         const transfer = [{
-            address: ''+address,
+            address: addr,
             message: trytesMessage,
             value: 0,
         }];
-        return this.api.prepareTransfers(this.seed, transfer)
-        .then((trytes: any) => this.api.sendTrytes(trytes, 2, this.minWeightMagnitude))
-        .then((transections: any) => {
-            console.log('message: ' + transections)
-        })
-        .catch((err: any) => {
-            console.error(err)
-        });
+        const trytes = await this.api.prepareTransfers(this.seed, transfer)
+        await this.api.sendTrytes(trytes, 2, this.minWeightMagnitude)
+        return
     }
-    public getMessages(addr: string[]) {
+    public async getMessages(addr: string[]) {
         const query: any = {
             addresses: addr,
         };
-        return this.api.findTransactions(query)
-            .then((hashes: any) =>
-                this.api.getTrytes(hashes)
-                    .then(async (trytes: string[]) => {
-                        return this.getMessagesFromTrytes(trytes) 
-                    })
-                    .catch((err: any) => console.log(err))
-            ).catch((err: any) => console.log(err))
+        const hashes = await this.api.findTransactions(query)
+        const trytes = await this.api.getTrytes(hashes)
+        return this.getMessagesFromTrytes(trytes) 
     }
 
-    public sendContactRequest (address: string ){
+    public async sendContactRequest (address: string ) {
         const message: IContactRequest = {
             mehtod: MessageMethod.ContactRequest,
             name: this.createChatName(),
         }
-        
-        return this.sendMessage(address, message)
+        await this.sendMessage(address, message)
+        return
     }  
     
     private async connectWithNode(){

@@ -24,7 +24,6 @@ export class MessageDisplayer extends React.Component<IPorps, IState> {
 
     public render() {
         const messages = this.state.messages
-        console.log(messages);
         return (
             <ul className="chats">
                 {messages !== undefined && messages.length > 0 ? messages.map(
@@ -37,11 +36,9 @@ export class MessageDisplayer extends React.Component<IPorps, IState> {
         );
     }
     
-    private loadMessages(){
-        this.props.iotaApi.getMessages([this.props.activeAddress])
-            .then( (msgs: IMessageResponse[]) => {
-                this.setState({messages: msgs})
-            })
+    private async loadMessages(){
+        const msgs = await this.props.iotaApi.getMessages([this.props.activeAddress])
+        this.setState({messages: msgs})
     }
 }
 

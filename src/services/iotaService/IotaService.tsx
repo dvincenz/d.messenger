@@ -67,6 +67,7 @@ export class Iota {
     }
 
     private createChatName(){
+        // todo user name & and random address per request
         return 'dvincenz@FASKJNWODFNLASDM'
     }
 

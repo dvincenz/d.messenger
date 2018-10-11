@@ -6,15 +6,15 @@ work in progress...
 ## Short description
 This repo contains an PoC of a distributed messenger. Messages are stored in the IOTA tangle and for online status webRTC is used. Following features are implemented or are planned to implement:
 - [x] send and store messages in the tangle
-- [] get all chats from seed
+- [ ] get all chats from seed
 - [x] contact request
-- [] contact approve
-- [] online status
-- [] group chat
-- [] send messages if both users are online ober webRTC
-- [] login with different seeds
-- [] local PoW (switch between local and remote PoW)
-- [] ....and a lot more
+- [ ] contact approve
+- [ ] online status
+- [ ] group chat
+- [ ] send messages if both users are online ober webRTC
+- [ ] login with different seeds
+- [ ] local PoW (switch between local and remote PoW)
+- [ ] ....and a lot more
 
 ### following NFR are on the task list
 - [] implement a suitable ui

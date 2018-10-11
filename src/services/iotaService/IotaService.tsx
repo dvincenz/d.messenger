@@ -108,5 +108,4 @@ export class Iota {
         return JSON.parse(str);
     }
 
-
 }

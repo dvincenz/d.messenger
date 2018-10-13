@@ -1,6 +1,6 @@
 import * as React from 'react';
 // import { Paper, TableHEad } from '@material-ui/core';
-import { Iota, Message} from '../services/IotaService';
+import { Iota, IMessageResponse} from '../services/iotaService';
 
 
 
@@ -9,7 +9,7 @@ interface IPorps {
     activeAddress: string;
 }
 interface IState {
-    messages: Message[]
+    messages: IMessageResponse[]
 }
 
 
@@ -24,24 +24,21 @@ export class MessageDisplayer extends React.Component<IPorps, IState> {
 
     public render() {
         const messages = this.state.messages
-        console.log(messages);
         return (
             <ul className="chats">
-                {messages.map(
+                {messages !== undefined && messages.length > 0 ? messages.map(
                     msg => {
                         return <MessageComponent key={msg.time} value={msg.message} />
                     }
-                )}
+                ) : <p>ops no message found on tangle</p>}
             </ul>
 
         );
     }
     
-    private loadMessages(){
-        this.props.iotaApi.getMessages([this.props.activeAddress])
-            .then( (msgs: Message[]) => {
-                this.setState({messages: msgs})
-            })
+    private async loadMessages(){
+        const msgs = await this.props.iotaApi.getMessages([this.props.activeAddress])
+        this.setState({messages: msgs})
     }
 }
 

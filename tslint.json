@@ -3,7 +3,7 @@
   "linterOptions": {
     "exclude": [
       "config/**/*.js",
-      "node_modules/**/*.ts",
+      "node_modules/**",
       "coverage/lcov-report/*.js"
     ]
   },
@@ -18,6 +18,12 @@
       "timeEnd",
       "trace"
     ],
-    "ordered-imports": false
+    "ordered-imports": false,
+    "no-debugger": false,
+    "jsx-boolean-value": false,
+    "object-literal-sort-keys": false,
+    "no-unused-expression":  {"severity": "warning"},
+    "no-unused-variable": {"severity": "warning"}
+     
   }
 }

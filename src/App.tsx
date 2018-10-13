@@ -1,32 +1,61 @@
 import * as React from 'react';
-import './App.css';
-import logo from './logo.svg';
-import { Iota } from './services/IotaService';
-import { Sender } from './components/Sender';
-import { MessageDisplayer } from './components/MessageDisplayer';
+import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import { Login, Chat } from './pages';
 
+interface IState {
+  seed: string,
+  isLoggedIn: boolean,
+}
 
-class App extends React.Component<{}> {
-  private api: Iota;
-  private tempAddress: string;
-  constructor(porps: {}){
+class App extends React.Component<{}, IState> {
+  constructor(porps: {}) {
     super(porps);
-    this.api = new Iota('http://65.52.143.115:14267', 'AUZHTFWRCCJY9INBKOECSIVCUORQIJWXPJHIRQZBRNHTEVXPGLFNOXLVEMEBWAXAOKUFNOCYNKTRGFSUA')
-    this.tempAddress = 'LKVQLLCIWSFNRIY9YOHFNAMGHEZTPUEWDPWJWMCE9PRHMVWKIOPRCIMMTPCKEQH9GBQPKUNDBMODMMDMYNNISEAPYY'
+    this.state = {
+      seed: '',
+      isLoggedIn: false,
+    }
   }
-  public render() {  
+  public render() {
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to d.messanger</h1>
-        </header>
-        <div className="chatroom">
-          <MessageDisplayer iotaApi={this.api} activeAddress={this.tempAddress} />
-          <Sender iotaApi={this.api} />
-        </div>
+
+      <div>
+        <BrowserRouter>
+            <Switch>
+              <Route path="/login" component={this.withPropsLogin}  />
+              <Route exact path="/chat" component={this.withPropsChat} />
+              <Route exact path="/" component={this.withPropsLogin} />
+            </Switch>
+          </BrowserRouter>
+        
       </div>
     );
+  }
+
+  private seedSave = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    // todo: check seed validity
+    // todo: redirect
+    this.setState({
+      isLoggedIn: true,
+    })
+  }
+
+  private withPropsLogin = (props: any) => {
+    return (<Login 
+      seedCallback={this.seedSave} 
+      seed={this.state.seed} 
+      handleInputChanges={this.handleInputChanges}
+      isLoggedIn={this.state.isLoggedIn} 
+      {...props}  />);
+  }
+  private withPropsChat = (props: any) => {
+    return (<Chat seed={this.state.seed} />)
+  }
+
+  private handleInputChanges = (event: React.ChangeEvent<HTMLInputElement>) => {
+    this.setState({
+      seed: event.target.value
+    })
   }
 }
 

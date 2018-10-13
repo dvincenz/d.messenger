@@ -9,12 +9,18 @@ interface IState {
   addContactDialogOpen: boolean,
 }
 
-class ChatCOmponent extends React.Component<{}, IState> {
+interface IProps {
+  seed: string;
+}
+
+
+class ChatCOmponent extends React.Component<IProps, IState> {
   private api: Iota;
   private tempAddress: string;
-  constructor(porps: {}){
+  constructor(porps: IProps){
     super(porps);
-    this.api = new Iota('http://65.52.143.115:14267', 'AUZHTFWRCCJY9INBKOECSIVCUORQIJWXPJHIRQZBRNHTEVXPGLFNOXLVEMEBWAXAOKUFNOCYNKTRGFSUA')
+    this.api = new Iota('http://65.52.143.115:14267', porps.seed)
+    // todo read all addresses from my seed an use it to construct chats
     this.tempAddress = 'LKVQLLCIWSFNRIY9YOHFNAMGHEZTPUEWDPWJWMCE9PRHMVWKIOPRCIMMTPCKEQH9GBQPKUNDBMODMMDMYNNISEAPYY'
     this.state = {
       addContactDialogOpen: false

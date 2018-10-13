@@ -1,27 +1,29 @@
 import * as React from 'react';
-import './App.css';
-import logo from './logo.svg';
-import { Iota } from './services/iotaService';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
-import { Login } from './pages';
+import { Login, Chat } from './pages';
 
 interface IState {
-  addContactDialogOpen: boolean,
+  seed: string,
+  isLoggedIn: boolean,
 }
 
 class App extends React.Component<{}, IState> {
-  private api: Iota;
-  private tempAddress: string;
   constructor(porps: {}) {
     super(porps);
+    this.state = {
+      seed: '',
+      isLoggedIn: false,
+    }
   }
   public render() {
     return (
+
       <div>
         <BrowserRouter>
             <Switch>
-              <Route path="/login" component={Login} />
-              <Route exact path="/" component={Login} />
+              <Route path="/login" component={this.withPropsLogin}  />
+              <Route exact path="/chat" component={this.withPropsChat} />
+              <Route exact path="/" component={this.withPropsLogin} />
             </Switch>
           </BrowserRouter>
         
@@ -29,9 +31,30 @@ class App extends React.Component<{}, IState> {
     );
   }
 
-  private handleAddContactDialog = () => {
+  private seedSave = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    // todo: check seed validity
+    // todo: redirect
     this.setState({
-      addContactDialogOpen: true,
+      isLoggedIn: true,
+    })
+  }
+
+  private withPropsLogin = (props: any) => {
+    return (<Login 
+      seedCallback={this.seedSave} 
+      seed={this.state.seed} 
+      handleInputChanges={this.handleInputChanges}
+      isLoggedIn={this.state.isLoggedIn} 
+      {...props}  />);
+  }
+  private withPropsChat = (props: any) => {
+    return (<Chat seed={this.state.seed} />)
+  }
+
+  private handleInputChanges = (event: React.ChangeEvent<HTMLInputElement>) => {
+    this.setState({
+      seed: event.target.value
     })
   }
 }

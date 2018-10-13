@@ -44,9 +44,10 @@ export class Iota {
         const hashes = await this.api.findTransactions(query)
         const trytes = await this.api.getTrytes(hashes)
         return this.getMessagesFromTrytes(trytes) 
+        
     }
 
-    public async sendContactRequest (address: string ) {
+    public async sendContactRequest (address: string) {
         const message: IContactRequest = {
             mehtod: MessageMethod.ContactRequest,
             name: this.createChatName(),

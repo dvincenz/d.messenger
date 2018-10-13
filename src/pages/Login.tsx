@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { AppBar, Button, CssBaseline, Toolbar, Typography, Grid, withStyles, StyleRulesCallback, TextField, Checkbox, FormControlLabel,  } from '@material-ui/core';
+import { AppBar, Button, CssBaseline, Toolbar, Typography, Grid, withStyles, StyleRulesCallback, TextField, Checkbox, FormControlLabel, } from '@material-ui/core';
+import { Redirect } from 'react-router';
 
 const styles: StyleRulesCallback = theme => ({
   appBar: {
@@ -34,90 +35,105 @@ const styles: StyleRulesCallback = theme => ({
     padding: theme.spacing.unit * 6,
   },
   gray: {
-    color:'gray',
+    color: 'gray',
   },
   register: {
     marginTop: 50,
     padding: 25,
     backgroundColor: '#F5F5F5'
-  ,}
+    ,
+  }
 });
 
 interface IPorps {
   classes: any;
+  seedCallback: (fromData: React.FormEvent<HTMLFormElement>) => void;
+  handleInputChanges: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  seed: string;
+  isLoggedIn: boolean
 }
 
-function LoginComponent(props: IPorps) {
-  const { classes } = props;
 
-  return (
-    <React.Fragment>
-      <CssBaseline />
-      <AppBar position="static" className={classes.appBar}>
-        <Toolbar>
-          <Typography component="h6" color="inherit" noWrap>
-            d.messanger - Distributed Messenger <span className={classes.gray}>(Alpha Version - use at your own risk)</span>
-          </Typography>
-        </Toolbar>
-      </AppBar>
-      <main>
-        <div className={classes.heroUnit}>
-          <div className={classes.heroContent}>
-            <Typography variant="display3" align="center" color="textPrimary" gutterBottom>
-              d.messenger
+class LoginComponent extends React.Component<IPorps, {}> {
+  constructor(props: IPorps) {
+    super(props);
+  }
+  public render() {
+    const { classes, seed, seedCallback, handleInputChanges, isLoggedIn } = this.props;
+    if (isLoggedIn) {
+      return <Redirect to={{ pathname: '/chat' }} />;
+    }
+    return (
+      <React.Fragment>
+        <CssBaseline />
+        <AppBar position="static" className={classes.appBar}>
+          <Toolbar>
+            <Typography component="h6" color="inherit" noWrap>
+              d.messanger - Distributed Messenger <span className={classes.gray}>(Alpha Version - use at your own risk)</span>
             </Typography>
-            <Typography variant="body2" align="center" color="textSecondary" paragraph>
-              d.messenger is a distributed messenger, which save all messages in the iota tangle network. No centralized unit is isRequired, this page is a static page and use only a connection with a node in the tangle network to be able to communicate.
+          </Toolbar>
+        </AppBar>
+        <main>
+          <div className={classes.heroUnit}>
+            <div className={classes.heroContent}>
+              <Typography variant="display3" align="center" color="primary" gutterBottom>
+                d.messenger
             </Typography>
-            <div className={classes.heroButtons}>
-              <Grid container spacing={16} justify="center">
-                <Grid item>
-                  <TextField inputProps={{size:81}} type="password"  label="Seed" />
-                </Grid>
-              </Grid>
-              <Grid container spacing={16}>
-                <Grid item alignContent="flex-start">
-                <FormControlLabel 
-                  control={
-                    <Checkbox value="save your seed in your browser" color="primary" />
-                  }
-                  label="save your seed in your browser"
-                />
-                </Grid>
-              </Grid>
-              <Grid container spacing={16} justify="flex-end">
-              <Grid item>
-                  <Button variant="contained" color="primary">
-                    Login with your Seed
-                  </Button>
-                </Grid>
-              </Grid>
-              <div className={classes.register}>
               <Typography variant="body2" align="center" color="textSecondary" paragraph>
-              You can register with enter your name, your browser will generate localy an seed that you can user in the feature to access your chat.
-              </Typography>
-              <Grid container spacing={16} justify="center">
-                <Grid item>
-                <TextField label="Enter username" />
+                d.messenger is a distributed messenger, which save all messages in the iota tangle network. No centralized unit is is required, this page is a static page and use only a connection with a node in the tangle network to be able to communicate.
+            </Typography>
+              <div className={classes.heroButtons}>
+              <form onSubmit={seedCallback}>
+                <Grid container spacing={16} justify="center">
+                  <Grid item>
+                    <TextField value={seed} inputProps={{ size: 81 }} type="password" label="Seed" onChange={handleInputChanges} />
+                  </Grid>
                 </Grid>
-                <Grid item>
-                <Button variant="outlined" color="primary">
-                   Create a new account
+                <Grid container spacing={16}>
+                  <Grid item>
+                    <FormControlLabel
+                      control={
+                        <Checkbox value="save your seed in your browser" color="primary" />
+                      }
+                      label="save your seed in your browser"
+                    />
+                  </Grid>
+                </Grid>
+                <Grid container spacing={16} justify="flex-end">
+                  <Grid item>
+                    <Button type="submit" variant="contained" color="primary">
+                      Login with your Seed
                   </Button>
+                  </Grid>
                 </Grid>
-              </Grid>
+              </form>
+                <div className={classes.register}>
+                  <Typography variant="body2" align="center" color="textSecondary" paragraph>
+                    You can register with enter your name, your browser will generate localy an seed that you can user in the feature to access your chat.
+              </Typography>
+                  <Grid container spacing={16} justify="center">
+                    <Grid item>
+                      <TextField label="Enter username" />
+                    </Grid>
+                    <Grid item>
+                      <Button variant="outlined" color="primary">
+                        Create a new account
+                  </Button>
+                    </Grid>
+                  </Grid>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </main>
-      <footer className={classes.footer}>
-        <Typography align="center" color="textSecondary" component="p">
-          You can find d.messanger on <a href="https://github.com/dvincenz/d.messenger" target="_blank">github</a>, feel free to contibute to this opensource project.
+        </main>
+        <footer className={classes.footer}>
+          <Typography align="center" color="textSecondary" component="p">
+            You can find d.messanger on <a href="https://github.com/dvincenz/d.messenger" target="_blank">github</a>, feel free to contibute to this opensource project.
         </Typography>
-      </footer>
-    </React.Fragment>
-  );
+        </footer>
+      </React.Fragment>
+    );
+  }
 }
 
 export const Login = withStyles(styles)(LoginComponent);

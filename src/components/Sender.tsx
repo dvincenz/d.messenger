@@ -1,17 +1,29 @@
 import * as React from 'react';
-import { Button, TextField} from '@material-ui/core';
+import { Button, TextField, withStyles, StyleRulesCallback} from '@material-ui/core';
 import { Iota } from '../services/iotaService';
 
 
 
 interface IPorps {
     iotaApi: Iota;
+    classes: any;
 }
 interface IState {
     message: string
 }
 
-export class Sender extends React.Component<IPorps, IState> {
+const styles: StyleRulesCallback = theme => ({
+    button: {
+        margin: '22px 20px 0'
+    },
+    textbox: {
+        margin: '10px 0',
+        width: 'calc(100% - 210px)' // todo fix ugly hotfix
+    }
+
+})
+
+export class SenderComponent extends React.Component<IPorps, IState> {
     constructor (props: IPorps){
         super(props);
         this.state = {
@@ -19,10 +31,12 @@ export class Sender extends React.Component<IPorps, IState> {
         }
     }
     public render() {
+        const { classes } = this.props
         return (
             <div>        
-                <TextField value={this.state.message} onChange={this.handleInputChange}  label="Message"   />
+                <TextField className={classes.textbox} value={this.state.message} onChange={this.handleInputChange}  label="Message"   />
                 <Button 
+                    className={classes.button}
                     variant="contained"
                     color="primary"  
                     id="send" 
@@ -40,6 +54,6 @@ export class Sender extends React.Component<IPorps, IState> {
     private handleInputChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
         this.setState({message: event.target.value})    
     }
-
-
 }
+
+export const Sender = withStyles(styles)(SenderComponent);

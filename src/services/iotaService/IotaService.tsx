@@ -3,6 +3,7 @@ import { asciiToTrytes, trytesToAscii } from '@iota/converter'
 import { asTransactionObject } from '@iota/transaction-converter'
 import { IMessageResponse, IContactRequest } from '.';
 import { IBaseMessage, MessageMethod, ITextMessage  } from './interfaces';
+import {Contact} from "../../entity/Contact";
 
 /*iotaService wrapper is build as no react component -> todo move to best practise in ract*/ 
 
@@ -11,6 +12,10 @@ export class Iota {
     private seed: string;
     private minWeightMagnitude: number;
     private api: any;
+
+    private contacts: Contact[] = [];
+    private textMessages: IMessageResponse[] = [];
+
     constructor(provider: string, seed: string) {
         this.provider = provider;
         this.seed = seed;
@@ -20,12 +25,22 @@ export class Iota {
 
     public sendTextMessage (address: string, text:string){
         const msg: ITextMessage = {
-            mehtod: MessageMethod.Message,
+            method: MessageMethod.Message,
             message: text,
             name: this.createChatName(),
         }
         return this.sendMessage(address, msg);
     }
+
+    public async sendContactRequest (address: string) {
+        const message: IContactRequest = {
+            method: MessageMethod.ContactRequest,
+            name: this.createChatName(),
+        }
+        await this.sendMessage(address, message)
+        return
+    }
+
     public async sendMessage (addr: string, message: IBaseMessage) {
         const trytesMessage = asciiToTrytes(JSON.stringify(message));
         const transfer = [{
@@ -37,25 +52,43 @@ export class Iota {
         await this.api.sendTrytes(trytes, 2, this.minWeightMagnitude)
         return
     }
-    public async getMessages(addr: string[]) {
+
+    public async loadData(addr:string[]) {
         const query: any = {
             addresses: addr,
         };
         const hashes = await this.api.findTransactions(query)
         const trytes = await this.api.getTrytes(hashes)
-        return this.getMessagesFromTrytes(trytes) 
-        
+
+        const messages = this.getMessagesFromTrytes(trytes)
+        messages.forEach(msg => {
+            switch (msg.method) {
+                case MessageMethod.Message: {
+                    this.textMessages.push(msg)
+                    break;
+                }
+                case MessageMethod.ContactRequest: {
+                    const contact = new Contact(msg.address, msg.address)
+                    this.contacts.push(contact)
+                    break;
+                }
+                case MessageMethod.ContactResponse: {
+                    const contact = new Contact(msg.address, msg.address)
+                    this.contacts.push(contact)
+                    break;
+                }
+            }
+        })
     }
 
-    public async sendContactRequest (address: string) {
-        const message: IContactRequest = {
-            mehtod: MessageMethod.ContactRequest,
-            name: this.createChatName(),
-        }
-        await this.sendMessage(address, message)
-        return
-    }  
-    
+    public getMessages() {
+        return this.textMessages
+    }
+
+    public getContacts() {
+        return this.contacts
+    }
+
     private async connectWithNode(){
         this.api = composeAPI({
             provider: this.provider
@@ -75,27 +108,28 @@ export class Iota {
     private getMessagesFromTrytes(trytes: string[]) {
         const messages: IMessageResponse[] = []
         trytes.forEach(
-            (tryt: any) => {  
+            (tryt: any) => {
                 const transaction = asTransactionObject(tryt)
-                if(transaction.signatureMessageFragment.replace(/9+$/, '') === ''){
+                if (transaction.signatureMessageFragment.replace(/9+$/, '') === '') {
                     return;
                 }
                 const messageObject = this.parseMessage(trytesToAscii(transaction.signatureMessageFragment.replace(/9+$/, '')));
-                if(messageObject === null ){
+                if (messageObject === null) {
                     console.log('some messages dosent match to the given pattern')
                     return;
                 }
-                if(!messageObject.message){
+                if (!messageObject.message) {
                     return;
                 }
+
                 const message: IMessageResponse = {
-                    address: transaction.address,
                     message: (messageObject as ITextMessage).message,
-                    time: transaction.timestamp
+                    time: transaction.timestamp,
+                    address: transaction.address,
+                    method: (messageObject as ITextMessage).method,
                 }
                 messages.push(message);
             }
-            
         )
         return messages.sort((a, b) => a.time > b.time ? 1 : -1);
     }

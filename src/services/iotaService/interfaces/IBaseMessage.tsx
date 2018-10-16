@@ -1,6 +1,6 @@
 
 export interface IBaseMessage {
-    mehtod: MessageMethod;
+    method: MessageMethod;
     name: string;
 }
 

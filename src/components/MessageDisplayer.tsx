@@ -37,7 +37,7 @@ export class MessageDisplayer extends React.Component<IPorps, IState> {
     }
     
     private async loadMessages(){
-        const msgs = await this.props.iotaApi.getMessages([this.props.activeAddress])
+        const msgs = await this.props.iotaApi.getMessages()
         this.setState({messages: msgs})
     }
 }

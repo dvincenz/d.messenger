@@ -1,11 +1,11 @@
-import { composeAPI  } from '@iota/core'
+import { composeAPI } from '@iota/core'
 import { asciiToTrytes, trytesToAscii } from '@iota/converter'
 import { asTransactionObject } from '@iota/transaction-converter'
 import { IMessageResponse, IContactRequest } from '.';
 import { IBaseMessage, MessageMethod, ITextMessage  } from './interfaces';
 import {Contact} from "../../entity/Contact";
 
-/*iotaService wrapper is build as no react component -> todo move to best practise in ract*/ 
+/*iotaService wrapper is build as no react component -> todo move to best practise in ract*/
 
 export class Iota {
     private provider: string;
@@ -23,13 +23,13 @@ export class Iota {
         this.connectWithNode();
     }
 
-    public sendTextMessage (address: string, text:string){
+    public async sendTextMessage(address: string, text: string) {
         const msg: ITextMessage = {
             method: MessageMethod.Message,
             message: text,
             name: this.createChatName(),
         }
-        return this.sendMessage(address, msg);
+        return await this.sendMessage(address, msg);
     }
 
     public async sendContactRequest (address: string) {
@@ -92,15 +92,15 @@ export class Iota {
     private async connectWithNode(){
         this.api = composeAPI({
             provider: this.provider
-          })
-        this.api.getNodeInfo((error: any, success: any) =>{
-            if(error){
+        })
+        this.api.getNodeInfo((error: any, success: any) => {
+            if (error) {
                 console.error(error);
             }
-        });  
+        });
     }
 
-    private createChatName(){
+    private createChatName() {
         // todo user name & and random address per request
         return 'dvincenz@FASKJNWODFNLASDM'
     }

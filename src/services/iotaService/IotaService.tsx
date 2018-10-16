@@ -123,6 +123,7 @@ export class Iota {
                 }
 
                 const message: IMessageResponse = {
+                    name: (messageObject as ITextMessage).name,
                     message: (messageObject as ITextMessage).message,
                     time: transaction.timestamp,
                     address: transaction.address,

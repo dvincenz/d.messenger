@@ -3,7 +3,7 @@ import { asciiToTrytes, trytesToAscii } from '@iota/converter'
 import { asTransactionObject } from '@iota/transaction-converter'
 import { IMessageResponse, IContactRequest } from '.';
 import { IBaseMessage, MessageMethod, ITextMessage  } from './interfaces';
-import {Contact} from "../../entity/Contact";
+import { Contact } from '../../entities/Contact'
 
 /*iotaService wrapper is build as no react component -> todo move to best practise in ract*/
 
@@ -12,7 +12,6 @@ export class Iota {
     private seed: string;
     private minWeightMagnitude: number;
     private api: any;
-
     private contacts: Contact[] = [];
     private textMessages: IMessageResponse[] = [];
 
@@ -42,6 +41,15 @@ export class Iota {
     }
 
     public async sendMessage (addr: string, message: IBaseMessage) {
+        const sendingMessage: IMessageResponse = {
+            address: addr,
+            message: (message as ITextMessage).message,
+            name: message.name,
+            time: -1,
+            method: 2,
+        }
+        this.textMessages.push(sendingMessage)
+        console.log(this.textMessages);
         const trytesMessage = asciiToTrytes(JSON.stringify(message));
         const transfer = [{
             address: addr,
@@ -81,12 +89,18 @@ export class Iota {
         })
     }
 
-    public getMessages() {
+    public async getMessages() {
+        // todo remove quick fix, to not every time load all data
+
+        if(this.textMessages.length === 0){
+            await this.loadData(['LKVQLLCIWSFNRIY9YOHFNAMGHEZTPUEWDPWJWMCE9PRHMVWKIOPRCIMMTPCKEQH9GBQPKUNDBMODMMDMYNNISEAPYY'])
+        }
         return this.textMessages
     }
 
-    public getContacts() {
-        return this.contacts
+    public async getContacts() {
+
+         return this.contacts
     }
 
     private async connectWithNode(){
@@ -98,6 +112,7 @@ export class Iota {
                 console.error(error);
             }
         });
+                 
     }
 
     private createChatName() {
@@ -143,5 +158,4 @@ export class Iota {
         }
         return JSON.parse(str);
     }
-
 }

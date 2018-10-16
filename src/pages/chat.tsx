@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Iota } from '../services/iotaService';
+import { Iota, IMessageResponse } from '../services/iotaService';
 import { Sender } from '../components/Sender';
 import { MessageDisplayer } from '../components/MessageDisplayer';
 import { AddContact } from '../components/AddContact';
@@ -7,7 +7,8 @@ import { Button, AppBar, Toolbar, Typography, StyleRulesCallback, withStyles } f
 import { Contacts } from '../components/Contacts';
 
 interface IState {
-  addContactDialogOpen: boolean,
+  addContactDialogOpen: boolean;
+  messages: IMessageResponse[];
 }
 
 interface IProps {
@@ -44,10 +45,13 @@ class ChatComponent extends React.Component<IProps, IState> {
     // todo read all addresses from my seed an use it to construct chats
     this.tempAddress = 'LKVQLLCIWSFNRIY9YOHFNAMGHEZTPUEWDPWJWMCE9PRHMVWKIOPRCIMMTPCKEQH9GBQPKUNDBMODMMDMYNNISEAPYY'
     this.state = {
-      addContactDialogOpen: false
+      addContactDialogOpen: false,
+      messages: new Array<IMessageResponse>(),
     }
+    this.getMessages();
   }
   public render() {
+    console.log('render chat')
     const { classes } = this.props
     return (
       <React.Fragment>
@@ -64,8 +68,8 @@ class ChatComponent extends React.Component<IProps, IState> {
           <Contacts iotaApi={this.api} />
         </div>
         <main id="main" className={classes.main}>
-          <MessageDisplayer iotaApi={this.api}  activeAddress={this.tempAddress} />
-          <Sender iotaApi={this.api} />
+          <MessageDisplayer messages={this.state.messages} iotaApi={this.api}  activeAddress={this.tempAddress} />
+          <Sender  iotaApi={this.api} senderCallBack={this.getMessages} />
         </main>
       </React.Fragment>
     );
@@ -77,6 +81,13 @@ class ChatComponent extends React.Component<IProps, IState> {
     })
   } 
 
+  private getMessages = () => {
+    this.api.getMessages().then( (mesgs: IMessageResponse[]) => {
+      console.log('get new messages')
+      this.setState({messages: mesgs})
+    })
+
+  }
 
 }
 

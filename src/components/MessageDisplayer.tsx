@@ -8,7 +8,8 @@ import { StyleRulesCallback, withStyles } from '@material-ui/core';
 interface IPorps {
     iotaApi: Iota;
     activeAddress: string;
-    classes: any
+    classes: any;
+    messages: IMessageResponse[];
 }
 interface IState {
     messages: IMessageResponse[]
@@ -37,8 +38,8 @@ const styles: StyleRulesCallback = theme => ({ // todo fix sizes with theme.spac
    chats:{
         boxSizing: 'border-box',
         paddingTop: 0,
+        margin: '0 16px 0 16px',
         paddingRight: theme.spacing.unit * 3,
-        marginLeft: theme.spacing.unit * 2,
         height: '100%',
         overflowY: 'auto',
    }
@@ -50,11 +51,11 @@ export class MessageDisplayerComponent extends React.Component<IPorps, IState> {
         this.state = {
             messages: []
         }
-        this.loadMessages();
     }
 
     public render() {
-        const messages = this.state.messages
+        const messages = this.props.messages
+        console.log(messages)
         const { classes } = this.props
         return (
             <div className={classes.chatroom}>
@@ -63,18 +64,15 @@ export class MessageDisplayerComponent extends React.Component<IPorps, IState> {
                         msg => {
                             return <MessageComponent key={msg.time} value={msg.message} classes={this.props.classes} />
                         }
-                    ) : <p>ops no message found on tangle</p>}
+                    ) : <p>loading messages...</p>}
                 </ul>
             </div>
 
         );
     }
     
-    private async loadMessages(){
-        const msgs = await this.props.iotaApi.getMessages()
-        this.setState({messages: msgs})
-    }
 }
+
 
 function MessageComponent(props: any){
     return <li className={props.classes.right} >{props.value}</li>

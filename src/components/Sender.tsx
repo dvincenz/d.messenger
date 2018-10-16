@@ -7,6 +7,7 @@ import { Iota } from '../services/iotaService';
 interface IPorps {
     iotaApi: Iota;
     classes: any;
+    senderCallBack: () => void;
 }
 interface IState {
     message: string
@@ -48,8 +49,9 @@ export class SenderComponent extends React.Component<IPorps, IState> {
 
     private handleSubmit = (): void => {
         const message = this.state.message;
+        this.setState({message: ''})
         this.props.iotaApi.sendTextMessage('LKVQLLCIWSFNRIY9YOHFNAMGHEZTPUEWDPWJWMCE9PRHMVWKIOPRCIMMTPCKEQH9GBQPKUNDBMODMMDMYNNISEAPYY', message);
-        
+        this.props.senderCallBack();
     }
     private handleInputChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
         this.setState({message: event.target.value})    

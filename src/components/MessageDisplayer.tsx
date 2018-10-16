@@ -2,7 +2,6 @@ import * as React from 'react';
 // import { Paper, TableHEad } from '@material-ui/core';
 import { Iota, IMessageResponse} from '../services/iotaService';
 import { StyleRulesCallback, withStyles } from '@material-ui/core';
-import { relative } from 'path';
 
 
 

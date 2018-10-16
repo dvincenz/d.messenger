@@ -131,10 +131,6 @@ export class Iota {
                 }
                 messages.push(message);
             }
-<<<<<<< HEAD
-
-=======
->>>>>>> master
         )
         return messages.sort((a, b) => a.time > b.time ? 1 : -1);
     }

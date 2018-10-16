@@ -41,7 +41,7 @@ class ContactsComponent extends React.Component<IProps> {
     }
 
     protected getContacts = () => {
-        this.props.iotaApi.getAllContacts();
+        this.props.iotaApi.getContacts();
     }
 }
 

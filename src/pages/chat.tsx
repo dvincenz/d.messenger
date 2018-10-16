@@ -64,7 +64,7 @@ class ChatComponent extends React.Component<IProps, IState> {
           <Contacts iotaApi={this.api} />
         </div>
         <main id="main" className={classes.main}>
-          <MessageDisplayer iotaApi={this.api} activeAddress={this.tempAddress} />
+          <MessageDisplayer iotaApi={this.api}  activeAddress={this.tempAddress} />
           <Sender iotaApi={this.api} />
         </main>
       </React.Fragment>
@@ -76,6 +76,8 @@ class ChatComponent extends React.Component<IProps, IState> {
       addContactDialogOpen: true,
     })
   } 
+
+
 }
 
 export const Chat = withStyles(styles)(ChatComponent);

@@ -1,4 +1,4 @@
-import {IBaseMessage, MessageMethod} from "./IBaseMessage";
+import {IBaseMessage } from "./IBaseMessage";
 
 export interface IMessageResponse extends IBaseMessage{
     message: string,

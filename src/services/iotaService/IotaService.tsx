@@ -1,10 +1,10 @@
-import { composeAPI  } from '@iota/core'
+import { composeAPI } from '@iota/core'
 import { asciiToTrytes, trytesToAscii } from '@iota/converter'
 import { asTransactionObject } from '@iota/transaction-converter'
 import { IMessageResponse, IContactRequest } from '.';
-import { IBaseMessage, MessageMethod, ITextMessage  } from './interfaces';
+import { IBaseMessage, MessageMethod, ITextMessage } from './interfaces';
 
-/*iotaService wrapper is build as no react component -> todo move to best practise in ract*/ 
+/*iotaService wrapper is build as no react component -> todo move to best practise in ract*/
 
 export class Iota {
     private provider: string;
@@ -18,15 +18,15 @@ export class Iota {
         this.connectWithNode();
     }
 
-    public sendTextMessage (address: string, text:string){
+    public async sendTextMessage(address: string, text: string) {
         const msg: ITextMessage = {
             mehtod: MessageMethod.Message,
             message: text,
             name: this.createChatName(),
         }
-        return this.sendMessage(address, msg);
+        return await this.sendMessage(address, msg);
     }
-    public async sendMessage (addr: string, message: IBaseMessage) {
+    public async sendMessage(addr: string, message: IBaseMessage) {
         const trytesMessage = asciiToTrytes(JSON.stringify(message));
         const transfer = [{
             address: addr,
@@ -43,31 +43,36 @@ export class Iota {
         };
         const hashes = await this.api.findTransactions(query)
         const trytes = await this.api.getTrytes(hashes)
-        return this.getMessagesFromTrytes(trytes) 
-        
+        return this.getMessagesFromTrytes(trytes)
+
     }
 
-    public async sendContactRequest (address: string) {
+    public async sendContactRequest(address: string) {
         const message: IContactRequest = {
             mehtod: MessageMethod.ContactRequest,
             name: this.createChatName(),
         }
         await this.sendMessage(address, message)
         return
-    }  
-    
-    private async connectWithNode(){
-        this.api = composeAPI({
-            provider: this.provider
-          })
-        this.api.getNodeInfo((error: any, success: any) =>{
-            if(error){
-                console.error(error);
-            }
-        });  
     }
 
-    private createChatName(){
+    public async getAllContacts() {
+        const accountData = await this.api.getAccountData(this.seed)
+        console.log(accountData);
+    }
+
+    private async connectWithNode() {
+        this.api = composeAPI({
+            provider: this.provider
+        })
+        this.api.getNodeInfo((error: any, success: any) => {
+            if (error) {
+                console.error(error);
+            }
+        });
+    }
+
+    private createChatName() {
         // todo user name & and random address per request
         return 'dvincenz@FASKJNWODFNLASDM'
     }
@@ -75,17 +80,17 @@ export class Iota {
     private getMessagesFromTrytes(trytes: string[]) {
         const messages: IMessageResponse[] = []
         trytes.forEach(
-            (tryt: any) => {  
+            (tryt: any) => {
                 const transaction = asTransactionObject(tryt)
-                if(transaction.signatureMessageFragment.replace(/9+$/, '') === ''){
+                if (transaction.signatureMessageFragment.replace(/9+$/, '') === '') {
                     return;
                 }
                 const messageObject = this.parseMessage(trytesToAscii(transaction.signatureMessageFragment.replace(/9+$/, '')));
-                if(messageObject === null ){
+                if (messageObject === null) {
                     console.log('some messages dosent match to the given pattern')
                     return;
                 }
-                if(!messageObject.message){
+                if (!messageObject.message) {
                     return;
                 }
                 const message: IMessageResponse = {
@@ -95,7 +100,7 @@ export class Iota {
                 }
                 messages.push(message);
             }
-            
+
         )
         return messages.sort((a, b) => a.time > b.time ? 1 : -1);
     }

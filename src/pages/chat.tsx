@@ -61,13 +61,11 @@ class ChatComponent extends React.Component<IProps, IState> {
         <div id="contacts" className={classes.contacts}>
         <Button onClick={this.handleAddContactDialog}>Add Contact</Button>
           <AddContact iotaApi={this.api} open={this.state.addContactDialogOpen} />
-          <Contacts />
+          <Contacts iotaApi={this.api} />
         </div>
         <main id="main" className={classes.main}>
           <MessageDisplayer iotaApi={this.api} activeAddress={this.tempAddress} />
           <Sender iotaApi={this.api} />
-          
-          
         </main>
       </React.Fragment>
     );

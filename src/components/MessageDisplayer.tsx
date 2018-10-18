@@ -6,8 +6,6 @@ import { StyleRulesCallback, withStyles } from '@material-ui/core';
 
 
 interface IPorps {
-    iotaApi: Iota;
-    activeAddress: string;
     classes: any;
     messages: IMessageResponse[];
 }
@@ -55,7 +53,6 @@ export class MessageDisplayerComponent extends React.Component<IPorps, IState> {
 
     public render() {
         const messages = this.props.messages
-        console.log(messages)
         const { classes } = this.props
         return (
             <div className={classes.chatroom}>

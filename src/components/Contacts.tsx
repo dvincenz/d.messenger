@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { StyleRulesCallback, withStyles, Avatar, ListItem, ListItemText, List } from '@material-ui/core';
+import { Address } from 'cluster';
 
 
 const styles: StyleRulesCallback = theme => ({ 
@@ -20,6 +21,7 @@ const styles: StyleRulesCallback = theme => ({
 interface IProps {
     classes: any;
     iotaApi: any;
+    selectContact: (address: string) => void
 }
 
 class ContactsComponent extends React.Component<IProps> {
@@ -48,7 +50,8 @@ class ContactsComponent extends React.Component<IProps> {
 
 function Person (props: any){
     return(
-        <ListItem button>
+        // tslint:disable-next-line:jsx-no-lambda
+        <ListItem button onClick={() => props.selectContact(props.address)}>
             <Avatar className={props.classes.avatar}>{(props.name).charAt(0)}</Avatar>
             <ListItemText primary={props.name} secondary={props.address} />
         </ListItem>

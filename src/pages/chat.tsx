@@ -9,6 +9,7 @@ import { Contacts } from '../components/Contacts';
 interface IState {
   addContactDialogOpen: boolean;
   messages: IMessageResponse[];
+  currentAddress: string;
 }
 
 interface IProps {
@@ -42,16 +43,14 @@ class ChatComponent extends React.Component<IProps, IState> {
   constructor(porps: IProps){
     super(porps);
     this.api = new Iota('http://65.52.143.115:14267', porps.seed)
-    // todo read all addresses from my seed an use it to construct chats
-    this.tempAddress = 'LKVQLLCIWSFNRIY9YOHFNAMGHEZTPUEWDPWJWMCE9PRHMVWKIOPRCIMMTPCKEQH9GBQPKUNDBMODMMDMYNNISEAPYY'
     this.state = {
       addContactDialogOpen: false,
       messages: new Array<IMessageResponse>(),
+      currentAddress: '',
     }
     this.getMessages();
   }
   public render() {
-    console.log('render chat')
     const { classes } = this.props
     return (
       <React.Fragment>
@@ -65,10 +64,10 @@ class ChatComponent extends React.Component<IProps, IState> {
         <div id="contacts" className={classes.contacts}>
         <Button onClick={this.handleAddContactDialog}>Add Contact</Button>
           <AddContact iotaApi={this.api} open={this.state.addContactDialogOpen} />
-          <Contacts iotaApi={this.api} />
+          <Contacts iotaApi={this.api} selectContact={this.selectContact} />
         </div>
         <main id="main" className={classes.main}>
-          <MessageDisplayer messages={this.state.messages} iotaApi={this.api}  activeAddress={this.tempAddress} />
+          <MessageDisplayer messages={this.state.messages} />
           <Sender  iotaApi={this.api} senderCallBack={this.getMessages} />
         </main>
       </React.Fragment>
@@ -81,14 +80,18 @@ class ChatComponent extends React.Component<IProps, IState> {
     })
   } 
 
-  private getMessages = () => {
-    this.api.getMessages().then( (mesgs: IMessageResponse[]) => {
-      console.log('get new messages')
+  private getMessages = async () => {
+     const mesgs = await this.api.getMessages(this.state.currentAddress);
       this.setState({messages: mesgs})
-    })
-
   }
 
+  private selectContact = (addr: string) => {
+    if(addr !== ''){
+      this.setState({
+        currentAddress: addr
+      })
+    }
+  }
 }
 
 export const Chat = withStyles(styles)(ChatComponent);

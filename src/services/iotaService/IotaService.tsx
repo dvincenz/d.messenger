@@ -48,8 +48,7 @@ export class Iota {
             time: -1,
             method: 2,
         }
-        this.textMessages.push(sendingMessage)
-        console.log(this.textMessages);
+        this.textMessages.push(sendingMessage);
         const trytesMessage = asciiToTrytes(JSON.stringify(message));
         const transfer = [{
             address: addr,
@@ -89,9 +88,9 @@ export class Iota {
         })
     }
 
-    public async getMessages() {
-        // todo remove quick fix, to not every time load all data
 
+    public async getMessages(addr: string) {
+        // todo remove quick fix, to not every time load all data
         if(this.textMessages.length === 0){
             await this.loadData(['LKVQLLCIWSFNRIY9YOHFNAMGHEZTPUEWDPWJWMCE9PRHMVWKIOPRCIMMTPCKEQH9GBQPKUNDBMODMMDMYNNISEAPYY'])
         }
@@ -112,6 +111,12 @@ export class Iota {
                 console.error(error);
             }
         });
+        const options = {
+            start: 1,
+            end: 100, 
+        }
+        const accountdata = await this.api.getAccountData(this.seed, options)
+        console.log(accountdata)
                  
     }
 

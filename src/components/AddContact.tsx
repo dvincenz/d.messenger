@@ -93,7 +93,6 @@ export class AddContact extends React.Component<IPorps, IState> {
          })
     }
     private handleClose = () => {
-        console.log('should close')
         this.setState({
             open: false
         })

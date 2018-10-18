@@ -49,6 +49,7 @@ export class Iota {
             value: 0,
         }];
         const trytes = await this.api.prepareTransfers(this.seed, transfer)
+
         await this.api.sendTrytes(trytes, 2, this.minWeightMagnitude)
         return
     }
@@ -68,12 +69,12 @@ export class Iota {
                     break;
                 }
                 case MessageMethod.ContactRequest: {
-                    const contact = new Contact(msg.address, msg.address)
+                    const contact = new Contact(msg.name, msg.address)
                     this.contacts.push(contact)
                     break;
                 }
                 case MessageMethod.ContactResponse: {
-                    const contact = new Contact(msg.address, msg.address)
+                    const contact = new Contact(msg.name, msg.address)
                     this.contacts.push(contact)
                     break;
                 }
@@ -116,9 +117,6 @@ export class Iota {
                 const messageObject = this.parseMessage(trytesToAscii(transaction.signatureMessageFragment.replace(/9+$/, '')));
                 if (messageObject === null) {
                     console.log('some messages dosent match to the given pattern')
-                    return;
-                }
-                if (!messageObject.message) {
                     return;
                 }
 

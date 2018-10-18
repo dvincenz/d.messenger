@@ -2,8 +2,10 @@ import { composeAPI  } from '@iota/core'
 import { asciiToTrytes, trytesToAscii } from '@iota/converter'
 import { asTransactionObject } from '@iota/transaction-converter'
 import { IMessageResponse, IContactRequest } from '.';
-import { IBaseMessage, MessageMethod, ITextMessage  } from './interfaces';
+import {IBaseMessage, MessageMethod, ITextMessage, RightsLevel} from './interfaces';
 import {Contact} from "../../entity/Contact";
+import {IContactResponse} from "./interfaces/IContactResponse";
+import {Permission} from "./interfaces/IBaseMessage";
 
 /*iotaService wrapper is build as no react component -> todo move to best practise in ract*/ 
 
@@ -36,6 +38,16 @@ export class Iota {
         const message: IContactRequest = {
             method: MessageMethod.ContactRequest,
             name: this.createChatName(),
+        }
+        await this.sendMessage(address, message)
+        return
+    }
+
+    public async sendContactResponse (address: string, permission: Permission) {
+        const message: IContactResponse = {
+            method: MessageMethod.ContactResponse,
+            name: this.createChatName(),
+            level: permission,
         }
         await this.sendMessage(address, message)
         return

@@ -1,5 +1,5 @@
 import {IBaseMessage, RightsLevel} from './IBaseMessage'
 
-export interface IContactRequest extends IBaseMessage {
+export interface IContactResponse extends IBaseMessage {
     level?: RightsLevel,
 }

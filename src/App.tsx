@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import { Login, Chat } from './pages';
-import { settingStore } from './stores/SettingStore'
 
 interface IState {
   seed: string,
@@ -22,25 +21,14 @@ class App extends React.Component<{}, IState> {
       <div>
         <BrowserRouter>
             <Switch>
-              <Route path="/login" component={this.withPropsLogin}  />
-              <Route exact path="/chat" component={this.withPropsChat} />
-              <Route exact path="/" component={this.withPropsLogin} />
+              <Route path="/login" component={Login}  />
+              <Route exact path="/chat" component={Chat} />
+              <Route exact path="/" component={Login} />
             </Switch>
           </BrowserRouter>
         
       </div>
     );
-  }
-
-
-  private withPropsLogin = (props: any) => {
-    return (<Login 
-      settingStore={settingStore}
-      isLoggedIn={this.state.isLoggedIn} 
-      {...props}  />);
-  }
-  private withPropsChat = (props: any) => {
-    return (<Chat settingStore={settingStore} />)
   }
 
 }

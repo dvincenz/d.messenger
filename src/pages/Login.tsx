@@ -2,7 +2,7 @@ import * as React from 'react';
 import { AppBar, Button, CssBaseline, Toolbar, Typography, Grid, withStyles, StyleRulesCallback, TextField, Checkbox, FormControlLabel, } from '@material-ui/core';
 import { Redirect } from 'react-router';
 import { observer } from 'mobx-react';
-import { SettingStore } from '../stores/SettingStore';
+import { settingStore } from '../stores/SettingStore';
 
 const styles: StyleRulesCallback = theme => ({
   appBar: {
@@ -49,7 +49,6 @@ const styles: StyleRulesCallback = theme => ({
 
 interface IPorps {
   classes: any;
-  settingStore: SettingStore;
 }
 
 interface IState {
@@ -65,7 +64,7 @@ class LoginComponent extends React.Component<IPorps, IState> {
     }
   }
   public render() {
-    const { settingStore, classes } = this.props;
+    const { classes } = this.props;
     if (settingStore.seed !== '') {
       return <Redirect to={{ pathname: '/chat' }} />;
     }
@@ -148,7 +147,7 @@ class LoginComponent extends React.Component<IPorps, IState> {
   }
 
   private handleStoreSeed = () => {
-    this.props.settingStore.setSeed(this.state.seed);
+    settingStore.setSeed(this.state.seed);
   }
 }
 

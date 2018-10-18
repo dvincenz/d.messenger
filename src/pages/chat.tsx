@@ -6,8 +6,9 @@ import { AddContact } from '../components/AddContact';
 import { Button, AppBar, Toolbar, Typography, StyleRulesCallback, withStyles } from '@material-ui/core';
 import { Contacts } from '../components/Contacts';
 import { messageStore } from '../stores/MessageStore';
-import { Message } from '../models';
-import { SettingStore } from '../stores/SettingStore'
+import { settingStore } from '../stores/SettingStore'
+import { observer } from 'mobx-react';
+import { Redirect } from 'react-router';
 
 interface IState {
   addContactDialogOpen: boolean;
@@ -16,7 +17,6 @@ interface IState {
 
 interface IProps {
   classes: any;
-  settingStore: SettingStore;
 }
 
 
@@ -39,11 +39,12 @@ const styles: StyleRulesCallback = theme => ({
   }
 })
 
+@observer
 class ChatComponent extends React.Component<IProps, IState> {
   private api: Iota;
   constructor(props: IProps){
     super(props);
-    this.api = new Iota(props.settingStore.host + ':' + props.settingStore.port , props.settingStore.seed)
+    this.api = new Iota(settingStore.host + ':' + settingStore.port , settingStore.seed)
     this.state = {
       addContactDialogOpen: false,
       currentAddress: '',
@@ -52,7 +53,11 @@ class ChatComponent extends React.Component<IProps, IState> {
   }
   public render() {
     const { classes } = this.props
+    if (settingStore.seed === '') {
+      return <Redirect to={{ pathname: '/login' }} />;
+    }
     return (
+
       <React.Fragment>
         <AppBar position="static" className={classes.appBar}>
           <Toolbar>
@@ -67,7 +72,7 @@ class ChatComponent extends React.Component<IProps, IState> {
           <Contacts iotaApi={this.api} selectContact={this.selectContact} />
         </div>
         <main id="main" className={classes.main}>
-          <MessageDisplayer messageStore={messageStore} />
+          <MessageDisplayer />
           <Sender messageStore={messageStore} />
         </main>
       </React.Fragment>

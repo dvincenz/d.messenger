@@ -1,16 +1,11 @@
 import * as React from 'react';
-// import { Paper, TableHEad } from '@material-ui/core';
 import { StyleRulesCallback, withStyles } from '@material-ui/core';
-import { MessageStore } from '../stores/MessageStore';
+import { messageStore } from '../stores/MessageStore';
 import { observer } from 'mobx-react';
-
-
 
 interface IPorps {
     classes: any;
-    messageStore: MessageStore;
 }
-
 
 const styles: StyleRulesCallback = theme => ({ // todo fix sizes with theme.spacing.unit
    right: {
@@ -51,8 +46,7 @@ export class MessageDisplayerComponent extends React.Component<IPorps, {}> {
     }
 
     public render() {
-        const messageStore = this.props.messageStore
-        const { classes } = this.props
+         const { classes } = this.props
         return (
             <div className={classes.chatroom}>
                 <ul className={classes.chats}>

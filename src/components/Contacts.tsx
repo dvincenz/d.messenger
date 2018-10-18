@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { StyleRulesCallback, withStyles, Avatar, ListItem, ListItemText, List } from '@material-ui/core';
-import { Address } from 'cluster';
 
 
 const styles: StyleRulesCallback = theme => ({ 

@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import { Login, Chat } from './pages';
+import { settingStore } from './stores/SettingStore'
 
 interface IState {
   seed: string,
@@ -31,32 +32,17 @@ class App extends React.Component<{}, IState> {
     );
   }
 
-  private seedSave = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    // todo: check seed validity
-    // todo: redirect
-    this.setState({
-      isLoggedIn: true,
-    })
-  }
 
   private withPropsLogin = (props: any) => {
     return (<Login 
-      seedCallback={this.seedSave} 
-      seed={this.state.seed} 
-      handleInputChanges={this.handleInputChanges}
+      settingStore={settingStore}
       isLoggedIn={this.state.isLoggedIn} 
       {...props}  />);
   }
   private withPropsChat = (props: any) => {
-    return (<Chat seed={this.state.seed} />)
+    return (<Chat settingStore={settingStore} />)
   }
 
-  private handleInputChanges = (event: React.ChangeEvent<HTMLInputElement>) => {
-    this.setState({
-      seed: event.target.value
-    })
-  }
 }
 
 

@@ -1,5 +1,4 @@
 import { observable, computed } from 'mobx';
-import { ITextMessage, IMessageResponse } from '../models/interfaces';
 import { Message } from '../models/Message';
 
 

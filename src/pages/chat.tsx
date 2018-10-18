@@ -7,6 +7,7 @@ import { Button, AppBar, Toolbar, Typography, StyleRulesCallback, withStyles } f
 import { Contacts } from '../components/Contacts';
 import { messageStore } from '../stores/MessageStore';
 import { Message } from '../models';
+import { SettingStore } from '../stores/SettingStore'
 
 interface IState {
   addContactDialogOpen: boolean;
@@ -14,8 +15,8 @@ interface IState {
 }
 
 interface IProps {
-  seed: string;
   classes: any;
+  settingStore: SettingStore;
 }
 
 
@@ -40,10 +41,9 @@ const styles: StyleRulesCallback = theme => ({
 
 class ChatComponent extends React.Component<IProps, IState> {
   private api: Iota;
-  private tempAddress: string;
-  constructor(porps: IProps){
-    super(porps);
-    this.api = new Iota('http://65.52.143.115:14267', porps.seed)
+  constructor(props: IProps){
+    super(props);
+    this.api = new Iota(props.settingStore.host + ':' + props.settingStore.port , props.settingStore.seed)
     this.state = {
       addContactDialogOpen: false,
       currentAddress: '',

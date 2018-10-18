@@ -1,17 +1,16 @@
 import * as React from 'react';
 // import { Paper, TableHEad } from '@material-ui/core';
-import { Iota, IMessageResponse} from '../services/iotaService';
 import { StyleRulesCallback, withStyles } from '@material-ui/core';
+import { MessageStore } from '../stores/MessageStore';
+import { observer } from 'mobx-react';
 
 
 
 interface IPorps {
     classes: any;
-    messages: IMessageResponse[];
+    messageStore: MessageStore;
 }
-interface IState {
-    messages: IMessageResponse[]
-}
+
 
 const styles: StyleRulesCallback = theme => ({ // todo fix sizes with theme.spacing.unit
    right: {
@@ -42,8 +41,8 @@ const styles: StyleRulesCallback = theme => ({ // todo fix sizes with theme.spac
         overflowY: 'auto',
    }
 })
-
-export class MessageDisplayerComponent extends React.Component<IPorps, IState> {
+@observer
+export class MessageDisplayerComponent extends React.Component<IPorps, {}> {
     constructor(props: IPorps) {
         super(props);
         this.state = {
@@ -52,12 +51,12 @@ export class MessageDisplayerComponent extends React.Component<IPorps, IState> {
     }
 
     public render() {
-        const messages = this.props.messages
+        const messageStore = this.props.messageStore
         const { classes } = this.props
         return (
             <div className={classes.chatroom}>
                 <ul className={classes.chats}>
-                    {messages !== undefined && messages.length > 0 ? messages.map(
+                    {messageStore !== undefined && messageStore.messages.length > 0 ? messageStore.messages.map(
                         msg => {
                             return <MessageComponent key={msg.time} value={msg.message} classes={this.props.classes} />
                         }

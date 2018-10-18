@@ -1,13 +1,13 @@
 import * as React from 'react';
 import { Button, TextField, withStyles, StyleRulesCallback} from '@material-ui/core';
-import { Iota } from '../services/iotaService';
+import { MessageStore } from '../stores/MessageStore';
+import { Message } from '../models';
 
 
 
 interface IPorps {
-    iotaApi: Iota;
+    messageStore: MessageStore;
     classes: any;
-    senderCallBack: () => void;
 }
 interface IState {
     message: string
@@ -48,10 +48,15 @@ export class SenderComponent extends React.Component<IPorps, IState> {
     }
 
     private handleSubmit = (): void => {
-        const message = this.state.message;
+        const msg = this.state.message;
         this.setState({message: ''})
-        this.props.iotaApi.sendTextMessage('LKVQLLCIWSFNRIY9YOHFNAMGHEZTPUEWDPWJWMCE9PRHMVWKIOPRCIMMTPCKEQH9GBQPKUNDBMODMMDMYNNISEAPYY', message);
-        this.props.senderCallBack();
+        const messageObject: Message = ({
+            message: msg,
+            time: new Date().getTime(),
+            name: 'fancy@name',            
+        })
+        this.props.messageStore.addMessage(messageObject)
+        
     }
     private handleInputChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
         this.setState({message: event.target.value})    

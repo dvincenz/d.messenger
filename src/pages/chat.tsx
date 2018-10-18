@@ -1,14 +1,15 @@
 import * as React from 'react';
-import { Iota, IMessageResponse } from '../services/iotaService';
+import { Iota } from '../services/iotaService';
 import { Sender } from '../components/Sender';
 import { MessageDisplayer } from '../components/MessageDisplayer';
 import { AddContact } from '../components/AddContact';
 import { Button, AppBar, Toolbar, Typography, StyleRulesCallback, withStyles } from '@material-ui/core';
 import { Contacts } from '../components/Contacts';
+import { messageStore } from '../stores/MessageStore';
+import { Message } from '../models';
 
 interface IState {
   addContactDialogOpen: boolean;
-  messages: IMessageResponse[];
   currentAddress: string;
 }
 
@@ -45,10 +46,9 @@ class ChatComponent extends React.Component<IProps, IState> {
     this.api = new Iota('http://65.52.143.115:14267', porps.seed)
     this.state = {
       addContactDialogOpen: false,
-      messages: new Array<IMessageResponse>(),
       currentAddress: '',
     }
-    this.getMessages();
+    // this.getMessages();
   }
   public render() {
     const { classes } = this.props
@@ -67,8 +67,8 @@ class ChatComponent extends React.Component<IProps, IState> {
           <Contacts iotaApi={this.api} selectContact={this.selectContact} />
         </div>
         <main id="main" className={classes.main}>
-          <MessageDisplayer messages={this.state.messages} />
-          <Sender  iotaApi={this.api} senderCallBack={this.getMessages} />
+          <MessageDisplayer messageStore={messageStore} />
+          <Sender messageStore={messageStore} />
         </main>
       </React.Fragment>
     );
@@ -80,10 +80,10 @@ class ChatComponent extends React.Component<IProps, IState> {
     })
   } 
 
-  private getMessages = async () => {
-     const mesgs = await this.api.getMessages(this.state.currentAddress);
-      this.setState({messages: mesgs})
-  }
+  // private getMessages = async () => {
+  //    const mesgs = await this.api.getMessages(this.state.currentAddress);
+  //     this.setState({messages: mesgs})
+  // }
 
   private selectContact = (addr: string) => {
     if(addr !== ''){

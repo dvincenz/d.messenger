@@ -1,4 +1,5 @@
 
+
 export class Contact {
 
     private name: string;

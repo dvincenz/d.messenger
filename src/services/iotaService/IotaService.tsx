@@ -1,9 +1,8 @@
 import { composeAPI } from '@iota/core'
 import { asciiToTrytes, trytesToAscii } from '@iota/converter'
 import { asTransactionObject } from '@iota/transaction-converter'
-import { IMessageResponse, IContactRequest } from '.';
-import { IBaseMessage, MessageMethod, ITextMessage  } from './interfaces';
-import { Contact } from '../../entities/Contact'
+import { IBaseMessage, MessageMethod, ITextMessage, IMessageResponse, IContactRequest  } from '../../models/interfaces';
+import { Contact } from '../../models/Contact'
 
 /*iotaService wrapper is build as no react component -> todo move to best practise in ract*/
 
@@ -113,7 +112,7 @@ export class Iota {
         });
         const options = {
             start: 1,
-            end: 100, 
+            end: 3, 
         }
         const accountdata = await this.api.getAccountData(this.seed, options)
         console.log(accountdata)

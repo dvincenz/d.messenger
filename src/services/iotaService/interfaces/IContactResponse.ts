@@ -1,5 +1,6 @@
-import {IBaseMessage, RightsLevel} from './IBaseMessage'
+import {IBaseMessage, Permission} from './IBaseMessage'
 
 export interface IContactResponse extends IBaseMessage {
-    level?: RightsLevel,
+    level?: Permission,
+    address: string,
 }

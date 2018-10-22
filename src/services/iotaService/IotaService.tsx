@@ -2,7 +2,7 @@ import { composeAPI  } from '@iota/core'
 import { asciiToTrytes, trytesToAscii } from '@iota/converter'
 import { asTransactionObject } from '@iota/transaction-converter'
 import { IMessageResponse, IContactRequest } from '.';
-import {IBaseMessage, MessageMethod, ITextMessage, RightsLevel} from './interfaces';
+import {IBaseMessage, MessageMethod, ITextMessage} from './interfaces';
 import {Contact} from "../../entity/Contact";
 import {IContactResponse} from "./interfaces/IContactResponse";
 import {Permission} from "./interfaces/IBaseMessage";
@@ -32,22 +32,26 @@ export class Iota {
             name: this.createChatName(),
         }
         return this.sendMessage(address, msg);
+        // this.sendContactRequest("LKVQLLCIWSFNRIY9YOHFNAMGHEZTPUEWDPWJWMCE9PRHMOHGTVPRCIMMTPCKEQH9GBQPKUNDBMODPGTVK", "LKVQLLCIWSFNRIY9YOHFNAMGHEZTPUEWDPWJWMCE9PRHMOHGTVPRCIMMTPCKEQH9GBQPKUNDBMODZTBKQ")
+        // this.sendContactResponse("LKVQLLCIWSFNRIY9YOHFNAMGHEZTPUEWDPWJWMCE9PRHMOHGTVPRCIMMTPCKEQH9GBQPKUNDBMODZTBKQ", Permission.accepted, "LKVQLLCIWSFNRIY9YOHFNAMGHEZTPUEWDPWJWMCE9PRHMOHGTVPRCIMMTPCKEQH9GBQPKUNDBMODPGTVK")
     }
 
-    public async sendContactRequest (address: string) {
+    public async sendContactRequest (address: string, ownAddress: string) {
         const message: IContactRequest = {
             method: MessageMethod.ContactRequest,
             name: this.createChatName(),
+            address: ownAddress,
         }
         await this.sendMessage(address, message)
         return
     }
 
-    public async sendContactResponse (address: string, permission: Permission) {
+    public async sendContactResponse (address: string, permission: Permission, ownAddress: string) {
         const message: IContactResponse = {
             method: MessageMethod.ContactResponse,
             name: this.createChatName(),
             level: permission,
+            address: ownAddress,
         }
         await this.sendMessage(address, message)
         return
@@ -66,14 +70,16 @@ export class Iota {
         return
     }
 
-    public async loadData(addr:string[]) {
-        const query: any = {
-            addresses: addr,
-        };
-        const hashes = await this.api.findTransactions(query)
-        const trytes = await this.api.getTrytes(hashes)
+    public getMessages() {
+        return this.textMessages
+    }
 
-        const messages = this.getMessagesFromTrytes(trytes)
+    public getContacts() {
+        return this.contacts
+    }
+
+    public async loadData(addr:string[], activeAddr:string) {
+        const messages = await this.getMessagesFromAddresses(addr)
         messages.forEach(msg => {
             switch (msg.method) {
                 case MessageMethod.Message: {
@@ -86,20 +92,48 @@ export class Iota {
                     break;
                 }
                 case MessageMethod.ContactResponse: {
-                    const contact = new Contact(msg.name, msg.address)
-                    this.contacts.push(contact)
+                    if(msg.level === Permission.accepted) {
+                        const contact = new Contact(msg.name, msg.address)
+                        contact.State = true
+                        this.contacts.push(contact)
+                    }
                     break;
                 }
             }
         })
+
+        this.contacts.forEach(contact => {
+            if(contact.State) {
+                return;
+            }
+            this.checkAcceptedStateOfContactRequests(contact, activeAddr)
+        })
     }
 
-    public getMessages() {
-        return this.textMessages
+    private async getMessagesFromAddresses(addr:string[]) {
+        const query: any = {
+            addresses: addr,
+        };
+        const hashes = await this.api.findTransactions(query)
+        const trytes = await this.api.getTrytes(hashes)
+
+        return this.getMessagesFromTrytes(trytes)
     }
 
-    public getContacts() {
-        return this.contacts
+    private async checkAcceptedStateOfContactRequests(contact:Contact, activeAddr:string) {
+        const addr:string[] = []
+        addr.push(contact.Address)
+
+        const messages = await this.getMessagesFromAddresses(addr)
+        messages.forEach(msg => {
+            if (msg.method === MessageMethod.ContactResponse) {
+                if(msg.address === activeAddr) {
+                    if(msg.level === Permission.accepted) {
+                        contact.State = true
+                    }
+                }
+            }
+        })
     }
 
     private async connectWithNode(){
@@ -136,7 +170,8 @@ export class Iota {
                     name: (messageObject as ITextMessage).name,
                     message: (messageObject as ITextMessage).message,
                     time: transaction.timestamp,
-                    address: transaction.address,
+                    address: (messageObject as IMessageResponse).address,
+                    level: (messageObject as IMessageResponse).level,
                     method: (messageObject as ITextMessage).method,
                 }
                 messages.push(message);

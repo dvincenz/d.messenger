@@ -3,10 +3,12 @@ export class Contact {
 
     private name: string;
     private address:string;
+    private state:boolean;
 
     constructor(name:string, address:string) {
         this.name = name;
         this.address = address;
+        this.state = false;
     }
 
     get Name() {
@@ -15,5 +17,13 @@ export class Contact {
 
     get Address() {
         return this.address;
+    }
+
+    get State() {
+        return this.state;
+    }
+
+    set State(newState: boolean) {
+        this.state = newState;
     }
 }

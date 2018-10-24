@@ -3,7 +3,8 @@ import { Iota } from '../services/iotaService';
 import { Sender } from '../components/Sender';
 import { MessageDisplayer } from '../components/MessageDisplayer';
 import { AddContact } from '../components/AddContact';
-import { Button } from '@material-ui/core';
+import { Button, AppBar, Toolbar, Typography, StyleRulesCallback, withStyles } from '@material-ui/core';
+import { Contacts } from '../components/Contacts';
 
 interface IState {
   addContactDialogOpen: boolean,
@@ -11,10 +12,30 @@ interface IState {
 
 interface IProps {
   seed: string;
+  classes: any;
 }
 
 
-class ChatCOmponent extends React.Component<IProps, IState> {
+const styles: StyleRulesCallback = theme => ({
+  appBar: {
+    position: 'relative',
+  },
+  main: {
+    position: 'absolute',
+    left: 300,
+    top: 64,
+    height: 'calc(100% - 132px)',
+    width: 'calc(100% - 300px)'
+  },
+  contacts:{
+    position: 'absolute',
+    left: 0,
+    top: 64,
+    width: 300,
+  }
+})
+
+class ChatComponent extends React.Component<IProps, IState> {
   private api: Iota;
   private tempAddress: string;
   constructor(porps: IProps){
@@ -26,15 +47,27 @@ class ChatCOmponent extends React.Component<IProps, IState> {
       addContactDialogOpen: false
     }
   }
-  public render() {  
+  public render() {
+    const { classes } = this.props
     return (
-        <div className="chatroom">
-          <MessageDisplayer iotaApi={this.api} activeAddress={this.tempAddress} />
-          <Sender iotaApi={this.api} />
-          <Button onClick={this.handleAddContactDialog}>Add Contact</Button>
-          <AddContact iotaApi={this.api} open={this.state.addContactDialogOpen}  />
-          
+      <React.Fragment>
+        <AppBar position="static" className={classes.appBar}>
+          <Toolbar>
+            <Typography component="h6" color="inherit" noWrap>
+              d.messanger - logged in as Dumeni Vincenz
+            </Typography>
+          </Toolbar>
+        </AppBar>
+        <div id="contacts" className={classes.contacts}>
+        <Button onClick={this.handleAddContactDialog}>Add Contact</Button>
+          <AddContact iotaApi={this.api} open={this.state.addContactDialogOpen} />
+          <Contacts iotaApi={this.api} />
         </div>
+        <main id="main" className={classes.main}>
+          <MessageDisplayer iotaApi={this.api}  activeAddress={this.tempAddress} />
+          <Sender iotaApi={this.api} />
+        </main>
+      </React.Fragment>
     );
   }
 
@@ -43,6 +76,8 @@ class ChatCOmponent extends React.Component<IProps, IState> {
       addContactDialogOpen: true,
     })
   } 
+
+
 }
 
-export const Chat = ChatCOmponent;
+export const Chat = withStyles(styles)(ChatComponent);

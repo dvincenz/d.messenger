@@ -9,3 +9,8 @@ export enum MessageMethod {
     ContactResponse,
     Message,
 }
+
+export enum Permission {
+    accepted,
+    declined,
+}

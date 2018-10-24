@@ -2,8 +2,10 @@ import { composeAPI } from '@iota/core'
 import { asciiToTrytes, trytesToAscii } from '@iota/converter'
 import { asTransactionObject } from '@iota/transaction-converter'
 import { IMessageResponse, IContactRequest } from '.';
-import { IBaseMessage, MessageMethod, ITextMessage  } from './interfaces';
+import {IBaseMessage, MessageMethod, ITextMessage} from './interfaces';
 import {Contact} from "../../entity/Contact";
+import {IContactResponse} from "./interfaces/IContactResponse";
+import {Permission} from "./interfaces/IBaseMessage";
 
 /*iotaService wrapper is build as no react component -> todo move to best practise in ract*/
 
@@ -29,13 +31,25 @@ export class Iota {
             message: text,
             name: this.createChatName(),
         }
-        return await this.sendMessage(address, msg);
+        return this.sendMessage(address, msg);
     }
 
-    public async sendContactRequest (address: string) {
+    public async sendContactRequest (address: string, ownAddress: string) {
         const message: IContactRequest = {
             method: MessageMethod.ContactRequest,
             name: this.createChatName(),
+            address: ownAddress,
+        }
+        await this.sendMessage(address, message)
+        return
+    }
+
+    public async sendContactResponse (address: string, permission: Permission, ownAddress: string) {
+        const message: IContactResponse = {
+            method: MessageMethod.ContactResponse,
+            name: this.createChatName(),
+            level: permission,
+            address: ownAddress,
         }
         await this.sendMessage(address, message)
         return
@@ -49,36 +63,9 @@ export class Iota {
             value: 0,
         }];
         const trytes = await this.api.prepareTransfers(this.seed, transfer)
+
         await this.api.sendTrytes(trytes, 2, this.minWeightMagnitude)
         return
-    }
-
-    public async loadData(addr:string[]) {
-        const query: any = {
-            addresses: addr,
-        };
-        const hashes = await this.api.findTransactions(query)
-        const trytes = await this.api.getTrytes(hashes)
-
-        const messages = this.getMessagesFromTrytes(trytes)
-        messages.forEach(msg => {
-            switch (msg.method) {
-                case MessageMethod.Message: {
-                    this.textMessages.push(msg)
-                    break;
-                }
-                case MessageMethod.ContactRequest: {
-                    const contact = new Contact(msg.address, msg.address)
-                    this.contacts.push(contact)
-                    break;
-                }
-                case MessageMethod.ContactResponse: {
-                    const contact = new Contact(msg.address, msg.address)
-                    this.contacts.push(contact)
-                    break;
-                }
-            }
-        })
     }
 
     public getMessages() {
@@ -87,6 +74,64 @@ export class Iota {
 
     public getContacts() {
         return this.contacts
+    }
+
+    public async loadData(addr:string[], activeAddr:string) {
+        const messages = await this.getMessagesFromAddresses(addr)
+        messages.forEach(msg => {
+            switch (msg.method) {
+                case MessageMethod.Message: {
+                    this.textMessages.push(msg)
+                    break;
+                }
+                case MessageMethod.ContactRequest: {
+                    const contact = new Contact(msg.name, msg.address)
+                    this.contacts.push(contact)
+                    break;
+                }
+                case MessageMethod.ContactResponse: {
+                    if(msg.level === Permission.accepted) {
+                        const contact = new Contact(msg.name, msg.address)
+                        contact.State = true
+                        this.contacts.push(contact)
+                    }
+                    break;
+                }
+            }
+        })
+
+        this.contacts.forEach(contact => {
+            if(contact.State) {
+                return;
+            }
+            this.checkAcceptedStateOfContactRequests(contact, activeAddr)
+        })
+    }
+
+    private async getMessagesFromAddresses(addr:string[]) {
+        const query: any = {
+            addresses: addr,
+        };
+        const hashes = await this.api.findTransactions(query)
+        const trytes = await this.api.getTrytes(hashes)
+
+        return this.getMessagesFromTrytes(trytes)
+    }
+
+    private async checkAcceptedStateOfContactRequests(contact:Contact, activeAddr:string) {
+        const addr:string[] = []
+        addr.push(contact.Address)
+
+        const messages = await this.getMessagesFromAddresses(addr)
+        messages.forEach(msg => {
+            if (msg.method === MessageMethod.ContactResponse) {
+                if(msg.address === activeAddr) {
+                    if(msg.level === Permission.accepted) {
+                        contact.State = true
+                    }
+                }
+            }
+        })
     }
 
     private async connectWithNode(){
@@ -118,15 +163,13 @@ export class Iota {
                     console.log('some messages dosent match to the given pattern')
                     return;
                 }
-                if (!messageObject.message) {
-                    return;
-                }
 
                 const message: IMessageResponse = {
                     name: (messageObject as ITextMessage).name,
                     message: (messageObject as ITextMessage).message,
                     time: transaction.timestamp,
-                    address: transaction.address,
+                    address: (messageObject as IMessageResponse).address,
+                    level: (messageObject as IMessageResponse).level,
                     method: (messageObject as ITextMessage).method,
                 }
                 messages.push(message);

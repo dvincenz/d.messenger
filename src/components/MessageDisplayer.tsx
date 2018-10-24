@@ -50,7 +50,7 @@ export class MessageDisplayerComponent extends React.Component<IPorps, IState> {
         this.state = {
             messages: []
         }
-        this.loadMessages();
+        this.loadMessages([props.activeAddress]);
     }
 
     public render() {
@@ -70,8 +70,9 @@ export class MessageDisplayerComponent extends React.Component<IPorps, IState> {
         );
     }
     
-    private async loadMessages(){
-        const msgs = await this.props.iotaApi.getMessages()
+    private async loadMessages(addr: string[]){
+        await this.props.iotaApi.loadData(addr, this.props.activeAddress)
+        const msgs = this.props.iotaApi.getMessages()
         this.setState({messages: msgs})
     }
 }

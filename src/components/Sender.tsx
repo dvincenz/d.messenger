@@ -48,7 +48,7 @@ export class SenderComponent extends React.Component<IPorps, IState> {
 
     private handleSubmit = (): void => {
         // get Conntact address form contact store
-        const addr = 'IAXUZ9CFIZOIMMQGFUEMYEGPLFYDLBQWYKPMRAGZREMWSGSP9IJUSKBYOLK9DUCVXUDUCBNRPYDUQYLG9IZYKIX9Q9'
+        const addr = 'IAXUZ9CFIZOIMMQGFUEMYEGPLFYDLBQWYKPMRAGZREMWSGSP9IJUSKBYOLK9DUCVXUDUCBNRPYDUQYLG9'
         const msg = this.state.message;
         this.setState({message: ''})
         messageStore.sendMessage(addr, msg)

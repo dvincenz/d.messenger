@@ -91,7 +91,7 @@ class ChatComponent extends React.Component<IProps, IState> {
   private  addDemoContact(): any {
     const contact: Contact = {
       name: "Dumeni",
-      address: "JJM9YJJUTGQGIIDOQHRI9BSOTRYXHJIRFLVKXJTQXPALGJTOSGQ9NKACLXHUGMSANYVLQGCDQIAZKNASDSFJEXTNMC"
+      address: "LKVQLLCIWSFNRIY9YOHFNAMGHEZTPUEWDPWJWMCE9PRHMVWKIOPRCIMMTPCKEQH9GBQPKUNDBMODMMDMYNNISEAPYY"
     }
     contactStore.addContact(contact)
     const contact2: Contact = {
@@ -99,6 +99,11 @@ class ChatComponent extends React.Component<IProps, IState> {
       address: "BVSVBGPVKRIDPANLUMTKJQEACJYEWQAIJKVEKDUYJEGMDDSPAIWLQRDLTQCFCVKZHUJ9PKTRJQHUCTCVYKSOTCV9T9"
     }
     contactStore.addContact(contact2)
+    const contact3: Contact = {
+      name: "MyOwn Address",
+      address: "IAXUZ9CFIZOIMMQGFUEMYEGPLFYDLBQWYKPMRAGZREMWSGSP9IJUSKBYOLK9DUCVXUDUCBNRPYDUQYLG9IZYKIX9Q9"
+    }
+    contactStore.addContact(contact3)
 
   }
   // private getMessages = async () => {

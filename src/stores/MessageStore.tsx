@@ -5,19 +5,18 @@ import { Iota } from '../services/iotaService';
 
 export class MessageStore {
     @computed get getMessagesFromAddress () {
-        return this.messages.filter(m => m.address === this.address);
+        return this.messages.filter(m => m.address === this.address.substring(0,81))
+        
     }
 
     @observable public messages: Message[] = []
-    @observable public name: string;
+    public name: string;
     @observable public state: MessageStoreState;
-    @observable public address: string;
+    public address: string;
     public fetchMessages = flow(function * (this: MessageStore, address: string) {
         this.state = MessageStoreState.loading;
         try{
-            console.log('filter by '  + this.address)
             const newMessages = yield this.Iota.getMessages(address)
-            console.log(newMessages);
             this.messages = newMessages;
             this.state = MessageStoreState.updated
         } catch (error) {
@@ -48,8 +47,7 @@ export class MessageStore {
     private Iota: Iota;
 
     constructor () {
-        this.Iota = new Iota(settingStore.host + ':' + settingStore.port, settingStore.seed);
-        this.address = 'JJM9YJJUTGQGIIDOQHRI9BSOTRYXHJIRFLVKXJTQXPALGJTOSGQ9NKACLXHUGMSANYVLQGCDQIAZKNASDSFJEXTNMC'
+        this.Iota = new Iota(settingStore.host + ':' + settingStore.port, settingStore.seed, 'IAXUZ9CFIZOIMMQGFUEMYEGPLFYDLBQWYKPMRAGZREMWSGSP9IJUSKBYOLK9DUCVXUDUCBNRPYDUQYLG9IZYKIX9Q9');
     }
     public addMessage (messages: Message){
         this.messages.push(messages)

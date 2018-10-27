@@ -1,7 +1,7 @@
 import { composeAPI } from '@iota/core'
 import { asciiToTrytes, trytesToAscii } from '@iota/converter'
 import { asTransactionObject } from '@iota/transaction-converter'
-import { IBaseMessage, MessageMethod, ITextMessage, IMessageResponse, IContactRequest  } from '../../models/interfaces';
+import { IBaseMessage, MessageMethod, ITextMessage, IMessageResponse, IContactRequest } from '../../models/interfaces';
 import { Message, MessageStatus } from '../../models';
 
 /*iotaService wrapper is build as no react component -> todo move to best practise in ract*/
@@ -13,14 +13,12 @@ export class Iota {
     private minWeightMagnitude: number;
     private api: any;
 
-    constructor(provider: string, seed: string, ownAddress: string = '') {
+    constructor(provider: string, seed: string, ownAddress: string) {
         this.provider = provider;
         this.seed = seed;
         this.minWeightMagnitude = 14
         this.connectWithNode();
-        if(ownAddress === ''){
-            this.getAllMessages();
-        }
+        this.ownAddress = ownAddress;
     }
 
     public async getMessages(addr: string) {
@@ -51,7 +49,7 @@ export class Iota {
 
 
 
-    private async sendContactRequest (address: string) {
+    private async sendContactRequest(address: string) {
         const message: IContactRequest = {
             method: MessageMethod.ContactRequest,
             name: this.createChatName(),
@@ -61,7 +59,7 @@ export class Iota {
 
     // #### Internale Methods ####
 
-    private async sendToTangle (addr: string, message: IBaseMessage) {
+    private async sendToTangle(addr: string, message: IBaseMessage) {
         const trytesMessage = asciiToTrytes(JSON.stringify(message));
         const transfer = [{
             address: addr,
@@ -74,13 +72,13 @@ export class Iota {
 
 
 
-    private async getAllMessages(){
+    private async getAllMessages() {
         // todo implement method to get all information from the block chain, only needed if local storage is empty.
         return await console.log('get root infromation is not implemented yet')
     }
 
 
-    private async connectWithNode(){
+    private async connectWithNode() {
         this.api = composeAPI({
             provider: this.provider
         })
@@ -95,7 +93,7 @@ export class Iota {
         const rawObjects = await this.getFromTangle(addr);
         const messages: Message[] = []
         rawObjects.forEach((m: any) => {
-            if(m.method === MessageMethod.Message){
+            if (m.method === MessageMethod.Message) {
                 messages.push(m as Message)
             }
         })
@@ -103,13 +101,18 @@ export class Iota {
     }
 
 
-    private async getFromTangle (addr: string[]) {
-        debugger;
+    private async getFromTangle(addr: string[]) {
         const query: any = {
             addresses: addr,
         };
-        const hashes = await this.api.findTransactions(query)
-        const trytes = await this.api.getTrytes(hashes)
+        let trytes: any = []
+        try {
+            const hashes = await this.api.findTransactions(query)
+            trytes = await this.api.getTrytes(hashes)
+        } catch (error) {
+            console.error(error);
+            return [];
+        }
         const convertedObjects: any[] = [];
         trytes.forEach(
             (tryt: any) => {
@@ -125,25 +128,27 @@ export class Iota {
                 if (!messageObject.message) {
                     return;
                 }
-                convertedObjects.push(messageObject)            
+                messageObject.address = transaction.address
+                convertedObjects.push(messageObject)
             }
         )
+
         return convertedObjects;
-    }
+}
 
     // #### Helper Methods ###
 
     private parseMessage(str: string) {
-        try {
-            JSON.parse(str);
-        } catch (e) {
-            return null;
-        }
-        return JSON.parse(str);
+    try {
+        JSON.parse(str);
+    } catch (e) {
+        return null;
     }
+    return JSON.parse(str);
+}
 
     private createChatName() {
-        // todo user name & and random address per request
-        return 'dvincenz@FASKJNWODFNLASDM'
-    }
+    // todo user name & and random address per request
+    return 'dvincenz@FASKJNWODFNLASDM'
+}
 }

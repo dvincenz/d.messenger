@@ -19,7 +19,7 @@ const styles: StyleRulesCallback = theme => ({ // todo fix sizes with theme.spac
        borderRadius:10,
        listStyle: 'none',
        margin: '10px 0',
-       maxWidth: 250,
+       maxWidth: 600,
    },
    chatroom: {
        height: "100%",
@@ -44,23 +44,16 @@ export class MessageDisplayerComponent extends React.Component<IPorps, {}> {
         this.state = {
             messages: []
         }
-        if(this.props !== null && this.props.address !== ''){
-            messageStore.fetchMessages(this.props.address);
-        }
     }
 
-
-
     public render() {
-        console.log(messageStore.messages);
-         const { classes } = this.props
-         
+        const { classes } = this.props
         return (
             <div className={classes.chatroom}>
                 <ul className={classes.chats}>
                     {messageStore !== undefined && messageStore.getMessagesFromAddress.length > 0 ? messageStore.getMessagesFromAddress.map(
                         msg => {
-                            return <MessageComponent key={msg.time} value={msg.message} classes={this.props.classes} />
+                            return <MessageComponent key={msg.time} value={msg.message + ' ' + msg.address} classes={this.props.classes} />
                         }
                     ) : <p>loading messages for {this.props.address}...</p>}
                 </ul>
@@ -70,12 +63,17 @@ export class MessageDisplayerComponent extends React.Component<IPorps, {}> {
     }
     
     public componentDidMount(){
-        messageStore.setFitlerMessages = this.props.address;
+        this.setAddress(this.props.address);
     }
     public componentDidUpdate () {
-        messageStore.setFitlerMessages = this.props.address;
+        this.setAddress(this.props.address);
     }
 
+    private setAddress (addr: string){
+        if(addr !== undefined && addr !== messageStore.address){
+            messageStore.setFitlerMessages = addr;
+        }
+    } 
 }
 
 

@@ -5,6 +5,7 @@ import { observer } from 'mobx-react';
 
 interface IPorps {
     classes: any;
+    address: string;
 }
 
 const styles: StyleRulesCallback = theme => ({ // todo fix sizes with theme.spacing.unit
@@ -43,24 +44,38 @@ export class MessageDisplayerComponent extends React.Component<IPorps, {}> {
         this.state = {
             messages: []
         }
+        if(this.props !== null && this.props.address !== ''){
+            messageStore.fetchMessages(this.props.address);
+        }
     }
 
+
+
     public render() {
+        console.log(messageStore.messages);
          const { classes } = this.props
+         
         return (
             <div className={classes.chatroom}>
                 <ul className={classes.chats}>
-                    {messageStore !== undefined && messageStore.messages.length > 0 ? messageStore.messages.map(
+                    {messageStore !== undefined && messageStore.getMessagesFromAddress.length > 0 ? messageStore.getMessagesFromAddress.map(
                         msg => {
                             return <MessageComponent key={msg.time} value={msg.message} classes={this.props.classes} />
                         }
-                    ) : <p>loading messages...</p>}
+                    ) : <p>loading messages for {this.props.address}...</p>}
                 </ul>
             </div>
 
         );
     }
     
+    public componentDidMount(){
+        messageStore.setFitlerMessages = this.props.address;
+    }
+    public componentDidUpdate () {
+        messageStore.setFitlerMessages = this.props.address;
+    }
+
 }
 
 

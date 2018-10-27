@@ -1,12 +1,11 @@
 import * as React from 'react';
 import { Button, TextField, withStyles, StyleRulesCallback} from '@material-ui/core';
-import { MessageStore } from '../stores/MessageStore';
+import { messageStore } from '../stores/MessageStore';
 import { Message } from '../models';
 
 
 
 interface IPorps {
-    messageStore: MessageStore;
     classes: any;
 }
 interface IState {
@@ -48,14 +47,11 @@ export class SenderComponent extends React.Component<IPorps, IState> {
     }
 
     private handleSubmit = (): void => {
+        // get Conntact address form contact store
+        const addr = 'IAXUZ9CFIZOIMMQGFUEMYEGPLFYDLBQWYKPMRAGZREMWSGSP9IJUSKBYOLK9DUCVXUDUCBNRPYDUQYLG9IZYKIX9Q9'
         const msg = this.state.message;
         this.setState({message: ''})
-        const messageObject: Message = ({
-            message: msg,
-            time: new Date().getTime(),
-            name: 'fancy@name',            
-        })
-        this.props.messageStore.addMessage(messageObject)
+        messageStore.sendMessage(addr, msg)
         
     }
     private handleInputChange = (event: React.ChangeEvent<HTMLInputElement>): void => {

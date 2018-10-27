@@ -5,18 +5,21 @@ import { MessageDisplayer } from '../components/MessageDisplayer';
 import { AddContact } from '../components/AddContact';
 import { Button, AppBar, Toolbar, Typography, StyleRulesCallback, withStyles } from '@material-ui/core';
 import { Contacts } from '../components/Contacts';
-import { messageStore } from '../stores/MessageStore';
+import { contactStore } from '../stores/ContactStore';
 import { settingStore } from '../stores/SettingStore'
 import { observer } from 'mobx-react';
 import { Redirect } from 'react-router';
+import { Contact } from '../models';
 
 interface IState {
   addContactDialogOpen: boolean;
   currentAddress: string;
+
 }
 
 interface IProps {
   classes: any;
+  match: any;
 }
 
 
@@ -41,14 +44,14 @@ const styles: StyleRulesCallback = theme => ({
 
 @observer
 class ChatComponent extends React.Component<IProps, IState> {
-  private api: Iota;
+
   constructor(props: IProps){
     super(props);
-    this.api = new Iota(settingStore.host + ':' + settingStore.port , settingStore.seed)
     this.state = {
       addContactDialogOpen: false,
       currentAddress: '',
     }
+    this.addDemoContact()
     // this.getMessages();
   }
   public render() {
@@ -68,12 +71,12 @@ class ChatComponent extends React.Component<IProps, IState> {
         </AppBar>
         <div id="contacts" className={classes.contacts}>
         <Button onClick={this.handleAddContactDialog}>Add Contact</Button>
-          <AddContact iotaApi={this.api} open={this.state.addContactDialogOpen} />
-          <Contacts iotaApi={this.api} selectContact={this.selectContact} />
+          <AddContact open={this.state.addContactDialogOpen} />
+          <Contacts />
         </div>
         <main id="main" className={classes.main}>
-          <MessageDisplayer />
-          <Sender messageStore={messageStore} />
+          <MessageDisplayer address={this.props.match.params.address}/>
+          <Sender />
         </main>
       </React.Fragment>
     );
@@ -85,6 +88,19 @@ class ChatComponent extends React.Component<IProps, IState> {
     })
   } 
 
+  private  addDemoContact(): any {
+    const contact: Contact = {
+      name: "Dumeni",
+      address: "JJM9YJJUTGQGIIDOQHRI9BSOTRYXHJIRFLVKXJTQXPALGJTOSGQ9NKACLXHUGMSANYVLQGCDQIAZKNASDSFJEXTNMC"
+    }
+    contactStore.addContact(contact)
+    const contact2: Contact = {
+      name: "Fancy Address",
+      address: "BVSVBGPVKRIDPANLUMTKJQEACJYEWQAIJKVEKDUYJEGMDDSPAIWLQRDLTQCFCVKZHUJ9PKTRJQHUCTCVYKSOTCV9T9"
+    }
+    contactStore.addContact(contact2)
+
+  }
   // private getMessages = async () => {
   //    const mesgs = await this.api.getMessages(this.state.currentAddress);
   //     this.setState({messages: mesgs})

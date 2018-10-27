@@ -22,6 +22,7 @@ class App extends React.Component<{}, IState> {
         <BrowserRouter>
             <Switch>
               <Route path="/login" component={Login}  />
+              <Route exact path="/chat/:address" component={Chat} />
               <Route exact path="/chat" component={Chat} />
               <Route exact path="/" component={Login} />
             </Switch>

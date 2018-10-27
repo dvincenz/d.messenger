@@ -6,12 +6,13 @@ export class Message {
     public hash?: string
     public name: string
     public time: number
+    public address: string
 
 }
 
 export enum MessageStatus {
     Read,
     ReadyToSend,
-    Send,
+    Sending,
     New,
 }

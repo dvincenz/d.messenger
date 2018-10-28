@@ -1,8 +1,7 @@
 import { composeAPI } from '@iota/core'
 import { asciiToTrytes, trytesToAscii } from '@iota/converter'
 import { asTransactionObject } from '@iota/transaction-converter'
-import { IBaseMessage, MessageMethod, ITextMessage, IMessageResponse, IContactRequest } from '../../models/interfaces';
-import { Message, MessageStatus } from '../../models';
+import { IBaseMessage, MessageMethod, ITextMessage, IContactResponse, Permission, IContactRequest } from '../../entities/interfaces';
 
 /*iotaService wrapper is build as no react component -> todo move to best practise in ract*/
 
@@ -23,46 +22,48 @@ export class Iota {
 
     public async getMessages(addr: string) {
         console.log('get from tangle');
-        const messages = await this.getMessagesFromTangle([addr, this.ownAddress]);
+        const messages = await this.getTrytesFromTangle([addr, this.ownAddress]);
         return messages.sort((a, b) => a.time > b.time ? 1 : -1);
 
     }
 
-    public async sendMessage(message: Message) {
+    public async sendMessage(message: ITextMessage) {
         // todo may do some checks of used simboles and size of message to prevent errors
-        const msg: ITextMessage = {
-            message: message.message,
-            method: MessageMethod.Message,
-            name: message.name
-        }
-        return await this.sendToTangle(message.address, msg);
+        return await this.sendToTangle(message);
     }
 
-    public async ContactRequest() {
-        // todo  request contacts
-
-    }
-
-    public async refrashContact(lastHash: string) {
-        // todo this method should get messages from seed to check new incoming messages and contact requests
-    }
-
-
-
-    private async sendContactRequest(address: string) {
+    public async sendContactRequest(addr: string, permission: Permission, ownAddress: string) {
         const message: IContactRequest = {
-            method: MessageMethod.ContactRequest,
+            method: MessageMethod.ContactResponse,
             name: this.createChatName(),
+            level: permission,
+            address: addr,
+            senderAddress: ownAddress,
+            time: new Date().getTime()
         }
-        return await this.sendToTangle(address, message)
+        return await this.sendToTangle(message)
+    }
+
+    public async sendContactResponse(addr: string, permission: Permission, ownAddress: string) {
+        const message: IContactResponse = {
+            method: MessageMethod.ContactResponse,
+            name: this.createChatName(),
+            level: permission,
+            address: addr,
+            senderAddress: ownAddress,
+            time: new Date().getTime()
+        }
+        return await this.sendToTangle(message)
     }
 
     // #### Internale Methods ####
 
-    private async sendToTangle(addr: string, message: IBaseMessage) {
-        const trytesMessage = asciiToTrytes(JSON.stringify(message));
+
+    private async sendToTangle(message: IBaseMessage) {
+
+        const trytesMessage = asciiToTrytes(this.stringify(message));
         const transfer = [{
-            address: addr,
+            address: message.address,
             message: trytesMessage,
             value: 0,
         }];
@@ -77,7 +78,6 @@ export class Iota {
         return await console.log('get root infromation is not implemented yet')
     }
 
-
     private async connectWithNode() {
         this.api = composeAPI({
             provider: this.provider
@@ -89,12 +89,24 @@ export class Iota {
         });
     }
 
-    private async getMessagesFromTangle(addr: string[]) {
+    private async getTrytesFromTangle(addr: string[]) {
         const rawObjects = await this.getFromTangle(addr);
-        const messages: Message[] = []
+        const messages: IBaseMessage[] = []
         rawObjects.forEach((m: any) => {
-            if (m.method === MessageMethod.Message) {
-                messages.push(m as Message)
+            switch (m.method) {
+                case MessageMethod.Message: {
+                    messages.push(m as ITextMessage)
+                    break;
+                }
+                case MessageMethod.ContactRequest: {
+                    messages.push(m as IContactRequest)
+                    break;
+                }
+                case MessageMethod.ContactResponse: {
+                    messages.push(m as IContactResponse)
+                    break;
+                }
+
             }
         })
         return messages
@@ -113,42 +125,58 @@ export class Iota {
             console.error(error);
             return [];
         }
-        const convertedObjects: any[] = [];
-        trytes.forEach(
-            (tryt: any) => {
-                const transaction = asTransactionObject(tryt)
-                if (transaction.signatureMessageFragment.replace(/9+$/, '') === '') {
-                    return;
-                }
-                const messageObject = this.parseMessage(trytesToAscii(transaction.signatureMessageFragment.replace(/9+$/, '')));
-                if (messageObject === null) {
-                    console.log('some messages dosent match to the given pattern')
-                    return;
-                }
-                if (!messageObject.message) {
-                    return;
-                }
-                messageObject.address = transaction.address
-                convertedObjects.push(messageObject)
-            }
-        )
+        const convertedObjects: IBaseMessage[] = [];
+        trytes.forEach((tryt: any) => {
+            const object = this.convertToObject(tryt)
+            convertedObjects.push(object);
+        })
 
         return convertedObjects;
-}
+    }
 
     // #### Helper Methods ###
 
-    private parseMessage(str: string) {
-    try {
-        JSON.parse(str);
-    } catch (e) {
-        return null;
-    }
-    return JSON.parse(str);
-}
-
     private createChatName() {
-    // todo user name & and random address per request
-    return 'dvincenz@FASKJNWODFNLASDM'
-}
+        // todo user name & and random address per request
+        return 'dvincenz@FASKJNWODFNLASDM'
+    }
+
+    private convertToObject(tryt: string): any {
+
+        const transaction = asTransactionObject(tryt);
+        if (transaction.signatureMessageFragment.replace(/9+$/, '') === '') {
+            return;
+        }
+        const object = this.parseMessage(trytesToAscii(transaction.signatureMessageFragment.replace(/9+$/, '')));
+        if (object === null) {
+            console.log('some messages dosent match to the given pattern');
+            return;
+        }
+        if (!object.message) {
+            return;
+        }
+        object.address = transaction.address;
+        object.hash = transaction.hash;
+        object.time = transaction.timestamp;
+        return object
+    }
+
+    private stringify(message: IBaseMessage) {
+        delete message.address;
+        delete message.hash;
+        delete message.time;
+        return JSON.stringify(message);
+    }
+
+    private parseMessage(str: string) {
+        try {
+            JSON.parse(str);
+        } catch (e) {
+            return null;
+        }
+        return JSON.parse(str);
+    }
+
+
+
 }

@@ -107,7 +107,7 @@ export class AddContact extends React.Component<IPorps, IState> {
         this.setState({
             disableInput: true,
         })
-        // this.props.iotaApi.sendContactRequest(this.state.address).then(
+        // this.props.iotaApi.sendContactRequest(this.state.address, this.state.address).then(
         //     () => this.setState({ 
         //         open: false,
         //         disableInput: false, 

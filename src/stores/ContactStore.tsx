@@ -1,5 +1,5 @@
 import { observable } from "mobx";
-import { Contact } from "../models";
+import { Contact } from "../entities";
 
 
 export class ContactStore {
@@ -11,6 +11,23 @@ export class ContactStore {
 }
 
  
+
+// todo put following logic in contact store
+// private async checkAcceptedStateOfContactRequests(contact: Contact, activeAddr: string) {
+//     const addr: string[] = []
+//     addr.push(contact.Address)
+
+//     const messages = await this.getMessagesFromAddresses(addr)
+//     messages.forEach(msg => {
+//         if (msg.method === MessageMethod.ContactResponse) {
+//             if (msg.address === activeAddr) {
+//                 if (msg.level === Permission.accepted) {
+//                     contact.State = true
+//                 }
+//             }
+//         }
+//     })
+// }
 
 
 export const contactStore = new ContactStore();

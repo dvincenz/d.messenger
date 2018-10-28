@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Button, TextField, withStyles, StyleRulesCallback} from '@material-ui/core';
 import { messageStore } from '../stores/MessageStore';
-import { Message } from '../models';
+import { Message } from '../entities';
 
 
 

@@ -1,12 +1,11 @@
 import { observable, computed, flow, when } from 'mobx';
-import { Message, MessageStatus } from '../models/Message';
+import { Message, MessageStatus } from '../entities/Message';
 import { settingStore } from './SettingStore'
 import { Iota } from '../services/iotaService';
 
 export class MessageStore {
     @computed get getMessagesFromAddress () {
         return this.messages.filter(m => m.address === this.address.substring(0,81))
-        
     }
 
     @observable public messages: Message[] = []
@@ -35,10 +34,11 @@ export class MessageStore {
             name: this.name,
             time: new Date().getTime(),
             status: MessageStatus.Sending,
+            toITextMessage: Message.prototype.toITextMessage // bad typescript hack
         }
         this.messages.push(msg);
         try {
-            yield this.Iota.sendMessage(msg)
+            yield this.Iota.sendMessage(msg.toITextMessage())
         } catch (error) {
             this.state = MessageStoreState.error
         }

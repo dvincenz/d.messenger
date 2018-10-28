@@ -5,7 +5,11 @@ import { Iota } from '../services/iotaService';
 
 export class MessageStore {
     @computed get getMessagesFromAddress () {
-        return this.messages.filter(m => m.address === this.address.substring(0,81))
+        this.messages.forEach((m: Message) => console.log("filter: " + m.address +
+          " and "+ this.address.substring(0,81))) 
+        const rmessages = this.messages.filter(m => m.address === this.address.substring(0,81))
+        console.log('number of maches: ' + rmessages.length)
+        return rmessages
     }
 
     @observable public messages: Message[] = []

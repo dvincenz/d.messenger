@@ -21,9 +21,13 @@ export class Iota {
     }
 
     public async getMessages(addr: string) {
-        console.log('get from tangle');
-        const messages = await this.getTrytesFromTangle([addr, this.ownAddress]);
-        return messages.sort((a, b) => a.time > b.time ? 1 : -1);
+        try {
+            const messages = await this.getObjectsFromTangle([addr, this.ownAddress]);
+            return messages.sort((a, b) => a.time > b.time ? 1 : -1);
+        } catch (error){
+            console.error(error)
+            return [];
+        }
 
     }
 
@@ -89,7 +93,7 @@ export class Iota {
         });
     }
 
-    private async getTrytesFromTangle(addr: string[]) {
+    private async getObjectsFromTangle(addr: string[]): Promise<IBaseMessage[]> {
         const rawObjects = await this.getFromTangle(addr);
         const messages: IBaseMessage[] = []
         rawObjects.forEach((m: any) => {
@@ -128,7 +132,9 @@ export class Iota {
         const convertedObjects: IBaseMessage[] = [];
         trytes.forEach((tryt: any) => {
             const object = this.convertToObject(tryt)
-            convertedObjects.push(object);
+            if(object !== undefined){
+                convertedObjects.push(object);
+            } 
         })
 
         return convertedObjects;
@@ -142,17 +148,16 @@ export class Iota {
     }
 
     private convertToObject(tryt: string): any {
-
         const transaction = asTransactionObject(tryt);
         if (transaction.signatureMessageFragment.replace(/9+$/, '') === '') {
             return;
         }
         const object = this.parseMessage(trytesToAscii(transaction.signatureMessageFragment.replace(/9+$/, '')));
-        if (object === null) {
+        if (object === null || object === undefined) {
             console.log('some messages dosent match to the given pattern');
             return;
         }
-        if (!object.message) {
+        if (!object.message || object.method === undefined) {
             return;
         }
         object.address = transaction.address;

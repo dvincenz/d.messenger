@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { Iota } from '../services/iotaService';
 import { Sender } from '../components/Sender';
 import { MessageDisplayer } from '../components/MessageDisplayer';
 import { AddContact } from '../components/AddContact';

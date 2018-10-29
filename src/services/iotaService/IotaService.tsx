@@ -2,6 +2,7 @@ import { composeAPI } from '@iota/core'
 import { asciiToTrytes, trytesToAscii } from '@iota/converter'
 import { asTransactionObject } from '@iota/transaction-converter'
 import { IBaseMessage, MessageMethod, ITextMessage, IContactResponse, Permission, IContactRequest } from '../../entities/interfaces';
+import {contactStore} from "../../stores/ContactStore";
 
 /*iotaService wrapper is build as no react component -> todo move to best practise in ract*/
 
@@ -28,7 +29,6 @@ export class Iota {
             console.error(error)
             return [];
         }
-
     }
 
     public async sendMessage(message: ITextMessage) {
@@ -62,7 +62,6 @@ export class Iota {
 
     // #### Internale Methods ####
 
-
     private async sendToTangle(message: IBaseMessage) {
 
         const trytesMessage = asciiToTrytes(this.stringify(message));
@@ -74,8 +73,6 @@ export class Iota {
         const trytes = await this.api.prepareTransfers(this.seed, transfer)
         return await this.api.sendTrytes(trytes, 2, this.minWeightMagnitude)
     }
-
-
 
     private async getAllMessages() {
         // todo implement method to get all information from the block chain, only needed if local storage is empty.
@@ -103,19 +100,23 @@ export class Iota {
                     break;
                 }
                 case MessageMethod.ContactRequest: {
-                    messages.push(m as IContactRequest)
+                    const msg = (m as IContactRequest)
+                    const contact = {name: msg.name, address: msg.address, state: false}
+                    contactStore.addContact(contact)
                     break;
                 }
                 case MessageMethod.ContactResponse: {
-                    messages.push(m as IContactResponse)
+                    const msg = (m as IContactResponse)
+                    if(msg.level === Permission.accepted) {
+                        const contact = {name: msg.name, address: msg.address, state: true}
+                        contactStore.addContact(contact)
+                    }
                     break;
                 }
-
             }
         })
         return messages
     }
-
 
     private async getFromTangle(addr: string[]) {
         const query: any = {
@@ -181,7 +182,4 @@ export class Iota {
         }
         return JSON.parse(str);
     }
-
-
-
 }

@@ -1,12 +1,21 @@
 import { observable } from "mobx";
 import { Contact } from "../entities";
 
-
 export class ContactStore {
     @observable public contacts: Contact[] = [];
-    
+
     public addContact (contact: Contact) {
         this.contacts.push(contact)
+    }
+
+    public getRequests() {
+        const requests: Contact[] = []
+        this.contacts.forEach(contact => {
+            if(!contact.state) {
+                requests.push(contact)
+            }
+        })
+        return requests
     }
 }
 

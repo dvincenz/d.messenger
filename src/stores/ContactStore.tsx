@@ -30,7 +30,7 @@ export class ContactStore {
                 if(message.method === MessageMethod.ContactResponse) {
                     const msg = (message as IContactResponse)
                     if(msg.level === Permission.accepted) {
-                        contact.state = true
+                        contact.isActivated = true
                     }
                 }
             })
@@ -50,7 +50,7 @@ export class ContactStore {
 
     public addContact (contact: Contact) {
         this.contacts.push(contact)
-        if(!contact.state) {
+        if(!contact.isActivated) {
             this.checkAcceptedStateOfContactRequest(contact)
         }
     }
@@ -59,14 +59,14 @@ export class ContactStore {
         switch (message.method) {
             case MessageMethod.ContactRequest: {
                 const msg = (message as IContactRequest)
-                const contact = {name: msg.name, address: msg.address, state: false}
+                const contact = {name: msg.name, address: msg.address, myName: "", isActivated: false}
                 this.addContact(contact)
                 break
             }
             case MessageMethod.ContactResponse: {
                 const msg = (message as IContactResponse)
                 if(msg.level) {
-                    const contact = {name: msg.name, address: msg.address, state: true}
+                    const contact = {name: msg.name, address: msg.address, myName: "", isActivated: true}
                     this.addContact(contact)
                 }
                 break

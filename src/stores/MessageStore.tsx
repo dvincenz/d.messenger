@@ -2,14 +2,20 @@ import { observable, computed, flow, when } from 'mobx';
 import { Message, MessageStatus } from '../entities/Message';
 import { settingStore } from './SettingStore'
 import { Iota } from '../services/iotaService';
+import { Contact } from '../entities';
 
 export class MessageStore {
     @computed get getMessagesFromAddress () {
-        this.messages.forEach((m: Message) => console.log("filter: " + m.address +
+        this.messages.forEach((m: Message) => console.log("filter: " + m.contact.address +
           " and "+ this.address.substring(0,81))) 
-        const rmessages = this.messages.filter(m => m.address === this.address.substring(0,81))
+        const rmessages = this.messages.filter(m => m.contact.address === this.address.substring(0,81))
+        let recivedMessages: Message[] = []
+        if(rmessages.length >= 1 ){
+           const myName = rmessages[0].contact.myName
+           recivedMessages = this.messages.filter(m => m.contact.name === myName)
+        }
         console.log('number of maches: ' + rmessages.length)
-        return rmessages
+        return rmessages.concat(recivedMessages)
     }
 
     @observable public messages: Message[] = []
@@ -30,12 +36,11 @@ export class MessageStore {
         this.fetchMessages(filterAddress);
         this.address = filterAddress;
     }
-    public sendMessage = flow(function* (this: MessageStore, addr: string, messageText: string) {
+    public sendMessage = flow(function* (this: MessageStore, reciver: Contact, messageText: string) {
         this.state = MessageStoreState.sending
         const msg: Message = {
-            address: addr,
+            contact: reciver,
             message: messageText,
-            name: this.name,
             time: new Date().getTime(),
             status: MessageStatus.Sending,
             toITextMessage: Message.prototype.toITextMessage // bad typescript hack

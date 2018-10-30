@@ -89,21 +89,24 @@ class ChatComponent extends React.Component<IProps, IState> {
 
   private  addDemoContact(): any {
     const contact: Contact = {
+      myName: 'dvi@1239876',
       name: "Dumeni",
       address: "LKVQLLCIWSFNRIY9YOHFNAMGHEZTPUEWDPWJWMCE9PRHMVWKIOPRCIMMTPCKEQH9GBQPKUNDBMODMMDMYNNISEAPYY",
-      state: true,
+      isActivated: true,
     }
     contactStore.addContact(contact)
     const contact2: Contact = {
+      myName: 'fancy@2345',
       name: "Fancy Address",
       address: "BVSVBGPVKRIDPANLUMTKJQEACJYEWQAIJKVEKDUYJEGMDDSPAIWLQRDLTQCFCVKZHUJ9PKTRJQHUCTCVYKSOTCV9T9",
-      state: true,
+      isActivated: true,
     }
     contactStore.addContact(contact2)
     const contact3: Contact = {
+      myName: 'addr1@1234',
       name: "MyOwn Address",
       address: "IAXUZ9CFIZOIMMQGFUEMYEGPLFYDLBQWYKPMRAGZREMWSGSP9IJUSKBYOLK9DUCVXUDUCBNRPYDUQYLG9IZYKIX9Q9",
-      state: true,
+      isActivated: true,
     }
     contactStore.addContact(contact3)
 

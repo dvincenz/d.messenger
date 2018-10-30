@@ -1,8 +1,8 @@
 
 
 export class Contact {
-
     public name:  string;
     public address: string;
-    public state: boolean;
+    public myName: string;
+    public isActivated: boolean;
 }

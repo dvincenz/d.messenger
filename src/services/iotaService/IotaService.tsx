@@ -100,17 +100,11 @@ export class Iota {
                     break;
                 }
                 case MessageMethod.ContactRequest: {
-                    const msg = (m as IContactRequest)
-                    const contact = {name: msg.name, address: msg.address, state: false}
-                    contactStore.addContact(contact)
+                    messages.push(m as IContactRequest)
                     break;
                 }
                 case MessageMethod.ContactResponse: {
-                    const msg = (m as IContactResponse)
-                    if(msg.level === Permission.accepted) {
-                        const contact = {name: msg.name, address: msg.address, state: true}
-                        contactStore.addContact(contact)
-                    }
+                    messages.push(m as IContactResponse)
                     break;
                 }
             }

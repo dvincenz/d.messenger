@@ -53,7 +53,7 @@ export class MessageDisplayerComponent extends React.Component<IPorps, {}> {
                 <ul className={classes.chats}>
                     {messageStore !== undefined && messageStore.getMessagesFromAddress.length > 0 ? messageStore.getMessagesFromAddress.map(
                         msg => {
-                            return <MessageComponent key={msg.time} value={msg.message + ' ' + msg.address} classes={this.props.classes} />
+                            return <MessageComponent key={msg.time} value={msg.message + ' ' + msg.contact.name} classes={this.props.classes} />
                         }
                     ) : <p>loading messages for {this.props.address}...</p>}
                 </ul>

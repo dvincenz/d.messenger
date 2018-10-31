@@ -11,10 +11,10 @@ export class Message {
 
     public toITextMessage(): ITextMessage{
         const message: ITextMessage = {
+            secret: this.contact.secret,
             address: this.contact.address,
             message: this.message,
             method:  MessageMethod.Message,
-            name: this.myName,
             time: new Date().getTime(),
         }
         return message

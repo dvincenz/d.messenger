@@ -75,7 +75,7 @@ class ChatComponent extends React.Component<IProps, IState> {
         </div>
         <main id="main" className={classes.main}>
           <MessageDisplayer address={this.props.match.params.address}/>
-          <Sender />
+          <Sender address={this.props.match.params.address} />
         </main>
       </React.Fragment>
     );
@@ -93,6 +93,7 @@ class ChatComponent extends React.Component<IProps, IState> {
       name: "Dumeni",
       address: "LKVQLLCIWSFNRIY9YOHFNAMGHEZTPUEWDPWJWMCE9PRHMVWKIOPRCIMMTPCKEQH9GBQPKUNDBMODMMDMYNNISEAPYY",
       isActivated: true,
+      secret: 'IABFKOELMGFJZVMGYBZF',
     }
     contactStore.addContact(contact)
     const contact2: Contact = {
@@ -100,6 +101,7 @@ class ChatComponent extends React.Component<IProps, IState> {
       name: "Fancy Address",
       address: "BVSVBGPVKRIDPANLUMTKJQEACJYEWQAIJKVEKDUYJEGMDDSPAIWLQRDLTQCFCVKZHUJ9PKTRJQHUCTCVYKSOTCV9T9",
       isActivated: true,
+      secret: 'ZZIRGFYLQAPTSU9KRFKV',
     }
     contactStore.addContact(contact2)
     const contact3: Contact = {
@@ -107,6 +109,7 @@ class ChatComponent extends React.Component<IProps, IState> {
       name: "MyOwn Address",
       address: "IAXUZ9CFIZOIMMQGFUEMYEGPLFYDLBQWYKPMRAGZREMWSGSP9IJUSKBYOLK9DUCVXUDUCBNRPYDUQYLG9IZYKIX9Q9",
       isActivated: true,
+      secret: 'VEFIVAHAFZIWWJSWRWYO'
     }
     contactStore.addContact(contact3)
 

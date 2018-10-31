@@ -2,6 +2,7 @@ import * as React from 'react';
 import { StyleRulesCallback, withStyles } from '@material-ui/core';
 import { messageStore } from '../stores/MessageStore';
 import { observer } from 'mobx-react';
+import { contactStore } from '../stores/ContactStore';
 
 interface IPorps {
     classes: any;
@@ -70,7 +71,7 @@ export class MessageDisplayerComponent extends React.Component<IPorps, {}> {
     }
 
     private setAddress (addr: string){
-        if(addr !== undefined && addr !== messageStore.address){
+        if(addr !== undefined && contactStore.currentContact !== undefined && addr !== contactStore.currentContact.address){
             messageStore.setFitlerMessages = addr;
         }
     } 

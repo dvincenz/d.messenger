@@ -4,7 +4,16 @@ import { Contact } from "../entities";
 
 export class ContactStore {
     @observable public contacts: Contact[] = [];
-    
+    @observable public currentContact?: Contact;
+
+    public set setCurrentContact (address: string) {
+        this.currentContact = this.contacts.find(c => c.address === address)
+    }
+
+    public get getCurrentContact() {
+        return this.currentContact;
+    }
+
     public addContact (contact: Contact) {
         this.contacts.push(contact)
     }

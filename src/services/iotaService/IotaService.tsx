@@ -83,13 +83,14 @@ export class Iota {
         return await this.sendToTangle(message)
     }
 
-    public async sendGroupInvitation(addr: string, groupAddr: string) {
+    public async sendGroupInvitation(addr: string, groupAddr: string, name: string) {
         const message: IGroupInvitation = {
             method: MessageMethod.GroupInvitation,
             address: addr,
             time: new Date().getTime(),
             secret: this.createSecret(),
-            groupAddress: groupAddr
+            groupAddress: groupAddr,
+            groupName: name,
         }
         return await this.sendToTangle(message)
     }

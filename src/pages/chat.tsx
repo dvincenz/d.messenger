@@ -109,7 +109,7 @@ class ChatComponent extends React.Component<IProps, IState> {
       name: "MyOwn Address",
       address: "IAXUZ9CFIZOIMMQGFUEMYEGPLFYDLBQWYKPMRAGZREMWSGSP9IJUSKBYOLK9DUCVXUDUCBNRPYDUQYLG9IZYKIX9Q9",
       isActivated: true,
-      secret: 'VEFIVAHAFZIWWJSWRWYO'
+      secret: 'IABFKOELMGFJZVMGYBZF'
     }
     contactStore.addContactRequest(contact3)
 

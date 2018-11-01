@@ -1,18 +1,24 @@
 import * as React from 'react';
-import { Iota } from '../services/iotaService';
 import { Sender } from '../components/Sender';
 import { MessageDisplayer } from '../components/MessageDisplayer';
 import { AddContact } from '../components/AddContact';
 import { Button, AppBar, Toolbar, Typography, StyleRulesCallback, withStyles } from '@material-ui/core';
 import { Contacts } from '../components/Contacts';
+import { contactStore } from '../stores/ContactStore';
+import { settingStore } from '../stores/SettingStore'
+import { observer } from 'mobx-react';
+import { Redirect } from 'react-router';
+import { Contact } from '../entities';
 
 interface IState {
-  addContactDialogOpen: boolean,
+  addContactDialogOpen: boolean;
+  currentAddress: string;
+
 }
 
 interface IProps {
-  seed: string;
   classes: any;
+  match: any;
 }
 
 
@@ -35,21 +41,25 @@ const styles: StyleRulesCallback = theme => ({
   }
 })
 
+@observer
 class ChatComponent extends React.Component<IProps, IState> {
-  private api: Iota;
-  private tempAddress: string;
-  constructor(porps: IProps){
-    super(porps);
-    this.api = new Iota('http://65.52.143.115:14267', porps.seed)
-    // todo read all addresses from my seed an use it to construct chats
-    this.tempAddress = 'LKVQLLCIWSFNRIY9YOHFNAMGHEZTPUEWDPWJWMCE9PRHMVWKIOPRCIMMTPCKEQH9GBQPKUNDBMODMMDMYNNISEAPYY'
+
+  constructor(props: IProps){
+    super(props);
     this.state = {
-      addContactDialogOpen: false
+      addContactDialogOpen: false,
+      currentAddress: '',
     }
+    this.addDemoContact()
+    // this.getMessages();
   }
   public render() {
     const { classes } = this.props
+    if (settingStore.seed === '') {
+      return <Redirect to={{ pathname: '/login' }} />;
+    }
     return (
+
       <React.Fragment>
         <AppBar position="static" className={classes.appBar}>
           <Toolbar>
@@ -60,12 +70,12 @@ class ChatComponent extends React.Component<IProps, IState> {
         </AppBar>
         <div id="contacts" className={classes.contacts}>
         <Button onClick={this.handleAddContactDialog}>Add Contact</Button>
-          <AddContact iotaApi={this.api} open={this.state.addContactDialogOpen} />
-          <Contacts iotaApi={this.api} />
+          <AddContact open={this.state.addContactDialogOpen} />
+          <Contacts />
         </div>
         <main id="main" className={classes.main}>
-          <MessageDisplayer iotaApi={this.api}  activeAddress={this.tempAddress} />
-          <Sender iotaApi={this.api} />
+          <MessageDisplayer address={this.props.match.params.address}/>
+          <Sender address={this.props.match.params.address} />
         </main>
       </React.Fragment>
     );
@@ -77,6 +87,33 @@ class ChatComponent extends React.Component<IProps, IState> {
     })
   } 
 
+  private  addDemoContact(): any {
+    const contact: Contact = {
+      myName: 'dvi@1239876',
+      name: "Dumeni",
+      address: "LKVQLLCIWSFNRIY9YOHFNAMGHEZTPUEWDPWJWMCE9PRHMVWKIOPRCIMMTPCKEQH9GBQPKUNDBMODMMDMYNNISEAPYY",
+      isActivated: true,
+      secret: 'IABFKOELMGFJZVMGYBZF',
+    }
+    contactStore.addContactRequest(contact)
+    const contact2: Contact = {
+      myName: 'fancy@2345',
+      name: "Fancy Address",
+      address: "BVSVBGPVKRIDPANLUMTKJQEACJYEWQAIJKVEKDUYJEGMDDSPAIWLQRDLTQCFCVKZHUJ9PKTRJQHUCTCVYKSOTCV9T9",
+      isActivated: true,
+      secret: 'ZZIRGFYLQAPTSU9KRFKV',
+    }
+    contactStore.addContactRequest(contact2)
+    const contact3: Contact = {
+      myName: 'addr1@1234',
+      name: "MyOwn Address",
+      address: "IAXUZ9CFIZOIMMQGFUEMYEGPLFYDLBQWYKPMRAGZREMWSGSP9IJUSKBYOLK9DUCVXUDUCBNRPYDUQYLG9IZYKIX9Q9",
+      isActivated: true,
+      secret: 'VEFIVAHAFZIWWJSWRWYO'
+    }
+    contactStore.addContactRequest(contact3)
+
+  }
 
 }
 

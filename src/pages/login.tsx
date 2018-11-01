@@ -1,6 +1,8 @@
 import * as React from 'react';
 import { AppBar, Button, CssBaseline, Toolbar, Typography, Grid, withStyles, StyleRulesCallback, TextField, Checkbox, FormControlLabel, } from '@material-ui/core';
 import { Redirect } from 'react-router';
+import { observer } from 'mobx-react';
+import { settingStore } from '../stores/SettingStore';
 
 const styles: StyleRulesCallback = theme => ({
   appBar: {
@@ -47,20 +49,23 @@ const styles: StyleRulesCallback = theme => ({
 
 interface IPorps {
   classes: any;
-  seedCallback: (fromData: React.FormEvent<HTMLFormElement>) => void;
-  handleInputChanges: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  seed: string;
-  isLoggedIn: boolean
 }
 
+interface IState {
+  seed: string;
+}
 
-class LoginComponent extends React.Component<IPorps, {}> {
+@observer
+class LoginComponent extends React.Component<IPorps, IState> {
   constructor(props: IPorps) {
     super(props);
+    this.state = {
+      seed: ''
+    }
   }
   public render() {
-    const { classes, seed, seedCallback, handleInputChanges, isLoggedIn } = this.props;
-    if (isLoggedIn) {
+    const { classes } = this.props;
+    if (settingStore.seed !== '') {
       return <Redirect to={{ pathname: '/chat' }} />;
     }
     return (
@@ -83,10 +88,10 @@ class LoginComponent extends React.Component<IPorps, {}> {
                 d.messenger is a distributed messenger, which save all messages in the iota tangle network. No centralized unit is is required, this page is a static page and use only a connection with a node in the tangle network to be able to communicate.
             </Typography>
               <div className={classes.heroButtons}>
-              <form onSubmit={seedCallback}>
+              <form onSubmit={this.handleStoreSeed}>
                 <Grid container spacing={16} justify="center">
                   <Grid item>
-                    <TextField value={seed} inputProps={{ size: 81 }} type="password" label="Seed" onChange={handleInputChanges} />
+                    <TextField value={this.state.seed} inputProps={{ size: 81 }} type="password" label="Seed" onChange={this.handleSeedChange} />
                   </Grid>
                 </Grid>
                 <Grid container spacing={16}>
@@ -133,6 +138,16 @@ class LoginComponent extends React.Component<IPorps, {}> {
         </footer>
       </React.Fragment>
     );
+  }
+
+  private handleSeedChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    this.setState ({
+      seed: event.target.value
+    })
+  }
+
+  private handleStoreSeed = () => {
+    settingStore.setSeed(this.state.seed);
   }
 }
 

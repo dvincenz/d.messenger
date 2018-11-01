@@ -1,12 +1,10 @@
 import * as React from 'react';
 import { Button, TextField, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@material-ui/core';
-import { Iota } from '../services/iotaService';
 import { isValidChecksum } from '@iota/checksum';
 
 
 
 interface IPorps {
-    iotaApi: Iota;
     open: boolean;
 }
 interface IState {
@@ -93,7 +91,6 @@ export class AddContact extends React.Component<IPorps, IState> {
          })
     }
     private handleClose = () => {
-        console.log('should close')
         this.setState({
             open: false
         })
@@ -110,12 +107,12 @@ export class AddContact extends React.Component<IPorps, IState> {
         this.setState({
             disableInput: true,
         })
-        this.props.iotaApi.sendContactRequest(this.state.address, this.state.address).then(
-            () => this.setState({ 
-                open: false,
-                disableInput: false, 
-            })
-        );
+        // this.props.iotaApi.sendContactRequest(this.state.address, this.state.address).then(
+        //     () => this.setState({ 
+        //         open: false,
+        //         disableInput: false, 
+        //     })
+        // );
         
     }
 

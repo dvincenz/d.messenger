@@ -1,12 +1,14 @@
 import * as React from 'react';
 import { Button, TextField, withStyles, StyleRulesCallback} from '@material-ui/core';
-import { Iota } from '../services/iotaService';
+import { messageStore } from '../stores/MessageStore';
+import { contactStore } from '../stores/ContactStore';
+import { Contact } from '../entities';
 
 
 
 interface IPorps {
-    iotaApi: Iota;
     classes: any;
+    address: string;
 }
 interface IState {
     message: string
@@ -46,11 +48,32 @@ export class SenderComponent extends React.Component<IPorps, IState> {
         );
     }
 
+    public componentDidMount(){
+        this.setAddress(this.props.address);
+    }
+    public componentDidUpdate () {
+        this.setAddress(this.props.address);
+    }
+
+    private setAddress (addr: string){
+        if(addr !== undefined && (contactStore.currentContact === undefined || contactStore.currentContact.address !== addr)){
+            contactStore.setCurrentContact = addr
+        }
+    } 
+
     private handleSubmit = (): void => {
-        const message = this.state.message;
-        this.props.iotaApi.sendTextMessage('LKVQLLCIWSFNRIY9YOHFNAMGHEZTPUEWDPWJWMCE9PRHMVWKIOPRCIMMTPCKEQH9GBQPKUNDBMODMMDMYNNISEAPYY', message);
+        // get Conntact address form contact store
+        const msg = this.state.message;
+        this.setState({message: ''})
+        if(contactStore === undefined){
+            console.error('error seding the address')   
+            return
+        }
+        messageStore.sendMessage(contactStore.currentContact as Contact, msg)
         
     }
+
+    
     private handleInputChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
         this.setState({message: event.target.value})    
     }

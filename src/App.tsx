@@ -21,9 +21,10 @@ class App extends React.Component<{}, IState> {
       <div>
         <BrowserRouter>
             <Switch>
-              <Route path="/login" component={this.withPropsLogin}  />
-              <Route exact path="/chat" component={this.withPropsChat} />
-              <Route exact path="/" component={this.withPropsLogin} />
+              <Route path="/login" component={Login}  />
+              <Route exact path="/chat/:address" component={Chat} />
+              <Route exact path="/chat" component={Chat} />
+              <Route exact path="/" component={Login} />
             </Switch>
           </BrowserRouter>
         
@@ -31,32 +32,6 @@ class App extends React.Component<{}, IState> {
     );
   }
 
-  private seedSave = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    // todo: check seed validity
-    // todo: redirect
-    this.setState({
-      isLoggedIn: true,
-    })
-  }
-
-  private withPropsLogin = (props: any) => {
-    return (<Login 
-      seedCallback={this.seedSave} 
-      seed={this.state.seed} 
-      handleInputChanges={this.handleInputChanges}
-      isLoggedIn={this.state.isLoggedIn} 
-      {...props}  />);
-  }
-  private withPropsChat = (props: any) => {
-    return (<Chat seed={this.state.seed} />)
-  }
-
-  private handleInputChanges = (event: React.ChangeEvent<HTMLInputElement>) => {
-    this.setState({
-      seed: event.target.value
-    })
-  }
 }
 
 

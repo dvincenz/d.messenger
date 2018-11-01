@@ -1,7 +1,10 @@
 
 export interface IBaseMessage {
     method: MessageMethod;
-    name: string;
+    address: string;
+    hash?: string;
+    time: number;
+    secret: string;
 }
 
 export enum MessageMethod {

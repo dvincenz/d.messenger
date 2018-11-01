@@ -1,140 +1,104 @@
 import { composeAPI } from '@iota/core'
 import { asciiToTrytes, trytesToAscii } from '@iota/converter'
 import { asTransactionObject } from '@iota/transaction-converter'
-import { IMessageResponse, IContactRequest } from '.';
-import {IBaseMessage, MessageMethod, ITextMessage} from './interfaces';
-import {Contact} from "../../entity/Contact";
-import {IContactResponse} from "./interfaces/IContactResponse";
-import {Permission} from "./interfaces/IBaseMessage";
+import { IBaseMessage, MessageMethod, ITextMessage, IContactResponse, Permission, IContactRequest } from '../../entities/interfaces';
+import { getRandomSeed } from '../../utils';
 
-/*iotaService wrapper is build as no react component -> todo move to best practise in ract*/
 
 export class Iota {
     private provider: string;
     private seed: string;
+    private ownAddress: string;
     private minWeightMagnitude: number;
     private api: any;
 
-    private contacts: Contact[] = [];
-    private textMessages: IMessageResponse[] = [];
-
-    constructor(provider: string, seed: string) {
+    constructor(provider: string, seed: string, ownAddress: string) {
         this.provider = provider;
         this.seed = seed;
         this.minWeightMagnitude = 14
         this.connectWithNode();
+        this.ownAddress = ownAddress;
     }
 
-    public async sendTextMessage(address: string, text: string) {
-        const msg: ITextMessage = {
-            method: MessageMethod.Message,
-            message: text,
-            name: this.createChatName(),
+    public async getMessages(addr: string): Promise<IBaseMessage[]> {
+        try {
+            let messages = await this.getObjectsFromTangle([addr, this.ownAddress]);
+            messages = messages.filter(m => m.method === MessageMethod.Message);
+            return messages.sort((a, b) => a.time > b.time ? 1 : -1);
+        } catch (error){
+            console.error(error)
+            return [];
         }
-        return this.sendMessage(address, msg);
+    }
+    
+
+    public async getContacts(){
+        try {
+            // todo get own contact requests => need to fetch this contacts on seed sended messages because address is not knowing
+            const contacts = await this.getObjectsFromTangle([this.ownAddress]);
+            return contacts.filter(c => c.method === MessageMethod.ContactRequest || c.method === MessageMethod.ContactResponse);
+        } catch (error){
+            console.error(error)
+            return [];
+        }
     }
 
-    public async sendContactRequest (address: string, ownAddress: string) {
+    public async sendMessage(message: ITextMessage) {
+        // todo may do some checks of used simboles and size of message to prevent errors
+        return await this.sendToTangle(message);
+    }
+
+    public async sendContactRequest(addr: string, permission: Permission, ownAddress: string, myName: string) {
         const message: IContactRequest = {
-            method: MessageMethod.ContactRequest,
-            name: this.createChatName(),
-            address: ownAddress,
+            method: MessageMethod.ContactResponse,
+            name: myName,
+            secret: this.createSecret(),
+            address: addr,
+            senderAddress: ownAddress,
+            time: new Date().getTime()
         }
-        await this.sendMessage(address, message)
-        return
+        return await this.sendToTangle(message)
     }
 
-    public async sendContactResponse (address: string, permission: Permission, ownAddress: string) {
+    public async sendContactResponse(addr: string, permission: Permission, ownAddress: string, myName: string) {
         const message: IContactResponse = {
             method: MessageMethod.ContactResponse,
-            name: this.createChatName(),
+            name: myName,
+            secret: this.createSecret(),
             level: permission,
-            address: ownAddress,
+            address: addr,
+            senderAddress: ownAddress,
+            time: new Date().getTime()
         }
-        await this.sendMessage(address, message)
-        return
+        return await this.sendToTangle(message)
     }
 
-    public async sendMessage (addr: string, message: IBaseMessage) {
-        const trytesMessage = asciiToTrytes(JSON.stringify(message));
+    // #### Internale Methods ####
+
+    private async sendToTangle(message: IBaseMessage) {
+        const addr = message.address
+        const trytesMessage = asciiToTrytes(this.stringify(message));
         const transfer = [{
             address: addr,
             message: trytesMessage,
             value: 0,
         }];
-        const trytes = await this.api.prepareTransfers(this.seed, transfer)
-
-        await this.api.sendTrytes(trytes, 2, this.minWeightMagnitude)
-        return
+        
+        try{
+            const trytes = await this.api.prepareTransfers(this.seed, transfer)
+            return await this.api.sendTrytes(trytes, 2, this.minWeightMagnitude)
+        } catch (error){
+            console.error(error);
+            return
+        }
     }
 
-    public getMessages() {
-        return this.textMessages
+    private async getAllMessages() {
+        // todo implement method to get all information from the block chain, only needed if local storage is empty.
+        return await console.log('get root infromation is not implemented yet')
     }
 
-    public getContacts() {
-        return this.contacts
-    }
-
-    public async loadData(addr:string[], activeAddr:string) {
-        const messages = await this.getMessagesFromAddresses(addr)
-        messages.forEach(msg => {
-            switch (msg.method) {
-                case MessageMethod.Message: {
-                    this.textMessages.push(msg)
-                    break;
-                }
-                case MessageMethod.ContactRequest: {
-                    const contact = new Contact(msg.name, msg.address)
-                    this.contacts.push(contact)
-                    break;
-                }
-                case MessageMethod.ContactResponse: {
-                    if(msg.level === Permission.accepted) {
-                        const contact = new Contact(msg.name, msg.address)
-                        contact.State = true
-                        this.contacts.push(contact)
-                    }
-                    break;
-                }
-            }
-        })
-
-        this.contacts.forEach(contact => {
-            if(contact.State) {
-                return;
-            }
-            this.checkAcceptedStateOfContactRequests(contact, activeAddr)
-        })
-    }
-
-    private async getMessagesFromAddresses(addr:string[]) {
-        const query: any = {
-            addresses: addr,
-        };
-        const hashes = await this.api.findTransactions(query)
-        const trytes = await this.api.getTrytes(hashes)
-
-        return this.getMessagesFromTrytes(trytes)
-    }
-
-    private async checkAcceptedStateOfContactRequests(contact:Contact, activeAddr:string) {
-        const addr:string[] = []
-        addr.push(contact.Address)
-
-        const messages = await this.getMessagesFromAddresses(addr)
-        messages.forEach(msg => {
-            if (msg.method === MessageMethod.ContactResponse) {
-                if(msg.address === activeAddr) {
-                    if(msg.level === Permission.accepted) {
-                        contact.State = true
-                    }
-                }
-            }
-        })
-    }
-
-    private async connectWithNode(){
+    private async connectWithNode() {
         this.api = composeAPI({
             provider: this.provider
         })
@@ -145,37 +109,81 @@ export class Iota {
         });
     }
 
-    private createChatName() {
-        // todo user name & and random address per request
-        return 'dvincenz@FASKJNWODFNLASDM'
+    private async getObjectsFromTangle(addr: string[]): Promise<IBaseMessage[]> {
+        const rawObjects = await this.getFromTangle(addr);
+        const messages: IBaseMessage[] = []
+        rawObjects.forEach((m: any) => {
+            switch (m.method) {
+                case MessageMethod.Message: {
+                    messages.push(m as ITextMessage)
+                    break;
+                }
+                case MessageMethod.ContactRequest: {
+                    messages.push(m as IContactRequest)
+                    break;
+                }
+                case MessageMethod.ContactResponse: {
+                    messages.push(m as IContactResponse)
+                    break;
+                }
+            }
+        })
+        return messages
     }
 
-    private getMessagesFromTrytes(trytes: string[]) {
-        const messages: IMessageResponse[] = []
-        trytes.forEach(
-            (tryt: any) => {
-                const transaction = asTransactionObject(tryt)
-                if (transaction.signatureMessageFragment.replace(/9+$/, '') === '') {
-                    return;
-                }
-                const messageObject = this.parseMessage(trytesToAscii(transaction.signatureMessageFragment.replace(/9+$/, '')));
-                if (messageObject === null) {
-                    console.log('some messages dosent match to the given pattern')
-                    return;
-                }
+    private async getFromTangle(addr: string[]) {
+        const query: any = {
+            addresses: addr,
+        };
+        let trytes: any = []
+        try {
+            const hashes = await this.api.findTransactions(query)
+            trytes = await this.api.getTrytes(hashes)
+        } catch (error) {
+            console.error(error);
+            return [];
+        }
+        const convertedObjects: IBaseMessage[] = [];
+        trytes.forEach((tryt: any) => {
+            const object = this.convertToObject(tryt)
+            if(object !== undefined){
+                convertedObjects.push(object);
+            } 
+        })
 
-                const message: IMessageResponse = {
-                    name: (messageObject as ITextMessage).name,
-                    message: (messageObject as ITextMessage).message,
-                    time: transaction.timestamp,
-                    address: (messageObject as IMessageResponse).address,
-                    level: (messageObject as IMessageResponse).level,
-                    method: (messageObject as ITextMessage).method,
-                }
-                messages.push(message);
-            }
-        )
-        return messages.sort((a, b) => a.time > b.time ? 1 : -1);
+        return convertedObjects;
+    }
+
+    // #### Helper Methods ###
+
+    private createSecret() {
+        return getRandomSeed().substring(0,20);
+    }
+
+    private convertToObject(tryt: string): any {
+        const transaction = asTransactionObject(tryt);
+        if (transaction.signatureMessageFragment.replace(/9+$/, '') === '') {
+            return;
+        }
+        const object = this.parseMessage(trytesToAscii(transaction.signatureMessageFragment.replace(/9+$/, '')));
+        if (object === null || object === undefined) {
+            console.log('some messages dosent match to the given pattern');
+            return;
+        }
+        if (!object.message || object.method === undefined || object.secret === undefined) {
+            return;
+        }
+        object.address = transaction.address;
+        object.hash = transaction.hash;
+        object.time = transaction.timestamp;
+        return object
+    }
+
+    private stringify(message: IBaseMessage) {
+        delete message.address;
+        delete message.hash;
+        delete message.time;
+        return JSON.stringify(message);
     }
 
     private parseMessage(str: string) {
@@ -186,5 +194,4 @@ export class Iota {
         }
         return JSON.parse(str);
     }
-
 }

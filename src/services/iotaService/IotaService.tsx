@@ -3,6 +3,7 @@ import { asciiToTrytes, trytesToAscii } from '@iota/converter'
 import { asTransactionObject } from '@iota/transaction-converter'
 import { IBaseMessage, MessageMethod, ITextMessage, IContactResponse, Permission, IContactRequest } from '../../entities/interfaces';
 import { getRandomSeed } from '../../utils';
+import {IGroupInvitation} from "../../entities/interfaces/IGroupInvitation";
 
 
 export class Iota {
@@ -30,7 +31,6 @@ export class Iota {
             return [];
         }
     }
-    
 
     public async getContacts(){
         try {
@@ -40,6 +40,16 @@ export class Iota {
         } catch (error){
             console.error(error)
             return [];
+        }
+    }
+
+    public async getGroups() {
+        try {
+            const groups = await this.getObjectsFromTangle([this.ownAddress])
+            return groups.filter(c => c.method === MessageMethod.GroupInvitation)
+        } catch (error) {
+            console.log(error)
+            return[]
         }
     }
 
@@ -69,6 +79,17 @@ export class Iota {
             address: addr,
             senderAddress: ownAddress,
             time: new Date().getTime()
+        }
+        return await this.sendToTangle(message)
+    }
+
+    public async sendGroupInvitation(addr: string, groupAddr: string) {
+        const message: IGroupInvitation = {
+            method: MessageMethod.GroupInvitation,
+            address: addr,
+            time: new Date().getTime(),
+            secret: this.createSecret(),
+            groupAddress: groupAddr
         }
         return await this.sendToTangle(message)
     }
@@ -124,6 +145,10 @@ export class Iota {
                 }
                 case MessageMethod.ContactResponse: {
                     messages.push(m as IContactResponse)
+                    break;
+                }
+                case MessageMethod.GroupInvitation: {
+                    messages.push(m as IGroupInvitation)
                     break;
                 }
             }

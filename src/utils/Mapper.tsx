@@ -1,5 +1,7 @@
 import { IBaseMessage, ITextMessage, IContactRequest, IContactResponse } from "../entities/interfaces";
 import { Message, Contact, MessageStatus } from "../entities";
+import {IGroupInvitation} from "../entities/interfaces/IGroupInvitation";
+import {Group} from "../entities/Group";
 
 export function toMessage(baseMessage: ITextMessage): Message {
     const returnMessage: Message = {
@@ -23,6 +25,14 @@ export function toContact(baseMessage: IBaseMessage | IContactRequest | IContact
 
     }
     return contact
+}
+
+export function toGroup(baseMessage: IGroupInvitation) : Group {
+    const group: Group = {
+        name: baseMessage.groupName,
+        address: baseMessage.groupAddress,
+    }
+    return group
 }
 
 

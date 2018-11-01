@@ -3,6 +3,8 @@ import { StyleRulesCallback, withStyles } from '@material-ui/core';
 import { messageStore } from '../stores/MessageStore';
 import { observer } from 'mobx-react';
 import { contactStore } from '../stores/ContactStore';
+import { settingStore } from 'src/stores/SettingStore';
+import { getDateString } from 'src/utils';
 
 interface IPorps {
     classes: any;
@@ -13,7 +15,7 @@ const styles: StyleRulesCallback = theme => ({ // todo fix sizes with theme.spac
    right: {
        float: "right",
        clear: "both",
-       backgroundColor: '#FFFFFF',
+       backgroundColor: '#dcf8c6',
        position: 'relative',
        padding:  '5px 10px', 
        fontSize: 14,
@@ -21,6 +23,18 @@ const styles: StyleRulesCallback = theme => ({ // todo fix sizes with theme.spac
        listStyle: 'none',
        margin: '10px 0',
        maxWidth: 600,
+   },
+   left:{
+    float: "left",
+    clear: "both",
+    backgroundColor: '#FFFFFF',
+    position: 'relative',
+    padding:  '5px 10px', 
+    fontSize: 14,
+    borderRadius:10,
+    listStyle: 'none',
+    margin: '10px 0',
+    maxWidth: 600,
    },
    chatroom: {
        height: "100%",
@@ -36,7 +50,18 @@ const styles: StyleRulesCallback = theme => ({ // todo fix sizes with theme.spac
         paddingRight: theme.spacing.unit * 3,
         height: '100%',
         overflowY: 'auto',
+   },
+   text:{
+       paddingRight:25,
+   },
+   time:{
+       color: '#6d6d6d',
+       fontSize: 8,
+       textAlign: 'right',
+       paddingTop:5,
+
    }
+
 })
 @observer
 export class MessageDisplayerComponent extends React.Component<IPorps, {}> {
@@ -54,7 +79,14 @@ export class MessageDisplayerComponent extends React.Component<IPorps, {}> {
                 <ul className={classes.chats}>
                     {messageStore !== undefined && messageStore.getMessagesFromAddress.length > 0 ? messageStore.getMessagesFromAddress.map(
                         msg => {
-                            return <MessageComponent key={msg.time} value={msg.message + ' ' + msg.contact.name} classes={this.props.classes} />
+                            console.log(msg.time)
+                            return <MessageComponent 
+                                key={msg.time} 
+                                value={msg.message} 
+                                time={msg.time}
+                                classes={this.props.classes} 
+                                ownMessage={msg.contact.address.substring(0,81) === settingStore.myAddress.substring(0,81)}
+                            />
                         }
                     ) : <p>loading messages for {this.props.address}...</p>}
                 </ul>
@@ -79,7 +111,14 @@ export class MessageDisplayerComponent extends React.Component<IPorps, {}> {
 
 
 function MessageComponent(props: any){
-    return <li className={props.classes.right} >{props.value}</li>
+    return <li className={props.ownMessage ? props.classes.left : props.classes.right } >
+        <div className={props.classes.text}> 
+            {props.value}
+        </div>
+        <div className={props.classes.time}>
+            {getDateString(props.time)}
+        </div>
+    </li>
 }
 
 

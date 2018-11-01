@@ -73,7 +73,7 @@ export class Iota {
         return await this.sendToTangle(message)
     }
 
-    // #### Internale Methods ####
+    // #### Internal Methods ####
 
     private async sendToTangle(message: IBaseMessage) {
         const addr = message.address

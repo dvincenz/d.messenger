@@ -2,9 +2,8 @@ import { composeAPI } from '@iota/core'
 import { asciiToTrytes, trytesToAscii } from '@iota/converter'
 import { asTransactionObject } from '@iota/transaction-converter'
 import { IBaseMessage, MessageMethod, ITextMessage, IContactResponse, Permission, IContactRequest } from '../../entities/interfaces';
-import { getRandomSeed } from '../../utils/Mapper';
+import { getRandomSeed } from '../../utils';
 
-/*iotaService wrapper is build as no react component -> todo move to best practise in ract*/
 
 export class Iota {
     private provider: string;
@@ -23,13 +22,25 @@ export class Iota {
 
     public async getMessages(addr: string): Promise<IBaseMessage[]> {
         try {
-            const messages = await this.getObjectsFromTangle([addr, this.ownAddress]);
+            let messages = await this.getObjectsFromTangle([addr, this.ownAddress]);
+            messages = messages.filter(m => m.method === MessageMethod.Message);
             return messages.sort((a, b) => a.time > b.time ? 1 : -1);
         } catch (error){
             console.error(error)
             return [];
         }
+    }
+    
 
+    public async getContacts(){
+        try {
+            // todo get own contact requests => need to fetch this contacts on seed sended messages because address is not knowing
+            const contacts = await this.getObjectsFromTangle([this.ownAddress]);
+            return contacts.filter(c => c.method === MessageMethod.ContactRequest || c.method === MessageMethod.ContactResponse);
+        } catch (error){
+            console.error(error)
+            return [];
+        }
     }
 
     public async sendMessage(message: ITextMessage) {
@@ -42,7 +53,6 @@ export class Iota {
             method: MessageMethod.ContactResponse,
             name: myName,
             secret: this.createSecret(),
-            level: permission,
             address: addr,
             senderAddress: ownAddress,
             time: new Date().getTime()
@@ -65,7 +75,6 @@ export class Iota {
 
     // #### Internale Methods ####
 
-
     private async sendToTangle(message: IBaseMessage) {
         const addr = message.address
         const trytesMessage = asciiToTrytes(this.stringify(message));
@@ -83,8 +92,6 @@ export class Iota {
             return
         }
     }
-
-
 
     private async getAllMessages() {
         // todo implement method to get all information from the block chain, only needed if local storage is empty.
@@ -119,12 +126,10 @@ export class Iota {
                     messages.push(m as IContactResponse)
                     break;
                 }
-
             }
         })
         return messages
     }
-
 
     private async getFromTangle(addr: string[]) {
         const query: any = {
@@ -189,7 +194,4 @@ export class Iota {
         }
         return JSON.parse(str);
     }
-
-
-
 }

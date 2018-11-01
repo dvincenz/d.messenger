@@ -1,4 +1,4 @@
-import { IBaseMessage, ITextMessage } from "../entities/interfaces";
+import { IBaseMessage, ITextMessage, IContactRequest, IContactResponse } from "../entities/interfaces";
 import { Message, Contact, MessageStatus } from "../entities";
 
 export function toMessage(baseMessage: ITextMessage): Message {
@@ -13,7 +13,7 @@ export function toMessage(baseMessage: ITextMessage): Message {
     return returnMessage;
 }
 
-export function toContact(baseMessage: IBaseMessage): Contact {
+export function toContact(baseMessage: IBaseMessage | IContactRequest | IContactResponse): Contact {
     const contact: Contact = {
         address: baseMessage.address,
         name: '',
@@ -25,18 +25,4 @@ export function toContact(baseMessage: IBaseMessage): Contact {
     return contact
 }
 
-export function getRandomSeed(lenght: number = 81){                      
-    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ9"; 
-    const randomValues = new Uint32Array(length);       
-    const result = new Array(length);             
 
-    window.crypto.getRandomValues(randomValues);      
-
-    let cursor = 0;                                   
-    for (let i = 0; i < randomValues.length; i++) {   
-        cursor += randomValues[i];                    
-        result[i] = chars[cursor % chars.length];     
-    }
-
-    return result.join('');    
-}

@@ -1,7 +1,6 @@
-import {IBaseMessage, Permission} from './IBaseMessage'
+import { IBaseMessage } from './IBaseMessage'
 
 export interface IContactRequest extends IBaseMessage {
-    level?: Permission,
     address: string,
     senderAddress: string,
     name: string,

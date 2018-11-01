@@ -1,7 +1,6 @@
-import { observable, computed, flow, when } from 'mobx';
+import { observable, computed, flow } from 'mobx';
 import { Message, MessageStatus } from '../entities/Message';
 import { settingStore } from './SettingStore'
-import { Iota } from '../services/iotaService';
 import { Contact } from '../entities';
 import { toMessage } from '../utils/Mapper'
 import { ITextMessage } from '../entities/interfaces';
@@ -9,7 +8,7 @@ import { contactStore } from './ContactStore';
 
 export class MessageStore {
     @computed get getMessagesFromAddress () {
-        if(this.messages === undefined || this.messages.length === 0 || contactStore.currentContact === undefined){
+        if(this.messages === undefined || this.messages.length === 0 || typeof contactStore.currentContact === undefined){
             return [] as Message []
         }
         return this.messages.filter(m => m.contact.secret === contactStore.currentContact.secret)
@@ -20,7 +19,7 @@ export class MessageStore {
     public fetchMessages = flow(function * (this: MessageStore, address: string) {
         this.state = MessageStoreState.loading;
         try{
-            const newMessages = yield this.Iota.getMessages(address)
+            const newMessages = yield settingStore.Iota.getMessages(address)
             if(newMessages === undefined){
                 return;
             }
@@ -48,17 +47,12 @@ export class MessageStore {
         }
         this.messages.push(msg);
         try {
-            yield this.Iota.sendMessage(msg.toITextMessage())
+            yield settingStore.Iota.sendMessage(msg.toITextMessage())
         } catch (error) {
             this.state = MessageStoreState.error
         }
     })
 
-    private Iota: Iota;
-
-    constructor () {
-        this.Iota = new Iota(settingStore.host + ':' + settingStore.port, settingStore.seed, 'IAXUZ9CFIZOIMMQGFUEMYEGPLFYDLBQWYKPMRAGZREMWSGSP9IJUSKBYOLK9DUCVXUDUCBNRPYDUQYLG9IZYKIX9Q9');
-    }
     public addMessage (messages: Message){
         this.messages.push(messages)
     }

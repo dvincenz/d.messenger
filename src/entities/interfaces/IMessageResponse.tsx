@@ -1,5 +1,5 @@
 
-import {IBaseMessage, MessageMethod, Permission} from "./IBaseMessage";
+import {IBaseMessage, Permission} from "./IBaseMessage";
 
 
 export interface IMessageResponse extends IBaseMessage{

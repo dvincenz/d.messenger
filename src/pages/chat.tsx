@@ -95,7 +95,7 @@ class ChatComponent extends React.Component<IProps, IState> {
       isActivated: true,
       secret: 'IABFKOELMGFJZVMGYBZF',
     }
-    contactStore.addContact(contact)
+    contactStore.addContactRequest(contact)
     const contact2: Contact = {
       myName: 'fancy@2345',
       name: "Fancy Address",
@@ -103,7 +103,7 @@ class ChatComponent extends React.Component<IProps, IState> {
       isActivated: true,
       secret: 'ZZIRGFYLQAPTSU9KRFKV',
     }
-    contactStore.addContact(contact2)
+    contactStore.addContactRequest(contact2)
     const contact3: Contact = {
       myName: 'addr1@1234',
       name: "MyOwn Address",
@@ -111,17 +111,10 @@ class ChatComponent extends React.Component<IProps, IState> {
       isActivated: true,
       secret: 'VEFIVAHAFZIWWJSWRWYO'
     }
-    contactStore.addContact(contact3)
+    contactStore.addContactRequest(contact3)
 
   }
 
-  private selectContact = (addr: string) => {
-    if(addr !== ''){
-      this.setState({
-        currentAddress: addr
-      })
-    }
-  }
 }
 
 export const Chat = withStyles(styles)(ChatComponent);

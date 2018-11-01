@@ -1,7 +1,7 @@
 import {flow, observable} from "mobx";
 import {Group} from "../entities/Group";
 import {settingStore} from "./SettingStore";
-import {IBaseMessage} from "../entities/interfaces";
+import {IBaseMessage, MessageMethod} from "../entities/interfaces";
 import {IGroupInvitation} from "../entities/interfaces/IGroupInvitation";
 import {toGroup} from "../utils/Mapper";
 
@@ -14,8 +14,12 @@ export class GroupStore {
         this.state = GroupStoreState.loading
         try {
             const groups = yield settingStore.Iota.getGroups()
-            groups.forEach((group: IBaseMessage) => {
-                this.addGroup(group)
+            groups.forEach((groupMessage: IBaseMessage) => {
+                if(groupMessage.method === MessageMethod.GroupInvitation) {
+                    const invitation = (groupMessage as IGroupInvitation)
+                    this.addGroup(invitation)
+                    settingStore.Iota.sendGroupInvitationResponse(groupMessage.address, "NAME") // TODO ownName generieren
+                }
             })
             this.state = GroupStoreState.updated
         } catch (error) {
@@ -24,8 +28,8 @@ export class GroupStore {
         }
     })
 
-    private addGroup(inv: IBaseMessage) {
-        this.groups.push(toGroup((inv as IGroupInvitation)))
+    private addGroup(invitation: IGroupInvitation) {
+        this.groups.push(toGroup(invitation))
     }
 }
 

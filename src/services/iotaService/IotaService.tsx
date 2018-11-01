@@ -4,6 +4,7 @@ import { asTransactionObject } from '@iota/transaction-converter'
 import { IBaseMessage, MessageMethod, ITextMessage, IContactResponse, Permission, IContactRequest } from '../../entities/interfaces';
 import { getRandomSeed } from '../../utils';
 import {IGroupInvitation} from "../../entities/interfaces/IGroupInvitation";
+import {IGroupInvitationResponse} from "../../entities/interfaces/IGroupInvitationResponse";
 
 
 export class Iota {
@@ -91,6 +92,17 @@ export class Iota {
             secret: this.createSecret(),
             groupAddress: groupAddr,
             groupName: name,
+        }
+        return await this.sendToTangle(message)
+    }
+
+    public async sendGroupInvitationResponse(groupAddr: string, ownName: string) {
+        const message: IGroupInvitationResponse = {
+            method: MessageMethod.GroupInvitationResponse,
+            address: groupAddr,
+            time: new Date().getTime(),
+            secret: this.createSecret(),
+            myName: ownName,
         }
         return await this.sendToTangle(message)
     }

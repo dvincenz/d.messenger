@@ -12,6 +12,7 @@ export enum MessageMethod {
     ContactResponse,
     Message,
     GroupInvitation,
+    GroupInvitationResponse,
 }
 
 export enum Permission {

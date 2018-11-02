@@ -10,6 +10,7 @@ import { observer } from 'mobx-react';
 import { Redirect } from 'react-router';
 import { Contact } from '../entities';
 import { WebRtcClient } from '../services/webRTCService'
+import { messageStore } from 'src/stores/MessageStore';
 
 interface IState {
   addContactDialogOpen: boolean;
@@ -62,6 +63,7 @@ class ChatComponent extends React.Component<IProps, IState> {
     if (settingStore.seed === '') {
       return <Redirect to={{ pathname: '/login' }} />;
     }
+
     return (
 
       <React.Fragment>
@@ -91,7 +93,9 @@ class ChatComponent extends React.Component<IProps, IState> {
 
   public componentDidMount () {
     if(settingStore.seed !== ''){
-      settingStore.setupMessanger();
+      settingStore.setupMessanger().then(
+        messageStore.subscribeForMessages
+      );
     }
   }
 

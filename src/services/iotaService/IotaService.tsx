@@ -103,18 +103,16 @@ export class Iota extends EventHandler {
         await asyncForEach(accountData.addresses, async (a: string) => {
             const transections = await this.getMessages(a)
             if(transections.length > 0){
-                console.log(transections)
                 messages.concat(transections);
                 ownAddress = a;
             }
-        })
+        }) 
         this.ownAddress = ownAddress;
         setInterval(async () => {
             await this.checkForNewMessages();
           }, 5000);
         return messages;
-    }
-
+    } 
 
 
     // #### Internal Methods ####
@@ -127,7 +125,6 @@ export class Iota extends EventHandler {
         try{
             const rawObjects = await this.getFromTangle([this.ownAddress]);
             rawObjects.forEach((m: any) => {
-                console.log(m)
                 switch (m.method) {
                     case MessageMethod.Message: {
                         this.publish('message', m as IMessageResponse)
@@ -139,7 +136,7 @@ export class Iota extends EventHandler {
                     }
                     case MessageMethod.ContactResponse: {
                         this.publish('contactRespone', m as IMessageResponse)
-                        break;
+                        break; 
                     }
                     case MessageMethod.ICE: {
                         this.publish('ice', m as Ice)
@@ -244,7 +241,6 @@ export class Iota extends EventHandler {
         }
         const object = this.parseMessage(trytesToAscii(transaction.signatureMessageFragment.replace(/9+$/, '')));
         if (object === null || object === undefined) {
-            console.log('some messages dosent match to the given pattern');
             return;
         }
         if (!object.message || object.method === undefined || object.secret === undefined) {

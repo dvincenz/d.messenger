@@ -55,12 +55,21 @@ export class MessageStore {
         }
     })
 
-    constructor() {
-        settingStore.Iota.subscribe('message', console.log('fancy get new message'))
+    public subscribeForMessages = () =>{
+        settingStore.Iota.subscribe('message', (data: ITextMessage) => 
+        {
+            console.log(toMessage(data))
+            if(data !== undefined){
+                this.messages.push(toMessage(data))
+            }
+            
+        })
     }
     public addMessage (messages: Message){
         this.messages.push(messages)
     }
+
+    
 }
 
 export const messageStore = new MessageStore()

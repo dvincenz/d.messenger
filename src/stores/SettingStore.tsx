@@ -8,9 +8,7 @@ export class SettingStore {
     @observable public port: number = 14267
     public myAddress: string;
     public Iota: Iota;
-    constructor () {
-        this.Iota = new Iota(this.host + ':' + this.port, this.seed);
-    }
+
     public setSeed (seed: string){
         this.seed = seed;
     }

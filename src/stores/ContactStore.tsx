@@ -17,6 +17,8 @@ export class ContactStore {
         return this.currentContact;
     }
 
+    
+
     @observable public state: ContactStoreState;
 
     public fetchContacts = flow(function *(this: ContactStore, address: string) {

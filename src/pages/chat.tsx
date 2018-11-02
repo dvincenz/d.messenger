@@ -89,6 +89,12 @@ class ChatComponent extends React.Component<IProps, IState> {
     );
   }
 
+  public componentDidMount () {
+    if(settingStore.seed !== ''){
+      settingStore.setupMessanger();
+    }
+  }
+
   private handleAddContactDialog = () => {
     this.setState({
       addContactDialogOpen: true,

@@ -29,3 +29,10 @@ export function getDateString(timestamp: number): string {
     }
     return date.getDate() + '.' + date.getMonth() + ' ' + date.getHours() + ':' +  date.getMinutes();
 }
+
+
+export async function asyncForEach(array: any, callback: any) {
+    for (let index = 0; index < array.length; index++) {
+      await callback(array[index], index, array)
+    }
+  } 

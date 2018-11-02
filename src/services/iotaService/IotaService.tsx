@@ -1,28 +1,35 @@
-import { composeAPI } from '@iota/core'
+import { composeAPI, AccountData } from '@iota/core'
 import { asciiToTrytes, trytesToAscii } from '@iota/converter'
 import { asTransactionObject } from '@iota/transaction-converter'
 import { IBaseMessage, MessageMethod, ITextMessage, IContactResponse, Permission, IContactRequest } from '../../services/iotaService/interfaces';
 import { getRandomSeed } from '../../utils';
+import { asyncForEach } from '../../utils';
 
 
 export class Iota {
+    public get myAddress(): string {
+        return this.ownAddress;
+    }
     private provider: string;
     private seed: string;
     private ownAddress: string;
     private minWeightMagnitude: number;
     private api: any;
-
-    constructor(provider: string, seed: string, ownAddress: string) {
+    constructor(provider: string, seed: string) {
         this.provider = provider;
         this.seed = seed;
         this.minWeightMagnitude = 14
         this.connectWithNode();
-        this.ownAddress = ownAddress;
     }
 
     public async getMessages(addr: string): Promise<IBaseMessage[]> {
         try {
-            let messages = await this.getObjectsFromTangle([addr, this.ownAddress]);
+            let messages: IBaseMessage[] = []
+            if(this.myAddress !== undefined){
+                messages = await this.getObjectsFromTangle([addr, this.myAddress]);
+            }else{
+                messages = await this.getObjectsFromTangle([addr]);
+            }
             messages = messages.filter(m => m.method === MessageMethod.Message);
             return messages.sort((a, b) => a.time > b.time ? 1 : -1);
         } catch (error){
@@ -42,6 +49,7 @@ export class Iota {
             return [];
         }
     }
+
 
     public async sendMessage(message: ITextMessage) {
         // todo may do some checks of used simboles and size of message to prevent errors
@@ -73,6 +81,26 @@ export class Iota {
         return await this.sendToTangle(message)
     }
 
+    public async bootstrapMessenger() {
+        const accountData: AccountData = await this.api.getAccountData(this.seed)
+        if(accountData.addresses.length  === null){
+            // todo create new address because seed is new and empty
+            console.log('todo create new address')
+        }
+        const messages: IBaseMessage[] = []
+        let ownAddress: string;
+        await asyncForEach(accountData.addresses, async (a: string) => {
+            const transections = await this.getMessages(a)
+            if(transections.length > 0){
+                console.log(transections)
+                messages.concat(transections);
+                ownAddress = a;
+            }
+        })
+        this.ownAddress = ownAddress;
+        return messages;
+    }
+
     // #### Internal Methods ####
 
     private async sendToTangle(message: IBaseMessage) {
@@ -91,11 +119,6 @@ export class Iota {
             console.error(error);
             return
         }
-    }
-
-    private async getAllMessages() {
-        // todo implement method to get all information from the block chain, only needed if local storage is empty.
-        return await console.log('get root infromation is not implemented yet')
     }
 
     private async connectWithNode() {

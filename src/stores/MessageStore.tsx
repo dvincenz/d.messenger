@@ -32,6 +32,8 @@ export class MessageStore {
         }
     })
 
+
+
     // todo find better way to fetch messages 
     public set setFitlerMessages (filterAddress: string) {
         this.fetchMessages(filterAddress);
@@ -53,6 +55,9 @@ export class MessageStore {
         }
     })
 
+    constructor() {
+        settingStore.Iota.subscribe('message', console.log('fancy get new message'))
+    }
     public addMessage (messages: Message){
         this.messages.push(messages)
     }

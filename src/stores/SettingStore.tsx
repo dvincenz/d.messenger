@@ -16,7 +16,6 @@ export class SettingStore {
     }
 
     public async setupMessanger() {
-        console.log(this.seed)
         this.Iota = new Iota(this.host + ':' + this.port, this.seed);
         const myMessages = await this.Iota.bootstrapMessenger();
         this.myAddress = this.Iota.myAddress;

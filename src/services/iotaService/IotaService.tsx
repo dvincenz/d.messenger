@@ -1,12 +1,15 @@
 import { composeAPI, AccountData } from '@iota/core'
 import { asciiToTrytes, trytesToAscii } from '@iota/converter'
 import { asTransactionObject } from '@iota/transaction-converter'
-import { IBaseMessage, MessageMethod, ITextMessage, IContactResponse, Permission, IContactRequest } from '../../services/iotaService/interfaces';
-import { getRandomSeed } from '../../utils';
+import { IBaseMessage, MessageMethod, ITextMessage, IContactResponse, Permission, IContactRequest, IMessageResponse } from '../../services/iotaService/interfaces';
+import { getRandomSeed, arrayDiff } from '../../utils';
 import { asyncForEach } from '../../utils';
+import { EventHandler } from '../../utils/EventHandler';
+import { Ice } from 'src/entities/Ice';
+import { diff, DiffData } from 'fast-array-diff'
 
 
-export class Iota {
+export class Iota extends EventHandler {
     public get myAddress(): string {
         return this.ownAddress;
     }
@@ -15,13 +18,20 @@ export class Iota {
     private ownAddress: string;
     private minWeightMagnitude: number;
     private api: any;
+    private loadedHashes: string[];
+    private isCallRunning: boolean = false;
+
     constructor(provider: string, seed: string) {
+        super();
         this.provider = provider;
         this.seed = seed;
         this.minWeightMagnitude = 14
         this.connectWithNode();
+        this.loadedHashes =  []
     }
 
+    
+    
     public async getMessages(addr: string): Promise<IBaseMessage[]> {
         try {
             let messages: IBaseMessage[] = []
@@ -38,6 +48,7 @@ export class Iota {
         }
     }
     
+
 
     public async getContacts(){
         try {
@@ -98,10 +109,51 @@ export class Iota {
             }
         })
         this.ownAddress = ownAddress;
+        setInterval(async () => {
+            await this.checkForNewMessages();
+          }, 5000);
         return messages;
     }
 
+
+
     // #### Internal Methods ####
+
+    private async checkForNewMessages(){
+        if(this.isCallRunning){
+            return;
+        }
+        this.isCallRunning = true;
+        try{
+            const rawObjects = await this.getFromTangle([this.ownAddress]);
+            rawObjects.forEach((m: any) => {
+                console.log(m)
+                switch (m.method) {
+                    case MessageMethod.Message: {
+                        this.publish('message', m as IMessageResponse)
+                        break;
+                    }
+                    case MessageMethod.ContactRequest: {
+                        this.publish('contactRequest', m as IMessageResponse)
+                        break;
+                    }
+                    case MessageMethod.ContactResponse: {
+                        this.publish('contactRespone', m as IMessageResponse)
+                        break;
+                    }
+                    case MessageMethod.ICE: {
+                        this.publish('ice', m as Ice)
+                        break;
+                    }
+                }
+            })
+        } catch (error){
+            console.error('error fetching message: '+ error);
+        } finally {
+            this.isCallRunning = false;
+        }
+
+    }
 
     private async sendToTangle(message: IBaseMessage) {
         const addr = message.address
@@ -161,8 +213,10 @@ export class Iota {
         let trytes: any = []
         try {
             const hashes = await this.api.findTransactions(query)
-            trytes = await this.api.getTrytes(hashes)
-        } catch (error) {
+            const newHashes = arrayDiff(this.loadedHashes, hashes)
+            trytes = await this.api.getTrytes(newHashes)
+            this.loadedHashes = this.loadedHashes.concat(newHashes)
+        } catch (error) { 
             console.error(error);
             return [];
         }

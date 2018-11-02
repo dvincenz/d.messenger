@@ -114,6 +114,9 @@ class ChatComponent extends React.Component<IProps, IState> {
   }
 
   private  addDemoContact(): any {
+    if(contactStore.contacts.length > 0){
+      return;
+    }
     const contact: Contact = {
       myName: 'dvi@1239876',
       name: "Dumeni",

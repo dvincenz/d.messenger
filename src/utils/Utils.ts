@@ -36,3 +36,14 @@ export async function asyncForEach(array: any, callback: any) {
       await callback(array[index], index, array)
     }
   } 
+
+// todo implement more efficient array diff method.
+export function arrayDiff(baseArray: string[], toSearch: string[]){
+    const diff: string[] = []
+    toSearch.forEach(s => {
+        if(!baseArray.find(f => f === s)){
+            diff.push(s)
+        }
+    });
+    return diff;
+}

@@ -2,17 +2,19 @@ import * as React from 'react';
 import { Sender } from '../components/Sender';
 import { MessageDisplayer } from '../components/MessageDisplayer';
 import { AddContact } from '../components/AddContact';
-import { Button, AppBar, Toolbar, Typography, StyleRulesCallback, withStyles } from '@material-ui/core';
+import { Button, AppBar, Toolbar, Typography, StyleRulesCallback, withStyles, TextField } from '@material-ui/core';
 import { Contacts } from '../components/Contacts';
 import { contactStore } from '../stores/ContactStore';
 import { settingStore } from '../stores/SettingStore'
 import { observer } from 'mobx-react';
 import { Redirect } from 'react-router';
 import { Contact } from '../entities';
+import { WebRtcClient } from '../services/webRTCService'
 
 interface IState {
   addContactDialogOpen: boolean;
   currentAddress: string;
+  ice: string;
 
 }
 
@@ -43,14 +45,16 @@ const styles: StyleRulesCallback = theme => ({
 
 @observer
 class ChatComponent extends React.Component<IProps, IState> {
-
+  private webRtc: WebRtcClient
   constructor(props: IProps){
     super(props);
     this.state = {
       addContactDialogOpen: false,
       currentAddress: '',
+      ice: ''
     }
     this.addDemoContact()
+    this.webRtc = new WebRtcClient()
     // this.getMessages();
   }
   public render() {
@@ -76,6 +80,10 @@ class ChatComponent extends React.Component<IProps, IState> {
         <main id="main" className={classes.main}>
           <MessageDisplayer address={this.props.match.params.address}/>
           <Sender address={this.props.match.params.address} />
+          <TextField onChange={this.handleIceImput} className={classes.textbox} value={this.state.ice}/>
+          <Button className={classes.button} variant="contained" color="primary" id="connect" onClick={this.handleConnect}>Connect</Button>
+          <Button className={classes.button} variant="contained" color="primary" id="ice" onClick={this.getICE}>Get ICE</Button>
+
         </main>
       </React.Fragment>
     );
@@ -86,6 +94,18 @@ class ChatComponent extends React.Component<IProps, IState> {
       addContactDialogOpen: true,
     })
   } 
+
+  private getICE = () => {
+    this.setState({ice: JSON.stringify(this.webRtc.ice)})
+  }
+
+  private handleConnect = () => {
+    this.webRtc.sendIce(this.state.ice);
+  }
+
+  private handleIceImput = (event: React.ChangeEvent<HTMLInputElement>) => {
+    this.setState({ice: event.target.value})
+  }
 
   private  addDemoContact(): any {
     const contact: Contact = {

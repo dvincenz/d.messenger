@@ -3,7 +3,7 @@ import { Message, MessageStatus } from '../entities/Message';
 import { settingStore } from './SettingStore'
 import { Contact } from '../entities';
 import { toMessage } from '../utils/Mapper'
-import { ITextMessage } from '../entities/interfaces';
+import { ITextMessage } from '../services/iotaService/interfaces';
 import { contactStore } from './ContactStore';
 
 export class MessageStore {

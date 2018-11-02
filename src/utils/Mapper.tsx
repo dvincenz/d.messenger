@@ -1,4 +1,4 @@
-import { IBaseMessage, ITextMessage, IContactRequest, IContactResponse } from "../entities/interfaces";
+import { IBaseMessage, ITextMessage, IContactRequest, IContactResponse } from "../services/iotaService/interfaces";
 import { Message, Contact, MessageStatus } from "../entities";
 
 export function toMessage(baseMessage: ITextMessage): Message {

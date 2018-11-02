@@ -1,7 +1,7 @@
 import {flow, observable} from "mobx";
 import { Contact } from "../entities";
 import {settingStore} from "./SettingStore";
-import {IBaseMessage, IContactRequest, IContactResponse, MessageMethod, Permission} from "../entities/interfaces";
+import {IBaseMessage, IContactRequest, IContactResponse, MessageMethod, Permission} from "../services/iotaService/interfaces";
 import { toContact } from "../utils/Mapper";
 
 

@@ -93,9 +93,7 @@ class ChatComponent extends React.Component<IProps, IState> {
 
   public componentDidMount () {
     if(settingStore.seed !== ''){
-      settingStore.setupMessanger().then(
-        messageStore.subscribeForMessages
-      );
+      settingStore.setupMessanger()
     }
   }
 

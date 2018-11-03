@@ -7,6 +7,7 @@ import { asyncForEach } from '../../utils';
 import { EventHandler } from '../../utils/EventHandler';
 import { Ice } from 'src/entities/Ice';
 import { diff, DiffData } from 'fast-array-diff'
+import { IICERequest } from './interfaces/IICERequest';
 
 
 export class Iota extends EventHandler {
@@ -20,6 +21,7 @@ export class Iota extends EventHandler {
     private api: any;
     private loadedHashes: string[];
     private isCallRunning: boolean = false;
+    private isBootStrapped: boolean = false;
 
     constructor(provider: string, seed: string) {
         super();
@@ -32,36 +34,18 @@ export class Iota extends EventHandler {
 
     
     
-    public async getMessages(addr: string): Promise<IBaseMessage[]> {
+    public async getMessages(addr: string) {
         try {
-            let messages: IBaseMessage[] = []
-            if(this.myAddress !== undefined){
-                messages = await this.getObjectsFromTangle([addr, this.myAddress]);
-            }else{
-                messages = await this.getObjectsFromTangle([addr]);
+            if(this.bootstrapMessenger){
+                await this.getObjectsFromTangle([addr]);
             }
-            messages = messages.filter(m => m.method === MessageMethod.Message);
-            return messages.sort((a, b) => a.time > b.time ? 1 : -1);
+            return;
         } catch (error){
             console.error(error)
-            return [];
+            return;
         }
     }
     
-
-
-    public async getContacts(){
-        try {
-            // todo get own contact requests => need to fetch this contacts on seed sended messages because address is not knowing
-            const contacts = await this.getObjectsFromTangle([this.ownAddress]);
-            return contacts.filter(c => c.method === MessageMethod.ContactRequest || c.method === MessageMethod.ContactResponse);
-        } catch (error){
-            console.error(error)
-            return [];
-        }
-    }
-
-
     public async sendMessage(message: ITextMessage) {
         // todo may do some checks of used simboles and size of message to prevent errors
         return await this.sendToTangle(message);
@@ -98,20 +82,15 @@ export class Iota extends EventHandler {
             // todo create new address because seed is new and empty
             console.log('todo create new address')
         }
-        const messages: IBaseMessage[] = []
-        let ownAddress: string;
-        await asyncForEach(accountData.addresses, async (a: string) => {
-            const transections = await this.getMessages(a)
-            if(transections.length > 0){
-                messages.concat(transections);
-                ownAddress = a;
-            }
-        }) 
-        this.ownAddress = ownAddress;
+        try{
+            await this.getObjectsFromTangle(accountData.addresses as [])
+        } catch(error){
+            console.error(error);
+        }
+        this.isBootStrapped = true;
         setInterval(async () => {
             await this.checkForNewMessages();
           }, 5000);
-        return messages;
     } 
 
 
@@ -123,27 +102,7 @@ export class Iota extends EventHandler {
         }
         this.isCallRunning = true;
         try{
-            const rawObjects = await this.getFromTangle([this.ownAddress]);
-            rawObjects.forEach((m: any) => {
-                switch (m.method) {
-                    case MessageMethod.Message: {
-                        this.publish('message', m as IMessageResponse)
-                        break;
-                    }
-                    case MessageMethod.ContactRequest: {
-                        this.publish('contactRequest', m as IMessageResponse)
-                        break;
-                    }
-                    case MessageMethod.ContactResponse: {
-                        this.publish('contactRespone', m as IMessageResponse)
-                        break; 
-                    }
-                    case MessageMethod.ICE: {
-                        this.publish('ice', m as Ice)
-                        break;
-                    }
-                }
-            })
+            this.getObjectsFromTangle([this.ownAddress])
         } catch (error){
             console.error('error fetching message: '+ error);
         } finally {
@@ -181,26 +140,40 @@ export class Iota extends EventHandler {
         });
     }
 
-    private async getObjectsFromTangle(addr: string[]): Promise<IBaseMessage[]> {
+    private async getObjectsFromTangle(addr: string[]) {
         const rawObjects = await this.getFromTangle(addr);
-        const messages: IBaseMessage[] = []
+        const messages: ITextMessage[] = []
+        const contactRequests: IContactRequest[] = []
+        const contactRespone: IContactResponse[] = []
+        const ice: IICERequest[] = []
         rawObjects.forEach((m: any) => {
             switch (m.method) {
                 case MessageMethod.Message: {
                     messages.push(m as ITextMessage)
+                    if(!this.isBootStrapped){
+                        this.ownAddress = m.address;
+                    }
                     break;
                 }
                 case MessageMethod.ContactRequest: {
-                    messages.push(m as IContactRequest)
+                    contactRequests.push(m as IContactRequest)
                     break;
                 }
                 case MessageMethod.ContactResponse: {
-                    messages.push(m as IContactResponse)
+                    contactRespone.push(m as IContactResponse)
+                    break; 
+                }
+                case MessageMethod.ICE: {
+                    ice.push(m as IICERequest)
                     break;
                 }
             }
         })
-        return messages
+        console.log(messages)
+        messages.length > 0 && this.publish('message', messages)
+        contactRequests.length > 0 && this.publish('contactRequest', contactRequests)
+        contactRespone.length && this.publish('contactRespone', contactRespone)
+        ice.length > 0 && this.publish('ice', ice)
     }
 
     private async getFromTangle(addr: string[]) {

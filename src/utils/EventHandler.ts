@@ -1,14 +1,9 @@
 export class EventHandler {
     protected events = {};
-    constructor () {
-        console.log('init event handler')
-    }
     
     public subscribe (eventName: string, func: any) {
-        console.log('subscribe for event ' + eventName)
         this.events[eventName] = this.events[eventName] || []
         this.events[eventName].push(func)
-        console.log(this.events)
     }
 
     public unsubscribe (eventName: string, func: any) {
@@ -24,7 +19,6 @@ export class EventHandler {
     }
 
     public publish (eventName: string, data: any) {
-        console.log(this.events)
         if(this.events[eventName]){
             this.events[eventName].forEach((func: any) => {
                 func(data)

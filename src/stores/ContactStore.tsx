@@ -21,19 +21,19 @@ export class ContactStore {
 
     @observable public state: ContactStoreState;
 
-    public fetchContacts = flow(function *(this: ContactStore, address: string) {
-        this.state = ContactStoreState.loading
-        try {
-            const contacts = yield settingStore.Iota.getContacts()
-            contacts.forEach((contact: IBaseMessage) => {
-                this.addContact(contact);
-            })
-            this.state = ContactStoreState.updated
-        } catch (error) {
-            this.state = ContactStoreState.error
-            console.log(error)
-        }
-    })
+    // public fetchContacts = flow(function *(this: ContactStore, address: string) {
+    //     this.state = ContactStoreState.loading
+    //     try {
+    //         const contacts = yield settingStore.Iota.getContacts()
+    //         contacts.forEach((contact: IBaseMessage) => {
+    //             this.addContact(contact);
+    //         })
+    //         this.state = ContactStoreState.updated
+    //     } catch (error) {
+    //         this.state = ContactStoreState.error
+    //         console.log(error)
+    //     }
+    // })
 
     public addContactRequest(contact: Contact){
         // todo send contact request to the tangle.

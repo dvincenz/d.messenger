@@ -87,7 +87,7 @@ export class MessageDisplayerComponent extends React.Component<IPorps, {}> {
                                 ownMessage={msg.contact.address.substring(0,81) === settingStore.myAddress.substring(0,81)}
                             />
                         }
-                    ) : <p>loading messages for {this.props.address}...</p>}
+                    ) : <p>loading messages for {this.props.address}... </p>}
                 </ul>
             </div>
 

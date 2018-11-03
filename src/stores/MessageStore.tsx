@@ -8,7 +8,7 @@ import { contactStore } from './ContactStore';
 
 export class MessageStore {
     @computed get getMessagesFromAddress () {
-        if(this.messages === undefined || this.messages.length === 0 || typeof contactStore.currentContact === undefined){
+        if(this.messages === undefined || this.messages.length === 0 || contactStore.currentContact === undefined){
             return [] as Message []
         }
         return this.messages.filter(m => m.contact.secret === contactStore.currentContact.secret)
@@ -56,17 +56,23 @@ export class MessageStore {
     })
 
     public subscribeForMessages = () =>{
-        settingStore.Iota.subscribe('message', (data: ITextMessage) => 
+        settingStore.Iota.subscribe('message', (data: ITextMessage[]) => 
         {
-            console.log(toMessage(data))
             if(data !== undefined){
-                this.messages.push(toMessage(data))
+                this.addMessages(data)
             }
             
         })
     }
     public addMessage (messages: Message){
         this.messages.push(messages)
+    }
+
+    private addMessages = (messages: ITextMessage[]) => {
+        messages.forEach(m => {
+            this.messages.push(toMessage(m))
+        })     
+        this.messages = this.messages.slice().sort((a, b) => a.time > b.time ? 1 : -1); // sort messages by time
     }
 
     

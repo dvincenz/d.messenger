@@ -70,7 +70,9 @@ export class MessageStore {
 
     private addMessages = (messages: ITextMessage[]) => {
         messages.forEach(m => {
-            this.messages.push(toMessage(m))
+            if(contactStore.contacts.find(c => c.secret === m.secret) !== undefined) {
+                this.messages.push(toMessage(m))
+            }
         })     
         this.messages = this.messages.slice().sort((a, b) => a.time > b.time ? 1 : -1); // sort messages by time
     }

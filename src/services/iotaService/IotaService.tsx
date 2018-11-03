@@ -51,11 +51,11 @@ export class Iota extends EventHandler {
         return await this.sendToTangle(message);
     }
 
-    public async sendContactRequest(addr: string, permission: Permission, ownAddress: string, myName: string) {
+    public async sendContactRequest(addr: string, ownAddress: string, myName: string) {
         const message: IContactRequest = {
-            method: MessageMethod.ContactResponse,
+            method: MessageMethod.ContactRequest,
             name: myName,
-            secret: this.createSecret(),
+            secret: getRandomSeed(20),
             address: addr,
             senderAddress: ownAddress,
             time: new Date().getTime()
@@ -67,7 +67,7 @@ export class Iota extends EventHandler {
         const message: IContactResponse = {
             method: MessageMethod.ContactResponse,
             name: myName,
-            secret: this.createSecret(),
+            secret: getRandomSeed(20),
             level: permission,
             address: addr,
             senderAddress: ownAddress,
@@ -146,13 +146,14 @@ export class Iota extends EventHandler {
         const contactRequests: IContactRequest[] = []
         const contactRespone: IContactResponse[] = []
         const ice: IICERequest[] = []
+        console.log(addr);
         rawObjects.forEach((m: any) => {
+            if(!this.isBootStrapped){
+                this.ownAddress = m.address;
+            }
             switch (m.method) {
                 case MessageMethod.Message: {
                     messages.push(m as ITextMessage)
-                    if(!this.isBootStrapped){
-                        this.ownAddress = m.address;
-                    }
                     break;
                 }
                 case MessageMethod.ContactRequest: {
@@ -167,9 +168,14 @@ export class Iota extends EventHandler {
                     ice.push(m as IICERequest)
                     break;
                 }
+                default:
+                    console.log('messages with wrong metadata dedected');
+                    console.log(m);
+                break;
             }
         })
-        console.log(messages)
+        console.log(contactRequests)
+        console.log(contactRespone)
         messages.length > 0 && this.publish('message', messages)
         contactRequests.length > 0 && this.publish('contactRequest', contactRequests)
         contactRespone.length && this.publish('contactRespone', contactRespone)
@@ -203,10 +209,6 @@ export class Iota extends EventHandler {
 
     // #### Helper Methods ###
 
-    private createSecret() {
-        return getRandomSeed().substring(0,20);
-    }
-
     private convertToObject(tryt: string): any {
         const transaction = asTransactionObject(tryt);
         if (transaction.signatureMessageFragment.replace(/9+$/, '') === '') {
@@ -216,12 +218,13 @@ export class Iota extends EventHandler {
         if (object === null || object === undefined) {
             return;
         }
-        if (!object.message || object.method === undefined || object.secret === undefined) {
+        if ((!object.message && object.method === MessageMethod.Message) || object.method === undefined || object.secret === undefined) {
             return;
         }
         object.address = transaction.address;
         object.hash = transaction.hash;
         object.time = transaction.timestamp;
+        console.log(object)
         return object
     }
 

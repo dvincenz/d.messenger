@@ -1,9 +1,10 @@
 import { IBaseMessage, ITextMessage, IContactRequest, IContactResponse } from "../services/iotaService/interfaces";
 import { Message, Contact, MessageStatus } from "../entities";
+import { contactStore } from "src/stores/ContactStore";
 
 export function toMessage(baseMessage: ITextMessage): Message {
     const returnMessage: Message = {
-        contact: toContact(baseMessage),
+        contact: contactStore.contacts.find(c => c.secret === baseMessage.secret),
         message: baseMessage.message,
         hash: baseMessage.hash,
         status: MessageStatus.Read,
@@ -13,13 +14,13 @@ export function toMessage(baseMessage: ITextMessage): Message {
     return returnMessage;
 }
 
-export function toContact(baseMessage: IBaseMessage | IContactRequest | IContactResponse): Contact {
+export function toContact(con: IContactRequest | IContactResponse): Contact {
     const contact: Contact = {
-        address: baseMessage.address,
-        name: '',
+        address: con.senderAddress,
+        name: con.name,
         myName: '',
         isActivated: true,
-        secret: baseMessage.secret,
+        secret: con.secret,
 
     }
     return contact

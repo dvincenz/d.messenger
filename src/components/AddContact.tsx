@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Button, TextField, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@material-ui/core';
 import { isValidChecksum } from '@iota/checksum';
+import { contactStore } from 'src/stores/ContactStore';
 
 
 
@@ -104,15 +105,13 @@ export class AddContact extends React.Component<IPorps, IState> {
             })
             return;
         }
-        this.setState({
-            disableInput: true,
-        })
-        // this.props.iotaApi.sendContactRequest(this.state.address, this.state.address).then(
-        //     () => this.setState({ 
-        //         open: false,
-        //         disableInput: false, 
-        //     })
-        // );
+
+        contactStore.addContactRequest(this.state.address).then(
+            () => this.setState({ 
+                open: false,
+                disableInput: false, 
+            })
+        );
         
     }
 

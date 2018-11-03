@@ -1,4 +1,4 @@
-export function getRandomSeed(lenght: number = 81){                      
+export function getRandomSeed(length: number = 81){                      
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ9"; 
     const randomValues = new Uint32Array(length);       
     const result = new Array(length);             

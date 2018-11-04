@@ -1,5 +1,7 @@
 import { ITextMessage, IContactRequest, IContactResponse, Permission } from "../services/iotaService/interfaces";
 import { Message, Contact, MessageStatus } from "../entities";
+import { IICERequest } from "src/services/iotaService/interfaces/IICERequest";
+import { Ice } from "src/entities/Ice";
 
 export function toMessage(baseMessage: ITextMessage): Message {
     const returnMessage: Message = {
@@ -26,6 +28,15 @@ export function toContact(con: IContactRequest | IContactResponse, address: stri
     }
     return contact
 
+}
+
+export function toIce(ice: IICERequest){
+    const returnIce: Ice = {
+        sdp: ice.iceObject,
+        time: ice.time,
+        type: 'offer'
+    }
+    return returnIce;
 }
 
 

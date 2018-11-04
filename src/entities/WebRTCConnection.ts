@@ -2,7 +2,8 @@ import { Ice } from './Ice';
 import { WebRtcClient } from 'src/services/webRTCService';
 
 export class WebRtcConnection {
-    public ices: Ice[];
+    public iceOffer?: Ice;
+    public iceRespone?: Ice;
     public status: WebRtcState;
     public connection: WebRtcClient;
 }
@@ -11,6 +12,7 @@ export class WebRtcConnection {
 export enum WebRtcState {
     connected,
     disconneted,
-    iceSend
+    offerSend,
+    responseSend,
 }
 

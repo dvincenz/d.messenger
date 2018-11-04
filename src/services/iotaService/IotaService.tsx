@@ -75,6 +75,14 @@ export class Iota extends EventHandler {
         return await this.sendToTangle(message)
     }
 
+    public async sendIceRequest(ice: IICERequest){
+        try{
+            await this.sendToTangle(ice)
+        }catch (error){
+            console.error('error sending ice to tangle ' + error)
+        }
+    }
+
     public async bootstrapMessenger() {
         const accountData: AccountData = await this.api.getAccountData(this.seed)
         try{

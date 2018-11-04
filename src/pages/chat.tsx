@@ -4,7 +4,7 @@ import { MessageDisplayer } from '../components/MessageDisplayer';
 import { AddContact } from '../components/AddContact';
 import { Button, AppBar, Toolbar, Typography, StyleRulesCallback, withStyles, TextField } from '@material-ui/core';
 import { Contacts } from '../components/Contacts';
-import { contactStore } from '../stores/ContactStore';
+import { contactStore, ContactStore } from '../stores/ContactStore';
 import { settingStore } from '../stores/SettingStore'
 import { observer } from 'mobx-react';
 import { Redirect } from 'react-router';
@@ -114,11 +114,11 @@ class ChatComponent extends React.Component<IProps, IState> {
   } 
 
   private getICE = () => {
-    this.setState({ice: JSON.stringify(this.webRtc.ice)})
+    console.log(JSON.stringify(this.webRtc.ice))
   }
 
   private handleConnect = () => {
-    this.webRtc.sendIce(this.state.ice);
+      contactStore.sendIce();
   }
 
   private handleIceImput = (event: React.ChangeEvent<HTMLInputElement>) => {

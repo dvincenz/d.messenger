@@ -20,7 +20,8 @@ export class SettingStore {
         this.Iota = new Iota(this.host + ':' + this.port, this.seed);
         messageStore.subscribeForMessages();
         contactStore.subscribeForContactRequests();
-        contactStore.subscribeForeContactResponse();
+        contactStore.subscribeForContactResponse();
+        contactStore.subscribeForIce();
         await this.Iota.bootstrapMessenger();
         this.myAddress = this.Iota.myAddress;
         // todo save myMessages with event subscriber on iota service

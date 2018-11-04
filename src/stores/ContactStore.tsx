@@ -1,8 +1,12 @@
 import { flow, observable, computed } from "mobx";
 import { Contact } from "../entities";
 import { settingStore } from "./SettingStore";
-import { IContactRequest, IContactResponse, Permission } from "../services/iotaService/interfaces";
-import { toContact } from "../utils/Mapper";
+import { IContactRequest, IContactResponse, Permission, MessageMethod } from "../services/iotaService/interfaces";
+import { toContact, toIce } from "../utils/Mapper";
+import { Ice } from "src/entities/Ice";
+import { IICERequest } from "src/services/iotaService/interfaces/IICERequest";
+import { WebRtcConnection, WebRtcState } from "src/entities/WebRTCConnection";
+import { WebRtcClient } from "src/services/webRTCService";
 
 
 export class ContactStore {
@@ -66,6 +70,27 @@ export class ContactStore {
             console.log(error)
         }
     })
+
+    public sendIce = flow(function* (this: ContactStore) {
+        const webRtcClient = new WebRtcClient()
+        const webRtcConnection: WebRtcConnection = {
+            connection: webRtcClient,
+            status: WebRtcState.offerSend,
+        }
+        const iceReqeust: IICERequest = {
+            address: this._currentContact,
+            iceObject: JSON.stringify(webRtcClient.peer.on('')),
+            method: MessageMethod.ICE,
+            secret: this.currentContact.secret,
+            time: new Date().getTime(),
+        }
+        console.log(iceReqeust);
+        yield settingStore.Iota.sendIceRequest(iceReqeust)
+        this.contacts[this._currentContact].WebRtcConnection = webRtcConnection
+    })
+
+
+
     @observable private contacts = {};
     // tslint:disable-next-line:variable-name
     @observable private _currentContact?: string;
@@ -99,7 +124,7 @@ export class ContactStore {
         })
     }
 
-    public subscribeForeContactResponse () {
+    public subscribeForContactResponse () {
         settingStore.Iota.subscribe('contactResponse', (contacts: IContactResponse[]) => {
             contacts.forEach(c => {
                 if(this.contacts[c.senderAddress] === undefined || (this.contacts[c.senderAddress] !== undefined && this.contacts[c.senderAddress].updateTime < c.time)){
@@ -115,7 +140,22 @@ export class ContactStore {
             })
         })
     }
+
+    public subscribeForIce () {
+        settingStore.Iota.subscribe('ice', (ice: IICERequest[]) => {
+            ice.forEach(i => {
+                // todo check if connection is obsolate
+                const contact = this.getContactBySecret(i.secret)
+                if(contact.updateTime < i.time){
+                   console.log('juhu get an ice request: ' + ice)
+                }
+            }
+        )}
+    )}
+
+
 }
+
 
 
 export const contactStore = new ContactStore();

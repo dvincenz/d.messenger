@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Sender, ContactConfirmator} from '../components';
+import { Sender} from '../components';
 import { MessageDisplayer } from '../components/MessageDisplayer';
 import { AddContact } from '../components/AddContact';
 import { Button, AppBar, Toolbar, Typography, StyleRulesCallback, withStyles, TextField } from '@material-ui/core';
@@ -61,7 +61,6 @@ class ChatComponent extends React.Component<IProps, IState> {
     if (settingStore.seed === '') {
       return <Redirect to={{ pathname: '/login' }} />;
     }
-    console.log(contactStore.currentContact);
     return (
       <React.Fragment>
         <AppBar position="static" className={classes.appBar}>
@@ -105,7 +104,6 @@ class ChatComponent extends React.Component<IProps, IState> {
       if(addr !== undefined && (contactStore.currentContact === undefined || addr !== contactStore.currentContact.address)){
           messageStore.setFitlerMessages = addr;
           contactStore.setCurrentContact = addr;
-          console.log('set current contact')
       }
   } 
 

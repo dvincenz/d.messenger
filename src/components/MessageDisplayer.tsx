@@ -73,7 +73,6 @@ export class MessageDisplayerComponent extends React.Component<IPorps, {}> {
     }
 
     public render() {
-        console.log('render');
         const { classes } = this.props
         if(contactStore.currentContact !== undefined && !contactStore.currentContact.isActivated){
             return (

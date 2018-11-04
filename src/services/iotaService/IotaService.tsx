@@ -1,7 +1,7 @@
 import { composeAPI, AccountData } from '@iota/core'
 import { asciiToTrytes, trytesToAscii } from '@iota/converter'
 import { asTransactionObject } from '@iota/transaction-converter'
-import { IBaseMessage, MessageMethod, ITextMessage, IContactResponse, Permission, IContactRequest, IMessageResponse } from '../../services/iotaService/interfaces';
+import { IBaseMessage, MessageMethod, ITextMessage, IContactResponse, Permission, IContactRequest } from '../../services/iotaService/interfaces';
 import { getRandomSeed, arrayDiff } from '../../utils';
 import { EventHandler } from '../../utils/EventHandler';
 import { IICERequest } from './interfaces/IICERequest';

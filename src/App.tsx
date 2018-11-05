@@ -5,6 +5,7 @@ import { Login, Chat } from './pages';
 interface IState {
   seed: string,
   isLoggedIn: boolean,
+  isGroup: boolean,
 }
 
 class App extends React.Component<{}, IState> {
@@ -13,6 +14,7 @@ class App extends React.Component<{}, IState> {
     this.state = {
       seed: '',
       isLoggedIn: false,
+      isGroup: false,
     }
   }
   public render() {
@@ -23,6 +25,7 @@ class App extends React.Component<{}, IState> {
             <Switch>
               <Route path="/login" component={Login}  />
               <Route exact path="/chat/:address" component={Chat} />
+              <Route exact path="/chat/:address/isGroup" component={Chat} />
               <Route exact path="/chat" component={Chat} />
               <Route exact path="/" component={Login} />
             </Switch>

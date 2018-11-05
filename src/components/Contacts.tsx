@@ -63,6 +63,7 @@ class ContactsComponent extends React.Component<IProps> {
 
 function Person(props: any) {
     const link = `/chat/${props.contact.address}`;
+    props.state.isGroup = false;
     return (
         // tslint:disable-next-line:jsx-no-lambda
         <Link to={link} onClick={props.handleClickContact} className={props.classes.link}>
@@ -75,7 +76,8 @@ function Person(props: any) {
 }
 
 function Group(props: any) {
-    const link = `/chat/${props.contact.address}`;
+    const link = `/chat/${props.contact.address}/isGroup`;
+    props.state.isGroup = true;
     return (
         // tslint:disable-next-line:jsx-no-lambda
         <Link to={link} onClick={props.handleClickContact} className={props.classes.link}>

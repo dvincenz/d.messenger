@@ -10,15 +10,6 @@ export class GroupStore {
     @observable public groups: Group[] = [];
     @observable public state: GroupStoreState;
 
-    @computed get getGroups () {
-        const groupsArray = []
-        // tslint:disable-next-line:forin
-        for(const key in this.groups) {
-            groupsArray.push(this.groups[key])
-        }
-        console.log(this.groups.length)
-        return groupsArray
-    }
 
     public createGroup = flow(function *(this: GroupStore, name: string) {
         this.state = GroupStoreState.loading
@@ -34,6 +25,28 @@ export class GroupStore {
             console.log(error)
         }
     })
+
+    // tslint:disable-next-line:variable-name
+    @observable private _currentGroup?: string;
+
+
+    @computed get currentGroup(): Group {
+        return this.groups[this._currentGroup]
+    }
+
+    set setCurrentGroup(address: string) {
+        this._currentGroup = address
+    }
+
+    @computed get getGroups () {
+        const groupsArray = []
+        // tslint:disable-next-line:forin
+        for(const key in this.groups) {
+            groupsArray.push(this.groups[key])
+        }
+        console.log(this.groups.length)
+        return groupsArray
+    }
 
     public subscribeForGroupInvitations () {
         settingStore.Iota.subscribe("groupInvitation", (grps: IGroupInvitation[]) => {

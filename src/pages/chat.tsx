@@ -11,6 +11,7 @@ import { Redirect } from 'react-router';
 import { WebRtcClient } from '../services/webRTCService'
 import { messageStore } from 'src/stores/MessageStore';
 import {CreateGroup} from "../components/CreateGroup";
+import {groupStore} from "../stores/GroupStore";
 
 interface IState {
   addContactDialogOpen: boolean;
@@ -105,9 +106,10 @@ class ChatComponent extends React.Component<IProps, IState> {
   private setAddress = (addr: string) => {
     // todo routing by mobx 
     
-      if(addr !== undefined && (contactStore.currentContact === undefined || addr !== contactStore.currentContact.address)){
+      if(addr !== undefined) {// && (contactStore.currentContact === undefined || addr !== contactStore.currentContact.address)){
           messageStore.setFitlerMessages = addr;
           contactStore.setCurrentContact = addr;
+          groupStore.setCurrentGroup = addr;
       }
   } 
 

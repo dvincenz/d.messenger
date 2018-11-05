@@ -7,7 +7,7 @@ import { toContact } from "../utils/Mapper";
 
 export class ContactStore {
     @computed get currentContact(): Contact {
-        return this.contacts[this._currentContact];
+        return this.contacts[this._currentContact]
     }
     set currentContact(contact: Contact) {
         this._currentContact = contact.address;

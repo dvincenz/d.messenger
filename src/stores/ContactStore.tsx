@@ -7,6 +7,7 @@ import { Ice } from "src/entities/Ice";
 import { IICERequest } from "src/services/iotaService/interfaces/IICERequest";
 import { WebRtcConnection, WebRtcState } from "src/entities/WebRTCConnection";
 import { WebRtcClient } from "src/services/webRTCService";
+import { stringify } from "querystring";
 
 
 export class ContactStore {
@@ -71,29 +72,15 @@ export class ContactStore {
         }
     })
 
-    public sendIce = flow(function* (this: ContactStore) {
-        const webRtcClient = new WebRtcClient()
-        const webRtcConnection: WebRtcConnection = {
-            connection: webRtcClient,
-            status: WebRtcState.offerSend,
-        }
-        const iceReqeust: IICERequest = {
-            address: this._currentContact,
-            iceObject: JSON.stringify(webRtcClient.peer.on('')),
-            method: MessageMethod.ICE,
-            secret: this.currentContact.secret,
-            time: new Date().getTime(),
-        }
-        console.log(iceReqeust);
-        yield settingStore.Iota.sendIceRequest(iceReqeust)
-        this.contacts[this._currentContact].WebRtcConnection = webRtcConnection
-    })
+
 
 
 
     @observable private contacts = {};
     // tslint:disable-next-line:variable-name
     @observable private _currentContact?: string;
+
+
 
     public addContact (contact: Contact) {
         this.contacts[contact.address] = contact;
@@ -144,16 +131,55 @@ export class ContactStore {
     public subscribeForIce () {
         settingStore.Iota.subscribe('ice', (ice: IICERequest[]) => {
             ice.forEach(i => {
+                let newestIce: IICERequest
                 // todo check if connection is obsolate
                 const contact = this.getContactBySecret(i.secret)
-                if(contact.updateTime < i.time){
-                   console.log('juhu get an ice request: ' + ice)
+                if(contact.updateTime < i.time && i.address === settingStore.myAddress){
+                    newestIce = i
+                }
+                if(newestIce === undefined) {
+                    return
+                }
+                const iceObject = JSON.parse(newestIce.iceObject)
+                if(iceObject.type === 'offer'){
+                    this.sendIce(false, iceObject)
+                } else {
+                    console.log('resiveAnswer')
+                    this.contacts[this._currentContact].webRtcClient.peer.signal(JSON.stringify(iceObject))
                 }
             }
         )}
     )}
 
+    public sendIce(offer: boolean = true, ice?: any) {
+        if(this.currentContact.webRtcConnection === undefined){
+            this.contacts[this._currentContact].webRtcClient = new WebRtcClient(offer)
+        }
+        const webRtcClient =  this.contacts[this._currentContact].webRtcClient
+    
+        webRtcClient.peer.on('signal',(data: any) => {
+            const iceReqeust: IICERequest = {
+                address: this._currentContact,
+                iceObject: JSON.stringify(data),
+                method: MessageMethod.ICE,
+                secret: this.currentContact.secret,
+                time: new Date().getTime(),
+            }
+            console.log('signal')
+            settingStore.Iota.sendIceRequest(iceReqeust)
+        })
+        webRtcClient.peer.on('connect', () => {
+            console.log('webRTC connect')
+            webRtcClient.peer.send('online ;)')
+        })
+        webRtcClient.peer.on('data', (data: any) => {
+            console.log('data recived: ' + data);
+        })
+        if(ice !== undefined){
+            webRtcClient.peer.signal(JSON.stringify(ice))
+        }
 
+    }
 }
 
 

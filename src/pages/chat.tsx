@@ -46,7 +46,6 @@ const styles: StyleRulesCallback = theme => ({
 
 @observer
 class ChatComponent extends React.Component<IProps, IState> {
-  private webRtc: WebRtcClient
   constructor(props: IProps){
     super(props);
     this.state = {
@@ -54,7 +53,6 @@ class ChatComponent extends React.Component<IProps, IState> {
       currentAddress: '',
       ice: ''
     }
-    this.webRtc = new WebRtcClient()
   }
   public render() {
     const { classes } = this.props
@@ -114,7 +112,7 @@ class ChatComponent extends React.Component<IProps, IState> {
   } 
 
   private getICE = () => {
-    console.log(JSON.stringify(this.webRtc.ice))
+    contactStore.sendIce();
   }
 
   private handleConnect = () => {

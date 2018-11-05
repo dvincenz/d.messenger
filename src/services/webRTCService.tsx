@@ -3,9 +3,10 @@ import * as SimplePeer from 'simple-peer';
 export class WebRtcClient {
     public ice: string
 
-    private peer = new SimplePeer({ initiator: location.hash === '#1', trickle: false })
+    public peer: any;
+    constructor(initiator: boolean){
+        this.peer = new SimplePeer({ initiator, trickle: false })
     
-    constructor(){
         this.peer.on('close', this.errorHandling)
         this.peer.on('data', this.dataResiver)
         this.peer.on('signal', this.signalHandling)

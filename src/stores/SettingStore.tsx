@@ -21,8 +21,8 @@ export class SettingStore {
         messageStore.subscribeForMessages();
         contactStore.subscribeForContactRequests();
         contactStore.subscribeForContactResponse();
-        contactStore.subscribeForIce();
         await this.Iota.bootstrapMessenger();
+        contactStore.subscribeForIce(); // hotfix to not get old Ice messages
         this.myAddress = this.Iota.myAddress;
         // todo save myMessages with event subscriber on iota service
         console.log(this.myAddress)

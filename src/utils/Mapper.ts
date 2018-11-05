@@ -27,7 +27,6 @@ export function toContact(con: IContactRequest | IContactResponse, address: stri
         isDisplayed: true,
     }
     return contact
-
 }
 
 export function toGroup(baseMessage: IGroupInvitation) : Group {

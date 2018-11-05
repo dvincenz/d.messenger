@@ -4,11 +4,10 @@ import { MessageDisplayer } from '../components/MessageDisplayer';
 import { AddContact } from '../components/AddContact';
 import { Button, AppBar, Toolbar, Typography, StyleRulesCallback, withStyles, TextField } from '@material-ui/core';
 import { Contacts } from '../components/Contacts';
-import { contactStore, ContactStore } from '../stores/ContactStore';
+import { contactStore } from '../stores/ContactStore';
 import { settingStore } from '../stores/SettingStore'
 import { observer } from 'mobx-react';
 import { Redirect } from 'react-router';
-import { WebRtcClient } from '../services/webRTCService'
 import { messageStore } from 'src/stores/MessageStore';
 
 interface IState {

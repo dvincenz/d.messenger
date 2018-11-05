@@ -2,12 +2,9 @@ import { flow, observable, computed } from "mobx";
 import { Contact } from "../entities";
 import { settingStore } from "./SettingStore";
 import { IContactRequest, IContactResponse, Permission, MessageMethod } from "../services/iotaService/interfaces";
-import { toContact, toIce } from "../utils/Mapper";
-import { Ice } from "src/entities/Ice";
+import { toContact } from "../utils/Mapper";
 import { IICERequest } from "src/services/iotaService/interfaces/IICERequest";
-import { WebRtcConnection, WebRtcState } from "src/entities/WebRTCConnection";
 import { WebRtcClient } from "src/services/webRTCService";
-import { stringify } from "querystring";
 
 
 export class ContactStore {

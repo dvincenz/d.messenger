@@ -39,4 +39,7 @@ export class WebRtcClient {
         this.peer.send(randomValue);
     }
 
+
+    
+
 }

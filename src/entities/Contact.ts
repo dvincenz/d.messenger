@@ -1,4 +1,4 @@
-import { WebRtcConnection } from "./WebRTCConnection";
+import { WebRtcClient } from "src/services/webRTCService";
 
 export class Contact {
     public name:  string;
@@ -6,7 +6,7 @@ export class Contact {
     public myName: string;
     public isActivated?: boolean;
     public secret: string;
-    public webRtcConnection?: WebRtcConnection;
+    public webRtcConnection?: WebRtcClient;
     public updateTime: number;
     public isDisplayed: boolean;
 }

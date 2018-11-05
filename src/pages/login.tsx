@@ -153,7 +153,10 @@ class LoginComponent extends React.Component<IPorps, IState> {
 
   private handleNewContact = () => {
     // TODO: add handling for the username
-    settingStore.setSeed(getRandomSeed());
+    // TODO: need a better way to show the newly generated seed
+    const seed: string = getRandomSeed();
+    console.log("New Seed: " + seed);
+    settingStore.setSeed(seed);
   }
 }
 

@@ -152,6 +152,7 @@ class LoginComponent extends React.Component<IPorps, IState> {
   }
 
   private handleNewContact = () => {
+    // TODO: add handling for the username
     settingStore.setSeed(getRandomSeed());
   }
 }

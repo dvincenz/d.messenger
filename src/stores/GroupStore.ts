@@ -1,13 +1,38 @@
-import {flow, observable} from "mobx";
+import {computed, flow, observable} from "mobx";
 import {Group} from "../entities/Group";
 import {settingStore} from "./SettingStore";
 import {IGroupInvitation} from "../services/iotaService/interfaces/IGroupInvitation";
-import {toContact, toGroup} from "../utils/Mapper";
+import {toGroup} from "../utils/Mapper";
+import {getRandomSeed} from "../utils";
 
 
 export class GroupStore {
     @observable public groups: Group[] = [];
     @observable public state: GroupStoreState;
+
+    @computed get getGroups () {
+        const groupsArray = []
+        // tslint:disable-next-line:forin
+        for(const key in this.groups) {
+            groupsArray.push(this.groups[key])
+        }
+        return groupsArray
+    }
+
+    public createGroup = flow(function *(this: GroupStore, name: string) {
+        this.state = GroupStoreState.loading
+        try {
+            const groupAddr = getRandomSeed(81)
+            yield settingStore.Iota.sendGroupInvitation(settingStore.myAddress, groupAddr, name)
+            console.log(name)
+            console.log(groupAddr)
+            console.log(settingStore.myAddress)
+            this.state = GroupStoreState.updated
+        } catch (error) {
+            this.state = GroupStoreState.error
+            console.log(error)
+        }
+    })
 
     public subscribeForGroupInvitations () {
         settingStore.Iota.subscribe("groupInvitation", (grps: IGroupInvitation[]) => {
@@ -19,24 +44,6 @@ export class GroupStore {
             this.state = GroupStoreState.updated
         })
     }
-
-    /* public fetchGroups = flow(function *(this: GroupStore) {
-        this.state = GroupStoreState.loading
-        try {
-            const groups = yield settingStore.Iota.getGroups()
-            groups.forEach((groupMessage: IBaseMessage) => {
-                if(groupMessage.method === MessageMethod.GroupInvitation) {
-                    const invitation = (groupMessage as IGroupInvitation)
-                    this.addGroup(invitation)
-                    settingStore.Iota.sendGroupInvitationResponse(groupMessage.address, "NAME") // TODO ownName generieren
-                }
-            })
-            this.state = GroupStoreState.updated
-        } catch (error) {
-            this.state = GroupStoreState.error
-            console.log(error)
-        }
-    }) */
 
     private addGroup(invitation: IGroupInvitation) {
         this.groups.push(toGroup(invitation))

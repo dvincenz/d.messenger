@@ -5,14 +5,16 @@ import { AddContact } from '../components/AddContact';
 import { Button, AppBar, Toolbar, Typography, StyleRulesCallback, withStyles, TextField } from '@material-ui/core';
 import { Contacts } from '../components/Contacts';
 import { contactStore } from '../stores/ContactStore';
-import { settingStore } from '../stores/SettingStore'
+import { settingStore } from '../stores/SettingStore';
 import { observer } from 'mobx-react';
 import { Redirect } from 'react-router';
 import { WebRtcClient } from '../services/webRTCService'
 import { messageStore } from 'src/stores/MessageStore';
+import {CreateGroup} from "../components/CreateGroup";
 
 interface IState {
   addContactDialogOpen: boolean;
+  createGroupDialogOpen: boolean;
   currentAddress: string;
   ice: string;
 
@@ -51,6 +53,7 @@ class ChatComponent extends React.Component<IProps, IState> {
     super(props);
     this.state = {
       addContactDialogOpen: false,
+      createGroupDialogOpen: false,
       currentAddress: '',
       ice: ''
     }
@@ -71,17 +74,18 @@ class ChatComponent extends React.Component<IProps, IState> {
           </Toolbar>
         </AppBar>
         <div id="contacts" className={classes.contacts}>
-        <Button onClick={this.handleAddContactDialog}>Add Contact</Button>
+          <Button onClick={this.handleAddContactDialog}>Add Contact</Button>
+          <Button onClick={this.handleCreateGroupDialog}>Create Group</Button>
           <AddContact open={this.state.addContactDialogOpen} />
+          <CreateGroup open={this.state.createGroupDialogOpen} />
           <Contacts />
         </div>
         <main id="main" className={classes.main}>
-           <MessageDisplayer />
+          <MessageDisplayer />
           <Sender address={this.props.match.params.address} />
           <TextField onChange={this.handleIceImput} className={classes.textbox} value={this.state.ice}/>
           <Button className={classes.button} variant="contained" color="primary" id="connect" onClick={this.handleConnect}>Connect</Button>
           <Button className={classes.button} variant="contained" color="primary" id="ice" onClick={this.getICE}>Get ICE</Button>
-
         </main>
       </React.Fragment>
     );
@@ -111,7 +115,13 @@ class ChatComponent extends React.Component<IProps, IState> {
     this.setState({
       addContactDialogOpen: true,
     })
-  } 
+  }
+
+  private handleCreateGroupDialog = () => {
+    this.setState({
+      createGroupDialogOpen: true,
+    })
+  }
 
   private getICE = () => {
     this.setState({ice: JSON.stringify(this.webRtc.ice)})

@@ -2,6 +2,7 @@ import * as React from 'react';
 import { StyleRulesCallback, withStyles, Avatar, ListItem, ListItemText, List } from '@material-ui/core';
 import { Link, Redirect } from 'react-router-dom';
 import { contactStore } from '../stores/ContactStore'
+import { groupStore} from "../stores/GroupStore";
 import { observer } from 'mobx-react';
 
 
@@ -37,8 +38,11 @@ class ContactsComponent extends React.Component<IProps> {
         return (
             <React.Fragment>
                 <List className={classes.list}>
-                    {contactStore.getContacts.map(c => 
+                    {contactStore.getContacts.map(c =>
                         <Person key={c.address} contact={c} classes={classes} handleClickContact={this.handleClickContact}/>
+                    )}
+                    {groupStore.getGroups.map(g =>
+                        <Person key={g.address} contact={g} classes={classes} handleClickGroup={this.handleClickContact}/>
                     )}
                 </List>
             </React.Fragment>

@@ -2,6 +2,7 @@ import * as React from 'react';
 import { StyleRulesCallback, withStyles, Avatar, ListItem, ListItemText, List } from '@material-ui/core';
 import { Link, Redirect } from 'react-router-dom';
 import { contactStore } from '../stores/ContactStore'
+import { observer } from 'mobx-react';
 
 
 const styles: StyleRulesCallback = theme => ({
@@ -25,11 +26,10 @@ const styles: StyleRulesCallback = theme => ({
 interface IProps {
     classes: any;
 }
-
+@observer
 class ContactsComponent extends React.Component<IProps> {
     constructor(props: IProps) {
         super(props)
-        this.getContacts();
     }
 
     public render() {
@@ -37,8 +37,8 @@ class ContactsComponent extends React.Component<IProps> {
         return (
             <React.Fragment>
                 <List className={classes.list}>
-                    {contactStore.contacts.map(c => 
-                        <Person key={c.address} contact={c} classes={classes}/>
+                    {contactStore.getContacts.map(c => 
+                        <Person key={c.address} contact={c} classes={classes} handleClickContact={this.handleClickContact}/>
                     )}
                 </List>
             </React.Fragment>
@@ -51,9 +51,11 @@ class ContactsComponent extends React.Component<IProps> {
         ) 
     }
 
-    protected getContacts = () => {
-        // this.props.iotaApi.getContacts();
+    protected handleClickContact = () => {
+        // todo: handle this click
     }
+
+
 }
 
 
@@ -61,10 +63,10 @@ function Person(props: any) {
     const link = `/chat/${props.contact.address}`;
     return (
         // tslint:disable-next-line:jsx-no-lambda
-        <Link to={link} className={props.classes.link}>
+        <Link to={link} onClick={props.handleClickContact} className={props.classes.link}>
             <ListItem button>
                 <Avatar className={props.classes.avatar}>{(props.contact.name).charAt(0)}</Avatar>
-                <ListItemText primary={props.contact.name} secondary={props.contact.address} />
+                <ListItemText primary={props.contact.name + ' ' + props.contact.secret} secondary={props.contact.address} />
             </ListItem>
         </Link>
     )

@@ -1,11 +1,12 @@
-import { IBaseMessage, ITextMessage, IContactRequest, IContactResponse } from "../entities/interfaces";
+import { ITextMessage, IContactRequest, IContactResponse, Permission } from "../services/iotaService/interfaces";
 import { Message, Contact, MessageStatus } from "../entities";
-import {IGroupInvitation} from "../entities/interfaces/IGroupInvitation";
+import {IGroupInvitation} from "../services/iotaService/interfaces/IGroupInvitation";
 import {Group} from "../entities/Group";
 
 export function toMessage(baseMessage: ITextMessage): Message {
     const returnMessage: Message = {
-        contact: toContact(baseMessage),
+        secret: baseMessage.secret,
+        reciverAddress: baseMessage.address,
         message: baseMessage.message,
         hash: baseMessage.hash,
         status: MessageStatus.Read,
@@ -15,16 +16,18 @@ export function toMessage(baseMessage: ITextMessage): Message {
     return returnMessage;
 }
 
-export function toContact(baseMessage: IBaseMessage | IContactRequest | IContactResponse): Contact {
+export function toContact(con: IContactRequest | IContactResponse, address: string): Contact {
     const contact: Contact = {
-        address: baseMessage.address,
-        name: '',
+        address,
+        name: con.name,
         myName: '',
-        isActivated: true,
-        secret: baseMessage.secret,
-
+        isActivated: (con as IContactResponse).level !== undefined && (con as IContactResponse).level === Permission.accepted,
+        secret: con.secret,
+        updateTime: con.time,
+        isDisplayed: true,
     }
     return contact
+
 }
 
 export function toGroup(baseMessage: IGroupInvitation) : Group {
@@ -36,3 +39,4 @@ export function toGroup(baseMessage: IGroupInvitation) : Group {
 }
 
 
+ 

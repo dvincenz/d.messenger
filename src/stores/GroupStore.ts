@@ -1,16 +1,26 @@
 import {flow, observable} from "mobx";
 import {Group} from "../entities/Group";
 import {settingStore} from "./SettingStore";
-import {IBaseMessage, MessageMethod} from "../entities/interfaces";
-import {IGroupInvitation} from "../entities/interfaces/IGroupInvitation";
-import {toGroup} from "../utils/Mapper";
+import {IGroupInvitation} from "../services/iotaService/interfaces/IGroupInvitation";
+import {toContact, toGroup} from "../utils/Mapper";
 
 
 export class GroupStore {
     @observable public groups: Group[] = [];
     @observable public state: GroupStoreState;
 
-    public fetchGroups = flow(function *(this: GroupStore) {
+    public subscribeForGroupInvitations () {
+        settingStore.Iota.subscribe("groupInvitation", (grps: IGroupInvitation[]) => {
+            this.state = GroupStoreState.loading
+            grps.forEach(g => {
+                this.addGroup(g)
+                settingStore.Iota.sendGroupInvitationResponse(g.address, settingStore.myName)
+            })
+            this.state = GroupStoreState.updated
+        })
+    }
+
+    /* public fetchGroups = flow(function *(this: GroupStore) {
         this.state = GroupStoreState.loading
         try {
             const groups = yield settingStore.Iota.getGroups()
@@ -26,7 +36,7 @@ export class GroupStore {
             this.state = GroupStoreState.error
             console.log(error)
         }
-    })
+    }) */
 
     private addGroup(invitation: IGroupInvitation) {
         this.groups.push(toGroup(invitation))

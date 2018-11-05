@@ -13,9 +13,10 @@ export enum MessageMethod {
     Message,
     GroupInvitation,
     GroupInvitationResponse,
+    ICE,
 }
 
 export enum Permission {
     accepted,
-    declined,
+    denied,
 }

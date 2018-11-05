@@ -22,8 +22,8 @@
     "no-debugger": false,
     "jsx-boolean-value": false,
     "object-literal-sort-keys": false,
-    "no-unused-expression":  {"severity": "warning"},
-    "no-unused-variable": {"severity": "warning"}
+    "no-unused-expression": [true, "allow-fast-null-checks"],
+    "no-unused-variable": {"severity": "warning"} 
      
   }
 }

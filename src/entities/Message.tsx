@@ -1,18 +1,19 @@
 import { observable } from "mobx";
-import { ITextMessage, MessageMethod } from "./interfaces";
-import { Contact } from "./Contact";
+import { ITextMessage, MessageMethod } from "../services/iotaService/interfaces";
+import { contactStore } from "src/stores/ContactStore";
 
 export class Message {
     public message: string 
+    public reciverAddress: string
     @observable public status?: MessageStatus = MessageStatus.New
     public hash?: string
     public time: number
-    public contact: Contact
+    public secret: string
 
     public toITextMessage(): ITextMessage{
         const message: ITextMessage = {
-            secret: this.contact.secret,
-            address: this.contact.address,
+            secret: this.secret,
+            address: contactStore.getContactBySecret(this.secret).address,
             message: this.message,
             method:  MessageMethod.Message,
             time: new Date().getTime(),

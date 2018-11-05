@@ -9,12 +9,15 @@
     "@material-ui/core": "^3.1.2",
     "@types/iota.lib.js": "^0.4.0",
     "@types/react-router-dom": "^4.3.1",
+    "@types/simple-peer": "^6.1.5",
+    "fast-array-diff": "^0.2.0",
     "mobx": "^5.5.0",
     "mobx-react": "^5.3.1",
     "react": "^16.5.2",
     "react-dom": "^16.5.2",
     "react-router-dom": "^4.3.1",
-    "react-scripts-ts": "2.17.0"
+    "react-scripts-ts": "2.17.0",
+    "simple-peer": "^9.1.2"
   },
   "scripts": {
     "start": "react-scripts-ts start --fix",

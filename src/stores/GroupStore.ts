@@ -16,6 +16,7 @@ export class GroupStore {
         for(const key in this.groups) {
             groupsArray.push(this.groups[key])
         }
+        console.log(this.groups.length)
         return groupsArray
     }
 
@@ -39,7 +40,6 @@ export class GroupStore {
             this.state = GroupStoreState.loading
             grps.forEach(g => {
                 this.addGroup(g)
-                settingStore.Iota.sendGroupInvitationResponse(g.address, settingStore.myName)
             })
             this.state = GroupStoreState.updated
         })

@@ -169,6 +169,7 @@ export class Iota extends EventHandler {
         const contactRequests: IContactRequest[] = []
         const contactResponse: IContactResponse[] = []
         const groupInvitations: IGroupInvitation[] = []
+        const groupInvitationResponse: IGroupInvitationResponse[] = []
         const ice: IICERequest[] = []
         rawObjects.forEach((m: any) => {
             if(!this.isBootStrapped){
@@ -193,6 +194,10 @@ export class Iota extends EventHandler {
                 }
                 case MessageMethod.GroupInvitation: {
                     groupInvitations.push(m as IGroupInvitation)
+                    break;
+                }
+                case MessageMethod.GroupInvitationResponse: {
+                    groupInvitationResponse.push(m as IGroupInvitationResponse)
                     break;
                 }
                 case MessageMethod.ICE: {

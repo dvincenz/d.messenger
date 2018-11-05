@@ -42,7 +42,7 @@ class ContactsComponent extends React.Component<IProps> {
                         <Person key={c.address} contact={c} classes={classes} handleClickContact={this.handleClickContact}/>
                     )}
                     {groupStore.getGroups.map(g =>
-                        <Person key={g.address} contact={g} classes={classes} handleClickGroup={this.handleClickContact}/>
+                        <Group key={g.address} contact={g} classes={classes} handleClickGroup={this.handleClickContact}/>
                     )}
                 </List>
             </React.Fragment>
@@ -58,8 +58,6 @@ class ContactsComponent extends React.Component<IProps> {
     protected handleClickContact = () => {
         // todo: handle this click
     }
-
-
 }
 
 
@@ -71,6 +69,19 @@ function Person(props: any) {
             <ListItem button>
                 <Avatar className={props.classes.avatar}>{(props.contact.name).charAt(0)}</Avatar>
                 <ListItemText primary={props.contact.name + ' ' + props.contact.secret} secondary={props.contact.address} />
+            </ListItem>
+        </Link>
+    )
+}
+
+function Group(props: any) {
+    const link = `/chat/${props.contact.address}`;
+    return (
+        // tslint:disable-next-line:jsx-no-lambda
+        <Link to={link} onClick={props.handleClickContact} className={props.classes.link}>
+            <ListItem button>
+                <Avatar className={props.classes.avatar}>{(props.contact.name).charAt(0)}</Avatar>
+                <ListItemText primary={props.contact.name} secondary={props.contact.address} />
             </ListItem>
         </Link>
     )

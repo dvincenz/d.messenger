@@ -147,7 +147,6 @@ class LoginComponent extends React.Component<IPorps, IState> {
   }
 
   private handleStoreSeed = () => {
-    console.log(this.state.seed)
     settingStore.setSeed(this.state.seed);
   }
 }

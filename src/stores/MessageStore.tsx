@@ -11,7 +11,9 @@ export class MessageStore {
         if(this.messages === undefined || this.messages.length === 0 || contactStore.currentContact === undefined){
             return [] as Message []
         }
-        return this.messages.filter(m => m.contact.secret === contactStore.currentContact.secret)
+        return this.messages.filter(m => {
+            return m.secret === contactStore.currentContact.secret
+        })
     }
 
     @observable public messages: Message[] = []
@@ -41,7 +43,8 @@ export class MessageStore {
     public sendMessage = flow(function* (this: MessageStore, reciver: Contact, messageText: string) {
         this.state = MessageStoreState.sending
         const msg: Message = {
-            contact: reciver,
+            secret: reciver.secret,
+            reciverAddress: reciver.address,
             message: messageText,
             time: new Date().getTime(),
             status: MessageStatus.Sending,
@@ -69,11 +72,7 @@ export class MessageStore {
     }
 
     private addMessages = (messages: ITextMessage[]) => {
-        messages.forEach(m => {
-            if(contactStore.contacts.find(c => c.secret === m.secret) !== undefined) {
-                this.messages.push(toMessage(m))
-            }
-        })     
+        messages.forEach(m => this.messages.push(toMessage(m)))
         this.messages = this.messages.slice().sort((a, b) => a.time > b.time ? 1 : -1); // sort messages by time
     }
 

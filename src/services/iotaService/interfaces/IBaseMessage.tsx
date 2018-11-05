@@ -16,5 +16,5 @@ export enum MessageMethod {
 
 export enum Permission {
     accepted,
-    declined,
+    denied,
 }

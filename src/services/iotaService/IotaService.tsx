@@ -1,13 +1,11 @@
 import { composeAPI, AccountData } from '@iota/core'
 import { asciiToTrytes, trytesToAscii } from '@iota/converter'
 import { asTransactionObject } from '@iota/transaction-converter'
-import { IBaseMessage, MessageMethod, ITextMessage, IContactResponse, Permission, IContactRequest, IMessageResponse } from '../../services/iotaService/interfaces';
+import { IBaseMessage, MessageMethod, ITextMessage, IContactResponse, Permission, IContactRequest } from '../../services/iotaService/interfaces';
 import { getRandomSeed, arrayDiff } from '../../utils';
-import { asyncForEach } from '../../utils';
 import { EventHandler } from '../../utils/EventHandler';
-import { Ice } from 'src/entities/Ice';
-import { diff, DiffData } from 'fast-array-diff'
 import { IICERequest } from './interfaces/IICERequest';
+
 
 
 export class Iota extends EventHandler {
@@ -63,11 +61,12 @@ export class Iota extends EventHandler {
         return await this.sendToTangle(message)
     }
 
-    public async sendContactResponse(addr: string, permission: Permission, ownAddress: string, myName: string) {
+    public async sendContactResponse(addr: string, permission: Permission, ownAddress: string, myName: string, key: string) {
+        debugger;
         const message: IContactResponse = {
             method: MessageMethod.ContactResponse,
             name: myName,
-            secret: getRandomSeed(20),
+            secret: key,
             level: permission,
             address: addr,
             senderAddress: ownAddress,
@@ -78,14 +77,13 @@ export class Iota extends EventHandler {
 
     public async bootstrapMessenger() {
         const accountData: AccountData = await this.api.getAccountData(this.seed)
-        if(accountData.addresses.length  === null){
-            // todo create new address because seed is new and empty
-            console.log('todo create new address')
-        }
         try{
             await this.getObjectsFromTangle(accountData.addresses as [])
         } catch(error){
             console.error(error);
+        }
+        if(this.ownAddress === undefined){
+            this.ownAddress = await this.api.getNewAddress(this.seed)
         }
         this.isBootStrapped = true;
         setInterval(async () => {
@@ -144,9 +142,8 @@ export class Iota extends EventHandler {
         const rawObjects = await this.getFromTangle(addr);
         const messages: ITextMessage[] = []
         const contactRequests: IContactRequest[] = []
-        const contactRespone: IContactResponse[] = []
+        const contactResponse: IContactResponse[] = []
         const ice: IICERequest[] = []
-        console.log(addr);
         rawObjects.forEach((m: any) => {
             if(!this.isBootStrapped){
                 this.ownAddress = m.address;
@@ -157,11 +154,15 @@ export class Iota extends EventHandler {
                     break;
                 }
                 case MessageMethod.ContactRequest: {
-                    contactRequests.push(m as IContactRequest)
+                    if(this.ownAddress === undefined || (this.ownAddress === m.address || m.senderAddress === this.ownAddress)){
+                        contactRequests.push(m as IContactRequest)
+                    }
                     break;
                 }
                 case MessageMethod.ContactResponse: {
-                    contactRespone.push(m as IContactResponse)
+                    if(this.ownAddress === undefined || (this.ownAddress === m.address || m.senderAddress === this.ownAddress)){
+                        contactResponse.push(m as IContactResponse)
+                    }
                     break; 
                 }
                 case MessageMethod.ICE: {
@@ -174,11 +175,9 @@ export class Iota extends EventHandler {
                 break;
             }
         })
-        console.log(contactRequests)
-        console.log(contactRespone)
         messages.length > 0 && this.publish('message', messages)
         contactRequests.length > 0 && this.publish('contactRequest', contactRequests)
-        contactRespone.length && this.publish('contactRespone', contactRespone)
+        contactResponse.length && this.publish('contactResponse', contactResponse)
         ice.length > 0 && this.publish('ice', ice)
     }
 
@@ -224,7 +223,6 @@ export class Iota extends EventHandler {
         object.address = transaction.address;
         object.hash = transaction.hash;
         object.time = transaction.timestamp;
-        console.log(object)
         return object
     }
 

@@ -36,8 +36,9 @@ export class SenderComponent extends React.Component<IPorps, IState> {
         const { classes } = this.props
         return (
             <div>        
-                <TextField className={classes.textbox} value={this.state.message} onChange={this.handleInputChange}  label="Message"   />
+                <TextField className={classes.textbox} disabled={contactStore.currentContact === undefined} value={this.state.message} onChange={this.handleInputChange}  label="Message"   />
                 <Button 
+                    disabled={contactStore.currentContact === undefined}
                     className={classes.button}
                     variant="contained"
                     color="primary"  
@@ -48,25 +49,11 @@ export class SenderComponent extends React.Component<IPorps, IState> {
         );
     }
 
-    public componentDidMount(){
-        this.setAddress(this.props.address);
-    }
-    public componentDidUpdate () {
-        this.setAddress(this.props.address);
-    }
-
-    private setAddress (addr: string){
-        if(addr !== undefined && (contactStore.currentContact === undefined || contactStore.currentContact.address !== addr)){
-            contactStore.setCurrentContact = addr
-        }
-    } 
-
     private handleSubmit = (): void => {
-        // get Conntact address form contact store
         const msg = this.state.message;
         this.setState({message: ''})
         if(contactStore === undefined){
-            console.error('error seding the address')   
+            console.error('error, no address aviable')   
             return
         }
         messageStore.sendMessage(contactStore.currentContact as Contact, msg)

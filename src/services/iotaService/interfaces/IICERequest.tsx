@@ -1,4 +1,4 @@
-import {IBaseMessage, Permission} from './IBaseMessage'
+import { IBaseMessage } from './IBaseMessage'
 
 export interface IICERequest extends IBaseMessage {
     iceObject: string;

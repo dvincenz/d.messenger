@@ -3,12 +3,12 @@ import { Message, MessageStatus } from '../entities/Message';
 import { settingStore } from './SettingStore'
 import { Contact } from '../entities';
 import { toMessage } from '../utils/Mapper'
-import { ITextMessage } from '../entities/interfaces';
+import { ITextMessage } from '../services/iotaService/interfaces';
 import { contactStore } from './ContactStore';
 
 export class MessageStore {
     @computed get getMessagesFromAddress () {
-        if(this.messages === undefined || this.messages.length === 0 || typeof contactStore.currentContact === undefined){
+        if(this.messages === undefined || this.messages.length === 0 || contactStore.currentContact === undefined){
             return [] as Message []
         }
         return this.messages.filter(m => m.contact.secret === contactStore.currentContact.secret)
@@ -32,6 +32,8 @@ export class MessageStore {
         }
     })
 
+
+
     // todo find better way to fetch messages 
     public set setFitlerMessages (filterAddress: string) {
         this.fetchMessages(filterAddress);
@@ -53,9 +55,29 @@ export class MessageStore {
         }
     })
 
+    public subscribeForMessages = () =>{
+        settingStore.Iota.subscribe('message', (data: ITextMessage[]) => 
+        {
+            if(data !== undefined){
+                this.addMessages(data)
+            }
+            
+        })
+    }
     public addMessage (messages: Message){
         this.messages.push(messages)
     }
+
+    private addMessages = (messages: ITextMessage[]) => {
+        messages.forEach(m => {
+            if(contactStore.contacts.find(c => c.secret === m.secret) !== undefined) {
+                this.messages.push(toMessage(m))
+            }
+        })     
+        this.messages = this.messages.slice().sort((a, b) => a.time > b.time ? 1 : -1); // sort messages by time
+    }
+
+    
 }
 
 export const messageStore = new MessageStore()

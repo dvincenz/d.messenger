@@ -1,5 +1,5 @@
 import { observable } from "mobx";
-import { ITextMessage, MessageMethod } from "./interfaces";
+import { ITextMessage, MessageMethod } from "../services/iotaService/interfaces";
 import { Contact } from "./Contact";
 
 export class Message {

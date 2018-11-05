@@ -2,6 +2,7 @@ import * as React from 'react';
 import { StyleRulesCallback, withStyles, Avatar, ListItem, ListItemText, List } from '@material-ui/core';
 import { Link, Redirect } from 'react-router-dom';
 import { contactStore } from '../stores/ContactStore'
+import { observer } from 'mobx-react';
 
 
 const styles: StyleRulesCallback = theme => ({
@@ -25,7 +26,7 @@ const styles: StyleRulesCallback = theme => ({
 interface IProps {
     classes: any;
 }
-
+@observer
 class ContactsComponent extends React.Component<IProps> {
     constructor(props: IProps) {
         super(props)

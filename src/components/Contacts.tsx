@@ -26,6 +26,7 @@ const styles: StyleRulesCallback = theme => ({
 interface IProps {
     classes: any;
 }
+
 @observer
 class ContactsComponent extends React.Component<IProps> {
     constructor(props: IProps) {
@@ -37,7 +38,7 @@ class ContactsComponent extends React.Component<IProps> {
         return (
             <React.Fragment>
                 <List className={classes.list}>
-                    {contactStore.getContacts.map(c => 
+                    {contactStore.getContacts.map(c =>
                         <Person key={c.address} contact={c} classes={classes} handleClickContact={this.handleClickContact}/>
                     )}
                 </List>
@@ -54,8 +55,6 @@ class ContactsComponent extends React.Component<IProps> {
     protected handleClickContact = () => {
         // todo: handle this click
     }
-
-
 }
 
 

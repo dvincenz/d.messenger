@@ -61,8 +61,8 @@ const styles: StyleRulesCallback = theme => ({ // todo fix sizes with theme.spac
         boxShadow: '0 0 8px 0 rgba(0,0,0, 0.3)'
 
     }
-
 })
+
 @observer
 export class MessageDisplayerComponent extends React.Component<IPorps, {}> {
     constructor(props: IPorps) {
@@ -74,11 +74,13 @@ export class MessageDisplayerComponent extends React.Component<IPorps, {}> {
 
     public render() {
         const { classes } = this.props
+
         if(contactStore.currentContact !== undefined && !contactStore.currentContact.isActivated){
             return (
                 <ContactConfirmator />
             )
         }
+
         return (
             <div className={classes.chatroom}>
                 <ul className={classes.chats}>
@@ -95,11 +97,9 @@ export class MessageDisplayerComponent extends React.Component<IPorps, {}> {
                     ) : <p>{contactStore.currentContact === undefined ? "select a contact to display" : `loading messages for ${contactStore.currentContact.address}`}</p>}
                 </ul>
             </div>
-
         );
     }
 }
-
 
 function MessageComponent(props: any) {
     return <li className={props.ownMessage ? props.classes.left : props.classes.right} >

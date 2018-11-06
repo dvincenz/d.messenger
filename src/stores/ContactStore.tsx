@@ -1,17 +1,20 @@
 import { flow, observable, computed } from "mobx";
 import { Contact } from "../entities";
 import { settingStore } from "./SettingStore";
-import { IContactRequest, IContactResponse, Permission } from "../services/iotaService/interfaces";
+import {IContactRequest, IContactResponse, Permission} from "../services/iotaService/interfaces";
 import { toContact } from "../utils/Mapper";
+import {getRandomSeed} from "../utils";
 
 
 export class ContactStore {
     @computed get currentContact(): Contact {
-        return this.contacts[this._currentContact];
+        return this.contacts[this._currentContact]
     }
+
     set currentContact(contact: Contact) {
         this._currentContact = contact.address;
     }
+
     set setCurrentContact(address: string){
         this._currentContact = address;
     }
@@ -25,10 +28,11 @@ export class ContactStore {
         }
         return contactsArray
     }
+
     public addContactRequest = flow(function *(this: ContactStore, address: string) {
         this.state = ContactStoreState.loading
         try {
-            yield settingStore.Iota.sendContactRequest(address, settingStore.myAddress, 'dvi')
+            yield settingStore.Iota.sendContactRequest(address, settingStore.myAddress, 'dvi', false)
             this.state = ContactStoreState.updated
         } catch (error) {
             this.state = ContactStoreState.error
@@ -50,6 +54,7 @@ export class ContactStore {
             console.log(error)
         }
     })
+
     public acceptCurrentContact = flow(function *(this: ContactStore) {
         this.state = ContactStoreState.loading
         try {
@@ -66,6 +71,19 @@ export class ContactStore {
             console.log(error)
         }
     })
+
+    public createGroup = flow(function *(this: ContactStore, name: string) {
+        this.state = ContactStoreState.loading
+        try {
+            const groupAddr = getRandomSeed(81)
+            yield settingStore.Iota.sendContactRequest(settingStore.myAddress, groupAddr, name, true)
+            this.state = ContactStoreState.updated
+        } catch (error) {
+            this.state = ContactStoreState.error
+            console.log(error)
+        }
+    })
+
     @observable private contacts = {};
     // tslint:disable-next-line:variable-name
     @observable private _currentContact?: string;
@@ -73,6 +91,7 @@ export class ContactStore {
     public addContact (contact: Contact) {
         this.contacts[contact.address] = contact;
     }
+
     public getContactBySecret(secret:string): Contact{
         for(const key in this.contacts){
             if(this.contacts[key].secret === secret){
@@ -90,10 +109,10 @@ export class ContactStore {
         settingStore.Iota.subscribe('contactRequest', (contacts: IContactRequest[]) => {
             contacts.forEach(c => {
                 if(this.contacts[c.senderAddress] === undefined && settingStore.myAddress !== c.senderAddress){
-                    this.contacts[c.senderAddress] = toContact(c, c.senderAddress)
+                    this.contacts[c.senderAddress] = toContact(c, c.senderAddress, c.isGroup)
                 }
                 if(this.contacts[c.address] === undefined && settingStore.myAddress !== c.address && settingStore.myAddress !== undefined){
-                    this.contacts[c.address] = toContact(c, c.address)
+                    this.contacts[c.address] = toContact(c, c.address, c.isGroup)
                 }
             })
         })
@@ -104,12 +123,12 @@ export class ContactStore {
             contacts.forEach(c => {
                 if(this.contacts[c.senderAddress] === undefined || (this.contacts[c.senderAddress] !== undefined && this.contacts[c.senderAddress].updateTime < c.time)){
                     if(settingStore.myAddress !== c.senderAddress){
-                        this.contacts[c.senderAddress] = toContact(c, c.senderAddress)
+                        this.contacts[c.senderAddress] = toContact(c, c.senderAddress, false)
                     }
                 }
                 if(this.contacts[c.address] === undefined || (this.contacts[c.address] !== undefined && this.contacts[c.address].updateTime < c.time)){
                     if(settingStore.myAddress !== c.address && settingStore.myAddress !== undefined){
-                        this.contacts[c.address] = toContact(c, c.address)
+                        this.contacts[c.address] = toContact(c, c.address, false)
                     }
                 }
             })

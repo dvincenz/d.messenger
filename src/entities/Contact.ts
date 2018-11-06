@@ -9,4 +9,5 @@ export class Contact {
     public webRtcConnection?: WebRtcConnection;
     public updateTime: number;
     public isDisplayed: boolean;
+    public isGroup: boolean;
 }

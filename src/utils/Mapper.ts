@@ -14,18 +14,18 @@ export function toMessage(baseMessage: ITextMessage): Message {
     return returnMessage;
 }
 
-export function toContact(con: IContactRequest | IContactResponse, address: string): Contact {
+export function toContact(con: IContactRequest | IContactResponse, address: string, isGrp: boolean): Contact {
     const contact: Contact = {
         address,
         name: con.name,
         myName: '',
-        isActivated: (con as IContactResponse).level !== undefined && (con as IContactResponse).level === Permission.accepted,
+        isActivated: (isGrp) || ((con as IContactResponse).level !== undefined && (con as IContactResponse).level === Permission.accepted),
         secret: con.secret,
         updateTime: con.time,
         isDisplayed: true,
+        isGroup: isGrp,
     }
     return contact
-
 }
 
 

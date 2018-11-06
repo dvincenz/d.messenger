@@ -1,22 +1,20 @@
 import * as React from 'react';
 import { Button, TextField, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@material-ui/core';
-import { isValidChecksum } from '@iota/checksum';
-import { contactStore } from 'src/stores/ContactStore';
+import {contactStore} from "../stores/ContactStore";
 
 
 interface IPorps {
     open: boolean;
 }
-
 interface IState {
     open: boolean,
-    address: string,
+    name: string,
     disableInput: boolean,
     error: string,
     bevoreOpen:boolean,
 }
 
-export class AddContact extends React.Component<IPorps, IState> {
+export class CreateGroup extends React.Component<IPorps, IState> {
     public static getDerivedStateFromProps(props: IPorps, state: IState) {
         if (state.open !== state.bevoreOpen){
             return {
@@ -31,13 +29,12 @@ export class AddContact extends React.Component<IPorps, IState> {
         }
         return null;
     }
-
     constructor(props: IPorps) {
         super(props);
         this.state = {
             open: props.open,
             bevoreOpen: props.open,
-            address: '',
+            name: '',
             disableInput: false,
             error: ''
         }
@@ -51,17 +48,17 @@ export class AddContact extends React.Component<IPorps, IState> {
                     onClose={this.handleClose}
                     aria-labelledby="form-dialog-title"
                 >
-                    <DialogTitle id="form-dialog-title">Add Contact</DialogTitle>
+                    <DialogTitle id="form-dialog-title">Create Group</DialogTitle>
                     <DialogContent>
                         <DialogContentText>
-                            Please enter the Adress of you new contact.
+                            Please enter the Group name.
                         </DialogContentText>
                         <TextField
                             onChange={this.handleInputChange}
                             autoFocus
                             margin="dense"
-                            id="address"
-                            label={this.state.error !== '' ? this.state.error : this.state.disableInput ? 'save...' : 'Address'}
+                            id="name"
+                            label={this.state.error !== '' ? this.state.error : this.state.disableInput ? 'save...' : 'Name'}
                             type="text"
                             fullWidth
                             disabled={this.state.disableInput}
@@ -73,7 +70,7 @@ export class AddContact extends React.Component<IPorps, IState> {
                             Cancel
                         </Button>
                         <Button onClick={this.handleSave} disabled={this.state.disableInput} color="primary">
-                            Add Contact
+                            Create Group
                         </Button>
                     </DialogActions>
                 </Dialog>
@@ -82,10 +79,10 @@ export class AddContact extends React.Component<IPorps, IState> {
     }
 
     private handleInputChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
-        this.setState({ 
-            address: event.target.value,
+        this.setState({
+            name: event.target.value,
             error: ''
-         })
+        })
     }
 
     private handleClose = () => {
@@ -94,20 +91,11 @@ export class AddContact extends React.Component<IPorps, IState> {
         })
     }
 
-    private handleSave = () =>{
-        try {
-            isValidChecksum(this.state.address)
-        } catch {
-            this.setState({
-                error: 'Invalid Address - try again'
-            })
-            return;
-        }
-
-        contactStore.addContactRequest(this.state.address).then(
-            () => this.setState({ 
+    private handleSave = () => {
+        contactStore.createGroup(this.state.name).then(
+            () => this.setState({
                 open: false,
-                disableInput: false, 
+                disableInput: false,
             })
         );
     }

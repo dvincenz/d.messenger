@@ -29,6 +29,8 @@ export function NewAccountDialog(props: any) {
           value={props.seed}
           inputProps={{size: 81}}
           onChange={props.handleSeedChange}
+          autoFocus
+          onFocus={props.handleSeedChange}
         />
       </DialogContent>
       <DialogActions>

@@ -72,6 +72,7 @@ interface IPorps {
 interface IState {
   seed: string;
   isNewAccountDialogShow: boolean;
+  textbox: any;
 }
 
 @observer
@@ -81,7 +82,8 @@ class LoginComponent extends React.Component<IPorps, IState> {
     super(props);
     this.state = {
       seed: '',
-      isNewAccountDialogShow: false
+      isNewAccountDialogShow: false,
+      textbox: null,
     }
   }
 
@@ -177,8 +179,10 @@ class LoginComponent extends React.Component<IPorps, IState> {
 
   private handleSeedChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     this.setState({
-      seed: event.target.value
+      seed: event.target.value,
+      textbox: event.target
     })
+    
   }
 
   private handleStoreSeed = () => {
@@ -194,6 +198,7 @@ class LoginComponent extends React.Component<IPorps, IState> {
   }
 
   private handleNewAccountDialogClose = () => {
+    this.state.textbox.select();
     document.execCommand("copy");
     this.setState({
       isNewAccountDialogShow: false

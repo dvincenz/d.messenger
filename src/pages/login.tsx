@@ -4,6 +4,11 @@ import {
   Button,
   Checkbox,
   CssBaseline,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   FormControlLabel,
   Grid,
   StyleRulesCallback,
@@ -16,11 +21,7 @@ import {Redirect} from 'react-router';
 import {observer} from 'mobx-react';
 import {settingStore} from '../stores/SettingStore';
 import {getRandomSeed} from "../utils";
-import Dialog from "@material-ui/core/Dialog/Dialog";
-import DialogTitle from "@material-ui/core/DialogTitle/DialogTitle";
-import DialogContent from "@material-ui/core/DialogContent/DialogContent";
-import DialogContentText from "@material-ui/core/DialogContentText/DialogContentText";
-import DialogActions from "@material-ui/core/DialogActions/DialogActions";
+import {RefObject} from "react";
 
 
 const styles: StyleRulesCallback = theme => ({
@@ -80,6 +81,8 @@ interface IState {
 
 @observer
 class LoginComponent extends React.Component<IPorps, IState> {
+  public newSeedRef : RefObject<any>;
+
   constructor(props: IPorps) {
     super(props);
     this.state = {
@@ -202,6 +205,7 @@ class LoginComponent extends React.Component<IPorps, IState> {
 }
 
 function NewAccount(props: any) {
+
   return (
       <Dialog
         open={props.open}
@@ -214,11 +218,11 @@ function NewAccount(props: any) {
           <DialogContentText  id="alert-dialog-description">
               Keep your seed save. It's your access token to your messages on d.messenger
           </DialogContentText>
-          <TextField 
-            multiline 
-            className={props.classes.seedTextbox} 
-            value={props.seed} 
-            inputProps={{size: 81}} 
+          <TextField
+            multiline
+            className={props.classes.seedTextbox}
+            value={props.seed}
+            inputProps={{size: 81}}
             id={"newSeed"}
             />
         </DialogContent>

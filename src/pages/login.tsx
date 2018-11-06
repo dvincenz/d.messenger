@@ -12,11 +12,11 @@ import {
   Typography,
   withStyles,
 } from '@material-ui/core';
-import {Redirect} from 'react-router';
-import {observer} from 'mobx-react';
-import {settingStore} from '../stores/SettingStore';
-import {getRandomSeed} from "../utils";
-import {NewAccountDialog} from "../entities/NewAccountDialog";
+import { Redirect } from 'react-router';
+import { observer } from 'mobx-react';
+import { settingStore } from '../stores/SettingStore';
+import { getRandomSeed } from "../utils";
+import { NewAccountDialog } from "../components/NewAccountDialog";
 
 
 const styles: StyleRulesCallback = theme => ({

@@ -1,13 +1,10 @@
 import { composeAPI, AccountData } from '@iota/core'
 import { asciiToTrytes, trytesToAscii } from '@iota/converter'
 import { asTransactionObject } from '@iota/transaction-converter'
-
 import { IBaseMessage, MessageMethod, ITextMessage, IContactResponse, Permission, IContactRequest } from '../../services/iotaService/interfaces';
 import { getRandomSeed, arrayDiff } from '../../utils';
 import { EventHandler } from '../../utils/EventHandler';
 import { IICERequest } from './interfaces/IICERequest';
-import {IGroupInvitation} from "./interfaces/IGroupInvitation";
-import {IGroupInvitationResponse} from "./interfaces/IGroupInvitationResponse";
 
 
 export class Iota extends EventHandler {
@@ -71,29 +68,6 @@ export class Iota extends EventHandler {
             address: addr,
             senderAddress: ownAddress,
             time: new Date().getTime()
-        }
-        return await this.sendToTangle(message)
-    }
-
-    public async sendGroupInvitation(addr: string, groupAddr: string, name: string) {
-        const message: IGroupInvitation = {
-            method: MessageMethod.GroupInvitation,
-            address: addr,
-            time: new Date().getTime(),
-            secret: getRandomSeed(20),
-            groupAddress: groupAddr,
-            groupName: name,
-        }
-        return await this.sendToTangle(message)
-    }
-
-    public async sendGroupInvitationResponse(groupAddr: string, ownName: string) {
-        const message: IGroupInvitationResponse = {
-            method: MessageMethod.GroupInvitationResponse,
-            address: groupAddr,
-            time: new Date().getTime(),
-            secret: getRandomSeed(20),
-            myName: ownName,
         }
         return await this.sendToTangle(message)
     }
@@ -166,8 +140,6 @@ export class Iota extends EventHandler {
         const messages: ITextMessage[] = []
         const contactRequests: IContactRequest[] = []
         const contactResponse: IContactResponse[] = []
-        const groupInvitations: IGroupInvitation[] = []
-        const groupInvitationResponse: IGroupInvitationResponse[] = []
         const ice: IICERequest[] = []
         rawObjects.forEach((m: any) => {
             if(!this.isBootStrapped){
@@ -190,14 +162,6 @@ export class Iota extends EventHandler {
                     }
                     break; 
                 }
-                case MessageMethod.GroupInvitation: {
-                    groupInvitations.push(m as IGroupInvitation)
-                    break;
-                }
-                case MessageMethod.GroupInvitationResponse: {
-                    groupInvitationResponse.push(m as IGroupInvitationResponse)
-                    break;
-                }
                 case MessageMethod.ICE: {
                     ice.push(m as IICERequest)
                     break;
@@ -211,7 +175,6 @@ export class Iota extends EventHandler {
         messages.length > 0 && this.publish('message', messages)
         contactRequests.length > 0 && this.publish('contactRequest', contactRequests)
         contactResponse.length && this.publish('contactResponse', contactResponse)
-        groupInvitations.length > 0 && this.publish('groupInvitation', groupInvitations)
         ice.length > 0 && this.publish('ice', ice)
     }
 

@@ -15,31 +15,17 @@ export function toMessage(baseMessage: ITextMessage): Message {
 }
 
 export function toContact(con: IContactRequest | IContactResponse, address: string, isGrp: boolean): Contact {
-    if(isGrp) {
-        const contact: Contact = {
-            address,
-            name: con.name,
-            myName: '',
-            isActivated: true,
-            secret: con.secret,
-            updateTime: con.time,
-            isDisplayed: true,
-            isGroup: isGrp,
-        }
-        return contact
-    } else {
-        const contact: Contact = {
-            address,
-            name: con.name,
-            myName: '',
-            isActivated: (con as IContactResponse).level !== undefined && (con as IContactResponse).level === Permission.accepted,
-            secret: con.secret,
-            updateTime: con.time,
-            isDisplayed: true,
-            isGroup: isGrp,
-        }
-        return contact
+    const contact: Contact = {
+        address,
+        name: con.name,
+        myName: '',
+        isActivated: (isGrp) || ((con as IContactResponse).level !== undefined && (con as IContactResponse).level === Permission.accepted),
+        secret: con.secret,
+        updateTime: con.time,
+        isDisplayed: true,
+        isGroup: isGrp,
     }
+    return contact
 }
 
 

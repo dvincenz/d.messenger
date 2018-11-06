@@ -4,11 +4,6 @@ import {
   Button,
   Checkbox,
   CssBaseline,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
   FormControlLabel,
   Grid,
   StyleRulesCallback,
@@ -21,7 +16,7 @@ import {Redirect} from 'react-router';
 import {observer} from 'mobx-react';
 import {settingStore} from '../stores/SettingStore';
 import {getRandomSeed} from "../utils";
-import {RefObject} from "react";
+import {NewAccountDialog} from "../entities/NewAccountDialog";
 
 
 const styles: StyleRulesCallback = theme => ({
@@ -81,8 +76,7 @@ interface IState {
 
 @observer
 class LoginComponent extends React.Component<IPorps, IState> {
-  public newSeedRef : RefObject<any>;
-
+  
   constructor(props: IPorps) {
     super(props);
     this.state = {
@@ -157,7 +151,7 @@ class LoginComponent extends React.Component<IPorps, IState> {
                       <Button variant="outlined" color="primary" onClick={this.handleNewContact}>
                         Create a new account
                       </Button>
-                      {this.state.isNewAccountDialogShow && <NewAccount classes={this.props.classes} open={true} handleClose={this.handleNewAccountDialogClose} seed={this.state.seed}/>}
+                      {this.state.isNewAccountDialogShow && <NewAccountDialog classes={this.props.classes} open={true} handleClose={this.handleNewAccountDialogClose} seed={this.state.seed}/>}
                     </Grid>
                   </Grid>
                 </div>
@@ -202,37 +196,6 @@ class LoginComponent extends React.Component<IPorps, IState> {
     })
     settingStore.setSeed(this.state.seed);
   }
-}
-
-function NewAccount(props: any) {
-
-  return (
-      <Dialog
-        open={props.open}
-        onClose={props.handleClose}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">Your new fresh seed</DialogTitle>
-        <DialogContent>
-          <DialogContentText  id="alert-dialog-description">
-              Keep your seed save. It's your access token to your messages on d.messenger
-          </DialogContentText>
-          <TextField
-            multiline
-            className={props.classes.seedTextbox}
-            value={props.seed}
-            inputProps={{size: 81}}
-            id={"newSeed"}
-            />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={props.handleClose} color="primary">
-            Copy seed & Close
-          </Button>
-        </DialogActions>
-      </Dialog>
-  );
 }
 
 export const Login = withStyles(styles)(LoginComponent);

@@ -170,6 +170,9 @@ export class ContactStore {
                         contact.webRtcClient = undefined;
                         this.sendIce(contact, false, iceObject)
                     }
+                    if(contact.webRtcClient === undefined){
+                        this.sendIce(contact, false, iceObject)
+                    }
                 } else {
                     this.getContactBySecret(i.secret).webRtcClient.peer.signal(JSON.stringify(iceObject))
                 }

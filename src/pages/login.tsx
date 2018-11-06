@@ -151,7 +151,13 @@ class LoginComponent extends React.Component<IPorps, IState> {
                       <Button variant="outlined" color="primary" onClick={this.handleNewContact}>
                         Create a new account
                       </Button>
-                      {this.state.isNewAccountDialogShow && <NewAccountDialog classes={this.props.classes} open={true} handleClose={this.handleNewAccountDialogClose} seed={this.state.seed}/>}
+                      {this.state.isNewAccountDialogShow && 
+                      <NewAccountDialog 
+                        handleSeedChange={this.handleSeedChange}
+                        classes={this.props.classes} 
+                        open 
+                        handleClose={this.handleNewAccountDialogClose} 
+                        seed={this.state.seed}/>}
                     </Grid>
                   </Grid>
                 </div>
@@ -188,8 +194,6 @@ class LoginComponent extends React.Component<IPorps, IState> {
   }
 
   private handleNewAccountDialogClose = () => {
-    const copyText : HTMLInputElement = document.getElementById("newSeed") as HTMLInputElement;
-    copyText.select();
     document.execCommand("copy");
     this.setState({
       isNewAccountDialogShow: false

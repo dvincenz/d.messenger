@@ -28,7 +28,7 @@ export function NewAccountDialog(props: any) {
           className={props.classes.seedTextbox}
           value={props.seed}
           inputProps={{size: 81}}
-          id={"newSeed"}
+          onChange={props.handleSeedChange}
         />
       </DialogContent>
       <DialogActions>

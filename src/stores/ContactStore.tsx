@@ -1,9 +1,8 @@
 import { flow, observable, computed } from "mobx";
 import { Contact } from "../entities";
 import { settingStore } from "./SettingStore";
-import {IContactRequest, IContactResponse, MessageMethod, Permission} from "../services/iotaService/interfaces";
+import {IContactRequest, IContactResponse, Permission} from "../services/iotaService/interfaces";
 import { toContact } from "../utils/Mapper";
-import {IGroupInvitation} from "../services/iotaService/interfaces/IGroupInvitation";
 import {getRandomSeed} from "../utils";
 
 
@@ -11,9 +10,11 @@ export class ContactStore {
     @computed get currentContact(): Contact {
         return this.contacts[this._currentContact]
     }
+
     set currentContact(contact: Contact) {
         this._currentContact = contact.address;
     }
+
     set setCurrentContact(address: string){
         this._currentContact = address;
     }
@@ -27,6 +28,7 @@ export class ContactStore {
         }
         return contactsArray
     }
+
     public addContactRequest = flow(function *(this: ContactStore, address: string) {
         this.state = ContactStoreState.loading
         try {
@@ -89,6 +91,7 @@ export class ContactStore {
     public addContact (contact: Contact) {
         this.contacts[contact.address] = contact;
     }
+
     public getContactBySecret(secret:string): Contact{
         for(const key in this.contacts){
             if(this.contacts[key].secret === secret){

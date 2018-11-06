@@ -4,18 +4,16 @@ import { isValidChecksum } from '@iota/checksum';
 import { contactStore } from 'src/stores/ContactStore';
 
 
-
 interface IPorps {
     open: boolean;
 }
+
 interface IState {
     open: boolean,
     address: string,
     disableInput: boolean,
     error: string,
     bevoreOpen:boolean,
-    
-
 }
 
 export class AddContact extends React.Component<IPorps, IState> {
@@ -26,13 +24,14 @@ export class AddContact extends React.Component<IPorps, IState> {
             }
         }
         if (props.open !== state.open) {
-          return {
-            open: props.open,
-            bevoreOpen: props.open
-          }; 
+            return {
+                open: props.open,
+                bevoreOpen: props.open
+            };
         }
         return null;
-      }
+    }
+
     constructor(props: IPorps) {
         super(props);
         this.state = {
@@ -43,8 +42,6 @@ export class AddContact extends React.Component<IPorps, IState> {
             error: ''
         }
     }
-
-
 
     public render() {
         return (
@@ -58,7 +55,7 @@ export class AddContact extends React.Component<IPorps, IState> {
                     <DialogContent>
                         <DialogContentText>
                             Please enter the Adress of you new contact.
-            </DialogContentText>
+                        </DialogContentText>
                         <TextField
                             onChange={this.handleInputChange}
                             autoFocus
@@ -74,14 +71,13 @@ export class AddContact extends React.Component<IPorps, IState> {
                     <DialogActions>
                         <Button onClick={this.handleClose} disabled={this.state.disableInput}  color="primary">
                             Cancel
-            </Button>
+                        </Button>
                         <Button onClick={this.handleSave} disabled={this.state.disableInput} color="primary">
                             Add Contact
-            </Button>
+                        </Button>
                     </DialogActions>
                 </Dialog>
             </div>
-
         );
     }
 
@@ -91,13 +87,15 @@ export class AddContact extends React.Component<IPorps, IState> {
             error: ''
          })
     }
+
     private handleClose = () => {
         this.setState({
             open: false
         })
     }
+
     private handleSave = () =>{
-        try{
+        try {
             isValidChecksum(this.state.address)
         } catch {
             this.setState({
@@ -112,8 +110,5 @@ export class AddContact extends React.Component<IPorps, IState> {
                 disableInput: false, 
             })
         );
-        
     }
-
-
 }

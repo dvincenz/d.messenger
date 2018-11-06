@@ -17,14 +17,12 @@ interface IState {
   createGroupDialogOpen: boolean;
   currentAddress: string;
   ice: string;
-
 }
 
 interface IProps {
   classes: any;
   match: any;
 }
-
 
 const styles: StyleRulesCallback = theme => ({
   appBar: {
@@ -43,7 +41,6 @@ const styles: StyleRulesCallback = theme => ({
     top: 64,
     width: 300,
   }
-  
 })
 
 @observer

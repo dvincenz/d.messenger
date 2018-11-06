@@ -10,7 +10,6 @@ import {IGroupInvitation} from "./interfaces/IGroupInvitation";
 import {IGroupInvitationResponse} from "./interfaces/IGroupInvitationResponse";
 
 
-
 export class Iota extends EventHandler {
     public get myAddress(): string {
         return this.ownAddress;
@@ -64,7 +63,6 @@ export class Iota extends EventHandler {
     }
 
     public async sendContactResponse(addr: string, permission: Permission, ownAddress: string, myName: string, key: string) {
-        debugger;
         const message: IContactResponse = {
             method: MessageMethod.ContactResponse,
             name: myName,
@@ -115,8 +113,7 @@ export class Iota extends EventHandler {
         setInterval(async () => {
             await this.checkForNewMessages();
           }, 5000);
-    } 
-
+    }
 
     // #### Internal Methods ####
 

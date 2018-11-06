@@ -61,8 +61,8 @@ const styles: StyleRulesCallback = theme => ({ // todo fix sizes with theme.spac
         boxShadow: '0 0 8px 0 rgba(0,0,0, 0.3)'
 
     }
-
 })
+
 @observer
 export class MessageDisplayerComponent extends React.Component<IPorps, {}> {
     constructor(props: IPorps) {

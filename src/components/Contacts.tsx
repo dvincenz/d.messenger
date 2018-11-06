@@ -26,6 +26,7 @@ const styles: StyleRulesCallback = theme => ({
 interface IProps {
     classes: any;
 }
+
 @observer
 class ContactsComponent extends React.Component<IProps> {
     constructor(props: IProps) {

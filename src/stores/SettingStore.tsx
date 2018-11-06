@@ -27,7 +27,6 @@ export class SettingStore {
         this.myAddress = this.Iota.myAddress;
         // todo save myMessages with event subscriber on iota service
         console.log(this.myAddress)
-
     }
 }
 

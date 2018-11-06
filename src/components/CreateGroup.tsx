@@ -90,6 +90,7 @@ export class CreateGroup extends React.Component<IPorps, IState> {
             open: false
         })
     }
+
     private handleSave = () => {
         contactStore.createGroup(this.state.name).then(
             () => this.setState({

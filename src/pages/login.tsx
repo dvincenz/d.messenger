@@ -3,6 +3,7 @@ import { AppBar, Button, CssBaseline, Toolbar, Typography, Grid, withStyles, Sty
 import { Redirect } from 'react-router';
 import { observer } from 'mobx-react';
 import { settingStore } from '../stores/SettingStore';
+import {getRandomSeed} from "../utils";
 
 const styles: StyleRulesCallback = theme => ({
   appBar: {
@@ -121,7 +122,7 @@ class LoginComponent extends React.Component<IPorps, IState> {
                       <TextField label="Enter username" />
                     </Grid>
                     <Grid item>
-                      <Button variant="outlined" color="primary">
+                      <Button variant="outlined" color="primary" onClick={this.handleNewContact}>
                         Create a new account
                   </Button>
                     </Grid>
@@ -148,6 +149,14 @@ class LoginComponent extends React.Component<IPorps, IState> {
 
   private handleStoreSeed = () => {
     settingStore.setSeed(this.state.seed);
+  }
+
+  private handleNewContact = () => {
+    // TODO: add handling for the username
+    // TODO: need a better way to show the newly generated seed
+    const seed: string = getRandomSeed();
+    console.log("New Seed: " + seed);
+    settingStore.setSeed(seed);
   }
 }
 

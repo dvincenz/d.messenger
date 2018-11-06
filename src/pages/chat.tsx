@@ -69,7 +69,7 @@ class ChatComponent extends React.Component<IProps, IState> {
         <AppBar position="static" className={classes.appBar}>
           <Toolbar>
             <Typography component="h6" color="inherit" noWrap>
-              d.messanger - logged in as Dumeni Vincenz
+              d.messanger - your public address: {settingStore.myAddress}
             </Typography>
           </Toolbar>
         </AppBar>

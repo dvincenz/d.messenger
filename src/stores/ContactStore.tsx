@@ -126,28 +126,36 @@ export class ContactStore {
         })
     }
 
-    public subscribeForIce () {
+    public subscribeForIce() {
         settingStore.Iota.subscribe('ice', (ice: IICERequest[]) => {
             ice.forEach(i => {
                 let newestIce: IICERequest
                 // todo check if connection is obsolate
                 const contact = this.getContactBySecret(i.secret)
-                if(contact.updateTime < i.time && i.address === settingStore.myAddress){
+                if (contact.updateTime < i.time && i.address === settingStore.myAddress) {
                     newestIce = i
                 }
-                if(newestIce === undefined) {
+                if (newestIce === undefined) {
                     return
                 }
                 const iceObject = JSON.parse(newestIce.iceObject)
-                if(iceObject.type === 'offer'){
-                    this.sendIce(contact, false, iceObject)
+                if (iceObject.type === 'offer') {
+                    if(contact.webRtcClient !== undefined && contact.address < settingStore.myAddress){
+                        // destroy webRtc Client of the lowest address if a offer arrives and a offer was already send => can easy happened because established over iota take some time.
+                        console.log('should destroy request')
+                        contact.webRtcClient.peer.destroy();
+                        contact.webRtcClient = undefined;
+                        this.sendIce(contact, false, iceObject)
+                    }
                 } else {
                     console.log('resiveAnswer')
                     this.getContactBySecret(i.secret).webRtcClient.peer.signal(JSON.stringify(iceObject))
                 }
             }
-        )}
-    )}
+            )
+        }
+        )
+    }
 
     public sendIce(contact: Contact, offer: boolean = true, ice?: any) {
         console.log('call send ice')

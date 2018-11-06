@@ -10,6 +10,7 @@ export class WebRtcClient {
         this.peer.on('close', this.errorHandling)
         this.peer.on('data', this.dataResiver)
         this.peer.on('signal', this.signalHandling)
+        
         // this.peer.on('connect', this.connected)
     }
 

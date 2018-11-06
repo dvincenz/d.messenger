@@ -65,7 +65,6 @@ class ChatComponent extends React.Component<IProps, IState> {
       return <Redirect to={{ pathname: '/login' }} />;
     }
     const isGroup = contactStore.currentContact && contactStore.currentContact.isGroup
-    console.log(contactStore.currentContact)
     return (
       <React.Fragment>
         <AppBar position="static" className={classes.appBar}>

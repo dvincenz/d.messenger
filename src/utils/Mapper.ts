@@ -2,6 +2,7 @@ import { ITextMessage, IContactRequest, IContactResponse, Permission } from "../
 import { Message, Contact, MessageStatus } from "../entities";
 import { IICERequest } from "src/services/iotaService/interfaces/IICERequest";
 import { Ice } from "src/entities/Ice";
+import { ChatStatus } from "src/entities/WebRTCConnection";
 
 export function toMessage(baseMessage: ITextMessage): Message {
     const returnMessage: Message = {
@@ -25,6 +26,7 @@ export function toContact(con: IContactRequest | IContactResponse, address: stri
         secret: con.secret,
         updateTime: con.time,
         isDisplayed: true,
+        status: ChatStatus.offline
     }
     return contact
 

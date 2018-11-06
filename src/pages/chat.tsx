@@ -76,7 +76,7 @@ class ChatComponent extends React.Component<IProps, IState> {
            <MessageDisplayer />
           <Sender address={this.props.match.params.address} />
           <TextField onChange={this.handleIceImput} className={classes.textbox} value={this.state.ice}/>
-          <Button className={classes.button} variant="contained" color="primary" id="connect" onClick={this.handleConnect}>Connect</Button>
+          <Button className={classes.button} variant="contained" color="primary" id="connect" >Connect</Button>
           <Button className={classes.button} variant="contained" color="primary" id="ice" onClick={this.getICE}>Get ICE</Button>
 
         </main>
@@ -111,12 +111,9 @@ class ChatComponent extends React.Component<IProps, IState> {
   } 
 
   private getICE = () => {
-    contactStore.sendIce();
+    contactStore.sendIce(contactStore.currentContact);
   }
 
-  private handleConnect = () => {
-      contactStore.sendIce();
-  }
 
   private handleIceImput = (event: React.ChangeEvent<HTMLInputElement>) => {
     this.setState({ice: event.target.value})

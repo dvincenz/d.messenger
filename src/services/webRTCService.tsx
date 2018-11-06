@@ -10,7 +10,7 @@ export class WebRtcClient {
         this.peer.on('close', this.errorHandling)
         this.peer.on('data', this.dataResiver)
         this.peer.on('signal', this.signalHandling)
-        this.peer.on('connect', this.connected)
+        // this.peer.on('connect', this.connected)
     }
 
     public sendIce(ice: string){
@@ -32,14 +32,5 @@ export class WebRtcClient {
     private dataResiver = (data: any) => {
         console.log('recived data ' + data);
     }
-
-    private connected = () => {
-        console.log('connected');
-        const randomValue = 'fancy-' + Math.random()
-        this.peer.send(randomValue);
-    }
-
-
-    
 
 }

@@ -5,6 +5,7 @@ import { IContactRequest, IContactResponse, Permission, MessageMethod } from "..
 import { toContact } from "../utils/Mapper";
 import { IICERequest } from "src/services/iotaService/interfaces/IICERequest";
 import { WebRtcClient } from "src/services/webRTCService";
+import { ChatStatus } from "src/entities/WebRTCConnection";
 
 
 export class ContactStore {
@@ -139,27 +140,27 @@ export class ContactStore {
                 }
                 const iceObject = JSON.parse(newestIce.iceObject)
                 if(iceObject.type === 'offer'){
-                    this.sendIce(false, iceObject)
+                    this.sendIce(contact, false, iceObject)
                 } else {
                     console.log('resiveAnswer')
-                    this.contacts[this._currentContact].webRtcClient.peer.signal(JSON.stringify(iceObject))
+                    this.getContactBySecret(i.secret).webRtcClient.peer.signal(JSON.stringify(iceObject))
                 }
             }
         )}
     )}
 
-    public sendIce(offer: boolean = true, ice?: any) {
-        if(this.currentContact.webRtcConnection === undefined){
-            this.contacts[this._currentContact].webRtcClient = new WebRtcClient(offer)
+    public sendIce(contact: Contact, offer: boolean = true, ice?: any) {
+        if(contact.webRtcClient === undefined){
+            contact.webRtcClient = new WebRtcClient(offer)
         }
-        const webRtcClient =  this.contacts[this._currentContact].webRtcClient
+        const webRtcClient = contact.webRtcClient
     
         webRtcClient.peer.on('signal',(data: any) => {
             const iceReqeust: IICERequest = {
-                address: this._currentContact,
+                address: contact.address,
                 iceObject: JSON.stringify(data),
                 method: MessageMethod.ICE,
-                secret: this.currentContact.secret,
+                secret: contact.secret,
                 time: new Date().getTime(),
             }
             console.log('signal')
@@ -167,15 +168,18 @@ export class ContactStore {
         })
         webRtcClient.peer.on('connect', () => {
             console.log('webRTC connect')
-            webRtcClient.peer.send('online ;)')
+            webRtcClient.peer.send(JSON.stringify({status: ChatStatus.online}))
         })
         webRtcClient.peer.on('data', (data: any) => {
-            console.log('data recived: ' + data);
+            console.log('get data: ' + data)
+            const dataObject = JSON.parse(data)
+            if(dataObject !== undefined && dataObject.status !== undefined){
+                contact.status = dataObject.status
+            }
         })
         if(ice !== undefined){
             webRtcClient.peer.signal(JSON.stringify(ice))
         }
-
     }
 }
 

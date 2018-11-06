@@ -28,6 +28,7 @@ export class MessageStore {
             this.messages = newMessages.map((m: ITextMessage) => {
                 return toMessage(m);
             });
+            
             this.state = MessageStoreState.updated
         } catch (error) {
             this.state = MessageStoreState.error

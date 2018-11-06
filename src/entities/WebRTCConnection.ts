@@ -16,3 +16,8 @@ export enum WebRtcState {
     responseSend,
 }
 
+export enum ChatStatus {
+    online,
+    offline,
+    writing,
+}

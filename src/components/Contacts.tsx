@@ -3,6 +3,7 @@ import { StyleRulesCallback, withStyles, Avatar, ListItem, ListItemText, List, D
 import { Link, Redirect } from 'react-router-dom';
 import { contactStore } from '../stores/ContactStore'
 import { observer } from 'mobx-react';
+import { ChatStatus } from 'src/entities/WebRTCConnection';
 
 
 const styles: StyleRulesCallback = theme => ({
@@ -12,6 +13,10 @@ const styles: StyleRulesCallback = theme => ({
     avatar: {
         color: '#FFFFFF',
         backgroundColor: '#f50057'
+    },
+    avatarActive: {
+        color: '#FFFFFF',
+        backgroundColor: '#00a02a'
     },
     list: {
         overflow: 'hidden',
@@ -64,17 +69,17 @@ class ContactsComponent extends React.Component<IProps> {
 }
 
 
-function Person(props: any) {
+const Person = observer((props: any) => {
     const link = `/chat/${props.contact.address}`;
     return (
         // tslint:disable-next-line:jsx-no-lambda
         <Link to={link} onClick={props.handleClickContact} className={props.classes.link}>
             <ListItem button>
-                <Avatar className={props.classes.avatar}>{(props.contact.name).charAt(0)}</Avatar>
+                <Avatar className={props.contact.status === ChatStatus.offline ? props.classes.avatar : props.classes.avatarActive}>{(props.contact.name).charAt(0)}</Avatar>
                 <ListItemText primary={props.contact.name + ' ' + props.contact.secret} secondary={props.contact.address} />
             </ListItem>
         </Link>
     )
-}
+})
 
 export const Contacts = withStyles(styles)(ContactsComponent);

@@ -8,7 +8,6 @@ import { contactStore } from '../stores/ContactStore';
 import { settingStore } from '../stores/SettingStore';
 import { observer } from 'mobx-react';
 import { Redirect } from 'react-router';
-import { WebRtcClient } from '../services/webRTCService'
 import { messageStore } from 'src/stores/MessageStore';
 import { CreateGroup } from "../components/CreateGroup";
 import { InviteContact } from "../components/InviteContact"
@@ -47,7 +46,6 @@ const styles: StyleRulesCallback = theme => ({
 
 @observer
 class ChatComponent extends React.Component<IProps, IState> {
-  private webRtc: WebRtcClient
   constructor(props: IProps){
     super(props);
     this.state = {
@@ -57,7 +55,6 @@ class ChatComponent extends React.Component<IProps, IState> {
       currentAddress: '',
       ice: ''
     }
-    this.webRtc = new WebRtcClient()
   }
   public render() {
     const { classes } = this.props
@@ -88,7 +85,7 @@ class ChatComponent extends React.Component<IProps, IState> {
           <MessageDisplayer />
           <Sender address={this.props.match.params.address} />
           <TextField onChange={this.handleIceImput} className={classes.textbox} value={this.state.ice}/>
-          <Button className={classes.button} variant="contained" color="primary" id="connect" onClick={this.handleConnect}>Connect</Button>
+          <Button className={classes.button} variant="contained" color="primary" id="connect" >Connect</Button>
           <Button className={classes.button} variant="contained" color="primary" id="ice" onClick={this.getICE}>Get ICE</Button>
         </main>
       </React.Fragment>
@@ -136,12 +133,9 @@ class ChatComponent extends React.Component<IProps, IState> {
   }
 
   private getICE = () => {
-    this.setState({ice: JSON.stringify(this.webRtc.ice)})
+    contactStore.sendIce(contactStore.currentContact);
   }
 
-  private handleConnect = () => {
-    this.webRtc.sendIce(this.state.ice);
-  }
 
   private handleIceImput = (event: React.ChangeEvent<HTMLInputElement>) => {
     this.setState({ice: event.target.value})

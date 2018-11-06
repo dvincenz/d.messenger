@@ -72,6 +72,14 @@ export class Iota extends EventHandler {
         return await this.sendToTangle(message)
     }
 
+    public async sendIceRequest(ice: IICERequest){
+        try{
+            await this.sendToTangle(ice)
+        }catch (error){
+            console.error('error sending ice to tangle ' + error)
+        }
+    }
+
     // #### Internale Methods ####
     public async bootstrapMessenger() {
         const accountData: AccountData = await this.api.getAccountData(this.seed)
@@ -166,10 +174,6 @@ export class Iota extends EventHandler {
                     ice.push(m as IICERequest)
                     break;
                 }
-                default:
-                    console.log('messages with wrong metadata dedected');
-                    console.log(m);
-                break;
             }
         })
         messages.length > 0 && this.publish('message', messages)

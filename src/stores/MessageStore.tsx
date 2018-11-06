@@ -27,20 +27,16 @@ export class MessageStore {
     public fetchMessages = flow(function * (this: MessageStore, address: string) {
         this.state = MessageStoreState.loading;
         try{
-            const newMessages = yield settingStore.Iota.getMessages(address)
-            if(newMessages === undefined){
-                return;
-            }
-            this.messages = newMessages.map((m: ITextMessage) => {
-                return toMessage(m);
-            });
+            yield settingStore.Iota.getMessages(address)
+            const contact = contactStore.getContactByAddress(address)
+            if (contact.webRtcClient === undefined && !contact.isGroup){
+                contactStore.sendIce(contact)
+            }            
             this.state = MessageStoreState.updated
         } catch (error) {
             this.state = MessageStoreState.error
         }
     })
-
-
 
     // todo find better way to fetch messages 
     public set setFitlerMessages (filterAddress: string) {

@@ -84,6 +84,17 @@ export class ContactStore {
         }
     })
 
+    public inviteContact = flow(function *(this: ContactStore, address: string, groupAddr: string, groupName: string) {
+        this.state = ContactStoreState.loading
+        try {
+            yield settingStore.Iota.sendContactRequest(address, groupAddr, groupName, true)
+            this.state = ContactStoreState.updated
+        } catch (error) {
+            this.state = ContactStoreState.error
+            console.log(error)
+        }
+    })
+
     @observable private contacts = {};
     // tslint:disable-next-line:variable-name
     @observable private _currentContact?: string;

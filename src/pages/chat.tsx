@@ -10,11 +10,13 @@ import { observer } from 'mobx-react';
 import { Redirect } from 'react-router';
 import { WebRtcClient } from '../services/webRTCService'
 import { messageStore } from 'src/stores/MessageStore';
-import {CreateGroup} from "../components/CreateGroup";
+import { CreateGroup } from "../components/CreateGroup";
+import { InviteContact } from "../components/InviteContact"
 
 interface IState {
   addContactDialogOpen: boolean;
   createGroupDialogOpen: boolean;
+  inviteContactDialogOpen: boolean;
   currentAddress: string;
   ice: string;
 }
@@ -51,6 +53,7 @@ class ChatComponent extends React.Component<IProps, IState> {
     this.state = {
       addContactDialogOpen: false,
       createGroupDialogOpen: false,
+      inviteContactDialogOpen: false,
       currentAddress: '',
       ice: ''
     }
@@ -73,8 +76,10 @@ class ChatComponent extends React.Component<IProps, IState> {
         <div id="contacts" className={classes.contacts}>
           <Button onClick={this.handleAddContactDialog}>Add Contact</Button>
           <Button onClick={this.handleCreateGroupDialog}>Create Group</Button>
+          <Button onClick={this.handleInviteContactDialog}>Invite Contact</Button>
           <AddContact open={this.state.addContactDialogOpen} />
           <CreateGroup open={this.state.createGroupDialogOpen} />
+          <InviteContact open={this.state.inviteContactDialogOpen} />
           <Contacts />
         </div>
         <main id="main" className={classes.main}>
@@ -118,6 +123,14 @@ class ChatComponent extends React.Component<IProps, IState> {
     this.setState({
       createGroupDialogOpen: true,
     })
+  }
+
+  private handleInviteContactDialog = () => {
+    if(contactStore.currentContact !== undefined && contactStore.currentContact.isGroup) {
+        this.setState({
+            inviteContactDialogOpen: true,
+        })
+    }
   }
 
   private getICE = () => {

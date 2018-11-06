@@ -171,13 +171,9 @@ export class Iota extends EventHandler {
                     break; 
                 }
                 case MessageMethod.ICE: {
-                    console.log(m)
                     ice.push(m as IICERequest)
                     break;
                 }
-                default:
-                    console.log('messages with wrong metadata dedected');
-                break;
             }
         })
         messages.length > 0 && this.publish('message', messages)

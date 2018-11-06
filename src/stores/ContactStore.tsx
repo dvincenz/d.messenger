@@ -181,7 +181,7 @@ export class ContactStore {
         }
         )
     }
-
+    // todo move logic to webRTC Service
     public sendIce(contact: Contact, offer: boolean = true, ice?: any) {
         if(contact.webRtcClient === undefined){
             contact.webRtcClient = new WebRtcClient(offer)

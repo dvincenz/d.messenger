@@ -64,6 +64,8 @@ class ChatComponent extends React.Component<IProps, IState> {
     if (settingStore.seed === '') {
       return <Redirect to={{ pathname: '/login' }} />;
     }
+    const isGroup = contactStore.currentContact && contactStore.currentContact.isGroup
+    console.log(contactStore.currentContact)
     return (
       <React.Fragment>
         <AppBar position="static" className={classes.appBar}>
@@ -76,10 +78,11 @@ class ChatComponent extends React.Component<IProps, IState> {
         <div id="contacts" className={classes.contacts}>
           <Button onClick={this.handleAddContactDialog}>Add Contact</Button>
           <Button onClick={this.handleCreateGroupDialog}>Create Group</Button>
-          <Button onClick={this.handleInviteContactDialog}>Invite Contact</Button>
+         
           <AddContact open={this.state.addContactDialogOpen} />
           <CreateGroup open={this.state.createGroupDialogOpen} />
-          <InviteContact open={this.state.inviteContactDialogOpen} />
+           {isGroup && <Button onClick={this.handleInviteContactDialog}>Invite Contact</Button>}
+            {isGroup &&<InviteContact open={this.state.inviteContactDialogOpen} />}
           <Contacts />
         </div>
         <main id="main" className={classes.main}>

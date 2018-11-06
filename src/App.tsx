@@ -12,7 +12,7 @@ class App extends React.Component<{}, IState> {
     super(porps);
     this.state = {
       seed: '',
-      isLoggedIn: false,
+      isLoggedIn: false
     }
   }
   public render() {

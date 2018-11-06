@@ -11,6 +11,8 @@ export enum MessageMethod {
     ContactRequest,
     ContactResponse,
     Message,
+    GroupInvitation,
+    GroupInvitationResponse,
     ICE,
 }
 

@@ -11,9 +11,15 @@ export class MessageStore {
         if(this.messages === undefined || this.messages.length === 0 || contactStore.currentContact === undefined){
             return [] as Message []
         }
-        return this.messages.filter(m => {
-            return m.secret === contactStore.currentContact.secret
-        })
+        if(contactStore.currentContact.isGroup) {
+            return this.messages.filter(m => {
+                return m.reciverAddress === contactStore.currentContact.address
+            })
+        } else {
+            return this.messages.filter(m => {
+                return m.secret === contactStore.currentContact.secret
+            })
+        }
     }
 
     @observable public messages: Message[] = []

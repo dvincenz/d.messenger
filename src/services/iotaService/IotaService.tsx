@@ -7,7 +7,6 @@ import { EventHandler } from '../../utils/EventHandler';
 import { IICERequest } from './interfaces/IICERequest';
 
 
-
 export class Iota extends EventHandler {
     public get myAddress(): string {
         return this.ownAddress;
@@ -30,8 +29,6 @@ export class Iota extends EventHandler {
         this.loadedHashes =  []
     }
 
-    
-    
     public async getMessages(addr: string) {
         try {
             if(this.bootstrapMessenger){
@@ -43,20 +40,21 @@ export class Iota extends EventHandler {
             return;
         }
     }
-    
+
     public async sendMessage(message: ITextMessage) {
         // todo may do some checks of used simboles and size of message to prevent errors
         return await this.sendToTangle(message);
     }
 
-    public async sendContactRequest(addr: string, ownAddress: string, myName: string) {
+    public async sendContactRequest(addr: string, ownAddress: string, myName: string, isGrp: boolean) {
         const message: IContactRequest = {
             method: MessageMethod.ContactRequest,
             name: myName,
             secret: getRandomSeed(20),
             address: addr,
             senderAddress: ownAddress,
-            time: new Date().getTime()
+            time: new Date().getTime(),
+            isGroup: isGrp,
         }
         return await this.sendToTangle(message)
     }
@@ -82,6 +80,7 @@ export class Iota extends EventHandler {
         }
     }
 
+    // #### Internale Methods ####
     public async bootstrapMessenger() {
         const accountData: AccountData = await this.api.getAccountData(this.seed)
         try{
@@ -96,8 +95,7 @@ export class Iota extends EventHandler {
         setInterval(async () => {
             await this.checkForNewMessages();
           }, 5000);
-    } 
-
+    }
 
     // #### Internal Methods ####
 

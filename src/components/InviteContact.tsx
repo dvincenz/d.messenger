@@ -1,13 +1,11 @@
 import * as React from 'react';
 import { Button, TextField, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@material-ui/core';
-import { isValidChecksum } from '@iota/checksum';
-import { contactStore } from 'src/stores/ContactStore';
+import {contactStore} from "../stores/ContactStore";
 
 
 interface IPorps {
     open: boolean;
 }
-
 interface IState {
     open: boolean,
     address: string,
@@ -16,7 +14,7 @@ interface IState {
     bevoreOpen:boolean,
 }
 
-export class AddContact extends React.Component<IPorps, IState> {
+export class InviteContact extends React.Component<IPorps, IState> {
     public static getDerivedStateFromProps(props: IPorps, state: IState) {
         if (state.open !== state.bevoreOpen){
             return {
@@ -31,7 +29,6 @@ export class AddContact extends React.Component<IPorps, IState> {
         }
         return null;
     }
-
     constructor(props: IPorps) {
         super(props);
         this.state = {
@@ -51,16 +48,16 @@ export class AddContact extends React.Component<IPorps, IState> {
                     onClose={this.handleClose}
                     aria-labelledby="form-dialog-title"
                 >
-                    <DialogTitle id="form-dialog-title">Add Contact</DialogTitle>
+                    <DialogTitle id="form-dialog-title">Invite Contact</DialogTitle>
                     <DialogContent>
                         <DialogContentText>
-                            Please enter the Adress of you new contact.
+                            Please enter the address of the account.
                         </DialogContentText>
                         <TextField
                             onChange={this.handleInputChange}
                             autoFocus
                             margin="dense"
-                            id="address"
+                            id="name"
                             label={this.state.error !== '' ? this.state.error : this.state.disableInput ? 'save...' : 'Address'}
                             type="text"
                             fullWidth
@@ -73,7 +70,7 @@ export class AddContact extends React.Component<IPorps, IState> {
                             Cancel
                         </Button>
                         <Button onClick={this.handleSave} disabled={this.state.disableInput} color="primary">
-                            Add Contact
+                            Invite Contact
                         </Button>
                     </DialogActions>
                 </Dialog>
@@ -82,10 +79,10 @@ export class AddContact extends React.Component<IPorps, IState> {
     }
 
     private handleInputChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
-        this.setState({ 
+        this.setState({
             address: event.target.value,
             error: ''
-         })
+        })
     }
 
     private handleClose = () => {
@@ -94,21 +91,15 @@ export class AddContact extends React.Component<IPorps, IState> {
         })
     }
 
-    private handleSave = () =>{
-        try {
-            isValidChecksum(this.state.address)
-        } catch {
-            this.setState({
-                error: 'Invalid Address - try again'
-            })
-            return;
-        }
+    private handleSave = () => {
+        const groupAddr: string = contactStore.currentContact.address
+        const groupName: string = contactStore.currentContact.name
 
-        contactStore.addContactRequest(this.state.address).then(
-            () => this.setState({ 
+        contactStore.inviteContact(this.state.address, groupAddr, groupName).then(
+            () => this.setState({
                 open: false,
-                disableInput: false, 
+                disableInput: false,
             })
-        );
+        )
     }
 }

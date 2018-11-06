@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { StyleRulesCallback, withStyles, Avatar, ListItem, ListItemText, List } from '@material-ui/core';
+import { StyleRulesCallback, withStyles, Avatar, ListItem, ListItemText, List, Divider } from '@material-ui/core';
 import { Link, Redirect } from 'react-router-dom';
 import { contactStore } from '../stores/ContactStore'
 import { observer } from 'mobx-react';
@@ -31,6 +31,7 @@ const styles: StyleRulesCallback = theme => ({
 interface IProps {
     classes: any;
 }
+
 @observer
 class ContactsComponent extends React.Component<IProps> {
     constructor(props: IProps) {
@@ -42,8 +43,14 @@ class ContactsComponent extends React.Component<IProps> {
         return (
             <React.Fragment>
                 <List className={classes.list}>
-                    {contactStore.getContacts.map(c => 
-                        <Person key={c.address} contact={c} classes={classes} handleClickContact={this.handleClickContact}/>
+                    {contactStore.getContacts.map(c =>
+                        !c.isGroup && <Person key={c.address} contact={c} classes={classes} handleClickContact={this.handleClickContact}/>
+                    )}
+                </List>
+                <Divider />
+                <List className={classes.list}>
+                    {contactStore.getContacts.map(c =>
+                        c.isGroup && <Person key={c.address} contact={c} classes={classes} handleClickContact={this.handleClickContact}/>
                     )}
                 </List>
             </React.Fragment>
@@ -59,8 +66,6 @@ class ContactsComponent extends React.Component<IProps> {
     protected handleClickContact = () => {
         // todo: handle this click
     }
-
-
 }
 
 

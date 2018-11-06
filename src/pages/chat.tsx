@@ -5,23 +5,25 @@ import { AddContact } from '../components/AddContact';
 import { Button, AppBar, Toolbar, Typography, StyleRulesCallback, withStyles, TextField } from '@material-ui/core';
 import { Contacts } from '../components/Contacts';
 import { contactStore } from '../stores/ContactStore';
-import { settingStore } from '../stores/SettingStore'
+import { settingStore } from '../stores/SettingStore';
 import { observer } from 'mobx-react';
 import { Redirect } from 'react-router';
 import { messageStore } from 'src/stores/MessageStore';
+import { CreateGroup } from "../components/CreateGroup";
+import { InviteContact } from "../components/InviteContact"
 
 interface IState {
   addContactDialogOpen: boolean;
+  createGroupDialogOpen: boolean;
+  inviteContactDialogOpen: boolean;
   currentAddress: string;
   ice: string;
-
 }
 
 interface IProps {
   classes: any;
   match: any;
 }
-
 
 const styles: StyleRulesCallback = theme => ({
   appBar: {
@@ -40,7 +42,6 @@ const styles: StyleRulesCallback = theme => ({
     top: 64,
     width: 300,
   }
-  
 })
 
 @observer
@@ -49,6 +50,8 @@ class ChatComponent extends React.Component<IProps, IState> {
     super(props);
     this.state = {
       addContactDialogOpen: false,
+      createGroupDialogOpen: false,
+      inviteContactDialogOpen: false,
       currentAddress: '',
       ice: ''
     }
@@ -58,27 +61,32 @@ class ChatComponent extends React.Component<IProps, IState> {
     if (settingStore.seed === '') {
       return <Redirect to={{ pathname: '/login' }} />;
     }
+    const isGroup = contactStore.currentContact && contactStore.currentContact.isGroup
     return (
       <React.Fragment>
         <AppBar position="static" className={classes.appBar}>
           <Toolbar>
             <Typography component="h6" color="inherit" noWrap>
-              d.messanger - logged in as Dumeni Vincenz
+              d.messanger - your public address: {settingStore.myAddress}
             </Typography>
           </Toolbar>
         </AppBar>
         <div id="contacts" className={classes.contacts}>
-        <Button onClick={this.handleAddContactDialog}>Add Contact</Button>
+          <Button onClick={this.handleAddContactDialog}>Add Contact</Button>
+          <Button onClick={this.handleCreateGroupDialog}>Create Group</Button>
+         
           <AddContact open={this.state.addContactDialogOpen} />
+          <CreateGroup open={this.state.createGroupDialogOpen} />
+           {isGroup && <Button onClick={this.handleInviteContactDialog}>Invite Contact</Button>}
+            {isGroup &&<InviteContact open={this.state.inviteContactDialogOpen} />}
           <Contacts />
         </div>
         <main id="main" className={classes.main}>
-           <MessageDisplayer />
+          <MessageDisplayer />
           <Sender address={this.props.match.params.address} />
           <TextField onChange={this.handleIceImput} className={classes.textbox} value={this.state.ice}/>
           <Button className={classes.button} variant="contained" color="primary" id="connect" >Connect</Button>
           <Button className={classes.button} variant="contained" color="primary" id="ice" onClick={this.getICE}>Get ICE</Button>
-
         </main>
       </React.Fragment>
     );
@@ -98,7 +106,7 @@ class ChatComponent extends React.Component<IProps, IState> {
   private setAddress = (addr: string) => {
     // todo routing by mobx 
     
-      if(addr !== undefined && (contactStore.currentContact === undefined || addr !== contactStore.currentContact.address)){
+      if(addr !== undefined  && (contactStore.currentContact === undefined || addr !== contactStore.currentContact.address)){
           messageStore.setFitlerMessages = addr;
           contactStore.setCurrentContact = addr;
       }
@@ -108,7 +116,21 @@ class ChatComponent extends React.Component<IProps, IState> {
     this.setState({
       addContactDialogOpen: true,
     })
-  } 
+  }
+
+  private handleCreateGroupDialog = () => {
+    this.setState({
+      createGroupDialogOpen: true,
+    })
+  }
+
+  private handleInviteContactDialog = () => {
+    if(contactStore.currentContact !== undefined && contactStore.currentContact.isGroup) {
+        this.setState({
+            inviteContactDialogOpen: true,
+        })
+    }
+  }
 
   private getICE = () => {
     contactStore.sendIce(contactStore.currentContact);

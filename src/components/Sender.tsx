@@ -5,11 +5,11 @@ import { contactStore } from '../stores/ContactStore';
 import { Contact } from '../entities';
 
 
-
 interface IPorps {
     classes: any;
     address: string;
 }
+
 interface IState {
     message: string
 }
@@ -22,7 +22,6 @@ const styles: StyleRulesCallback = theme => ({
         margin: '10px 0',
         width: 'calc(100% - 210px)' // todo fix ugly hotfix
     }
-
 })
 
 export class SenderComponent extends React.Component<IPorps, IState> {
@@ -32,6 +31,7 @@ export class SenderComponent extends React.Component<IPorps, IState> {
             message: ''
         }
     }
+
     public render() {
         const { classes } = this.props
         return (
@@ -45,7 +45,6 @@ export class SenderComponent extends React.Component<IPorps, IState> {
                     id="send" 
                     onClick={this.handleSubmit}>Send Message</Button>
             </div>
-
         );
     }
 
@@ -57,9 +56,7 @@ export class SenderComponent extends React.Component<IPorps, IState> {
             return
         }
         messageStore.sendMessage(contactStore.currentContact as Contact, msg)
-        
     }
-
     
     private handleInputChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
         this.setState({message: event.target.value})    

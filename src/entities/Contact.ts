@@ -11,4 +11,5 @@ export class Contact {
     public updateTime: number;
     public isDisplayed: boolean;
     public status: ChatStatus = ChatStatus.offline
+    public isGroup: boolean;
 }

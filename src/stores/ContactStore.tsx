@@ -166,13 +166,11 @@ export class ContactStore {
                 if (iceObject.type === 'offer') {
                     if(contact.webRtcClient !== undefined && contact.address < settingStore.myAddress){
                         // destroy webRtc Client of the lowest address if a offer arrives and a offer was already send => can easy happened because established over iota take some time.
-                        console.log('should destroy request')
                         contact.webRtcClient.peer.destroy();
                         contact.webRtcClient = undefined;
                         this.sendIce(contact, false, iceObject)
                     }
                 } else {
-                    console.log('resiveAnswer')
                     this.getContactBySecret(i.secret).webRtcClient.peer.signal(JSON.stringify(iceObject))
                 }
             }
@@ -182,7 +180,6 @@ export class ContactStore {
     }
 
     public sendIce(contact: Contact, offer: boolean = true, ice?: any) {
-        console.log('call send ice')
         if(contact.webRtcClient === undefined){
             contact.webRtcClient = new WebRtcClient(offer)
         }
@@ -196,15 +193,12 @@ export class ContactStore {
                 secret: contact.secret,
                 time: new Date().getTime(),
             }
-            console.log('signal')
             settingStore.Iota.sendIceRequest(iceReqeust)
         })
         webRtcClient.peer.on('connect', () => {
-            console.log('webRTC connect')
             webRtcClient.peer.send(JSON.stringify({status: ChatStatus.online}))
         })
         webRtcClient.peer.on('data', (data: any) => {
-            console.log('get data: ' + data)
             const dataObject = JSON.parse(data)
             if(dataObject !== undefined && dataObject.status !== undefined){
                 contact.status = dataObject.status

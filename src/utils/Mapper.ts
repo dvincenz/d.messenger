@@ -26,7 +26,7 @@ export function toContact(con: IContactRequest | IContactResponse, address: stri
         secret: con.secret,
         updateTime: con.time,
         isDisplayed: true,
-        status: ChatStatus.offline
+        status: ChatStatus.offline,
         isGroup: isGrp,
     }
     return contact

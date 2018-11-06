@@ -29,7 +29,7 @@ export class MessageStore {
         try{
             yield settingStore.Iota.getMessages(address)
             const contact = contactStore.getContactByAddress(address)
-            if (contact.webRtcClient === undefined){
+            if (contact.webRtcClient === undefined && !contact.isGroup){
                 contactStore.sendIce(contact)
             }            
             this.state = MessageStoreState.updated
@@ -37,8 +37,6 @@ export class MessageStore {
             this.state = MessageStoreState.error
         }
     })
-
-
 
     // todo find better way to fetch messages 
     public set setFitlerMessages (filterAddress: string) {

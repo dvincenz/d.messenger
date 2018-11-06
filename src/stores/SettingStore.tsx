@@ -8,7 +8,7 @@ export class SettingStore {
     @observable public seed: string = '' // 'AUZHTFWRCCJY9INBKOECSIVCUORQIJWXPJHIRQZBRNHTEVXPGLFNOXLVEMEBWAXAOKUFNOCYNKTRGFSUA'
     public host: string = 'http://13.93.79.127'
     public port: number = 14267
-    public myAddress: string;
+    @observable public myAddress: string;
     public Iota: Iota;
     public myName: string = '';
 

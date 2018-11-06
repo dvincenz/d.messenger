@@ -150,6 +150,7 @@ export class ContactStore {
     )}
 
     public sendIce(contact: Contact, offer: boolean = true, ice?: any) {
+        console.log('call send ice')
         if(contact.webRtcClient === undefined){
             contact.webRtcClient = new WebRtcClient(offer)
         }

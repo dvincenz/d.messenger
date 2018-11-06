@@ -62,7 +62,6 @@ export class Iota extends EventHandler {
     }
 
     public async sendContactResponse(addr: string, permission: Permission, ownAddress: string, myName: string, key: string) {
-        debugger;
         const message: IContactResponse = {
             method: MessageMethod.ContactResponse,
             name: myName,

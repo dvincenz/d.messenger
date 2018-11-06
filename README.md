@@ -21,9 +21,31 @@ This repo contains an PoC of a distributed messenger. Messages are stored in the
 - [ ] encryption
 - [ ] security audit
 
+## INSTALL
 
+### Prerequisites
+Node.js (8+)
 
+### Instructions
+1. Clone this repo
+```
+git clone https://github.com/dvincenz/d.messenger.git
+```
 
+2. Go to the d.messenger directory
+```
+cd d.messenger
+```
+
+3. Install the shared dependencies
+```
+npm install
+```
+
+4. Run the d.messenger
+```
+npm start
+```
 
 ## License
 Copyright 2018 @dvincenz, Dumeni Vincenz

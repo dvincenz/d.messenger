@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { Button, TextField, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@material-ui/core';
-import {groupStore} from "../stores/GroupStore";
-
+import {contactStore} from "../stores/ContactStore";
 
 
 interface IPorps {
@@ -13,8 +12,6 @@ interface IState {
     disableInput: boolean,
     error: string,
     bevoreOpen:boolean,
-
-
 }
 
 export class CreateGroup extends React.Component<IPorps, IState> {
@@ -42,8 +39,6 @@ export class CreateGroup extends React.Component<IPorps, IState> {
             error: ''
         }
     }
-
-
 
     public render() {
         return (
@@ -96,7 +91,7 @@ export class CreateGroup extends React.Component<IPorps, IState> {
         })
     }
     private handleSave = () => {
-        groupStore.createGroup(this.state.name).then(
+        contactStore.createGroup(this.state.name).then(
             () => this.setState({
                 open: false,
                 disableInput: false,

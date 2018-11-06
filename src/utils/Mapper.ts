@@ -1,7 +1,5 @@
 import { ITextMessage, IContactRequest, IContactResponse, Permission } from "../services/iotaService/interfaces";
 import { Message, Contact, MessageStatus } from "../entities";
-import {IGroupInvitation} from "../services/iotaService/interfaces/IGroupInvitation";
-import {Group} from "../entities/Group";
 
 export function toMessage(baseMessage: ITextMessage): Message {
     const returnMessage: Message = {
@@ -16,25 +14,32 @@ export function toMessage(baseMessage: ITextMessage): Message {
     return returnMessage;
 }
 
-export function toContact(con: IContactRequest | IContactResponse, address: string): Contact {
-    const contact: Contact = {
-        address,
-        name: con.name,
-        myName: '',
-        isActivated: (con as IContactResponse).level !== undefined && (con as IContactResponse).level === Permission.accepted,
-        secret: con.secret,
-        updateTime: con.time,
-        isDisplayed: true,
+export function toContact(con: IContactRequest | IContactResponse, address: string, isGrp: boolean): Contact {
+    if(isGrp) {
+        const contact: Contact = {
+            address,
+            name: con.name,
+            myName: '',
+            isActivated: true,
+            secret: con.secret,
+            updateTime: con.time,
+            isDisplayed: true,
+            isGroup: isGrp,
+        }
+        return contact
+    } else {
+        const contact: Contact = {
+            address,
+            name: con.name,
+            myName: '',
+            isActivated: (con as IContactResponse).level !== undefined && (con as IContactResponse).level === Permission.accepted,
+            secret: con.secret,
+            updateTime: con.time,
+            isDisplayed: true,
+            isGroup: isGrp,
+        }
+        return contact
     }
-    return contact
-}
-
-export function toGroup(baseMessage: IGroupInvitation) : Group {
-    const group: Group = {
-        name: baseMessage.groupName,
-        address: baseMessage.groupAddress,
-    }
-    return group
 }
 
 

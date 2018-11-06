@@ -3,7 +3,8 @@ import { observable } from 'mobx'
 import { Iota } from '../services/iotaService';
 import { messageStore } from './MessageStore';
 import { contactStore } from './ContactStore';
-import {groupStore} from "./GroupStore";
+
+
 export class SettingStore {
     // todo not fill with default values => store values in browser local storage
     @observable public seed: string = '' // 'AUZHTFWRCCJY9INBKOECSIVCUORQIJWXPJHIRQZBRNHTEVXPGLFNOXLVEMEBWAXAOKUFNOCYNKTRGFSUA'
@@ -22,7 +23,6 @@ export class SettingStore {
         messageStore.subscribeForMessages();
         contactStore.subscribeForContactRequests();
         contactStore.subscribeForeContactResponse();
-        groupStore.subscribeForGroupInvitations();
         await this.Iota.bootstrapMessenger();
         this.myAddress = this.Iota.myAddress;
         // todo save myMessages with event subscriber on iota service

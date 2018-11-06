@@ -2,7 +2,6 @@ import * as React from 'react';
 import { StyleRulesCallback, withStyles, Avatar, ListItem, ListItemText, List } from '@material-ui/core';
 import { Link, Redirect } from 'react-router-dom';
 import { contactStore } from '../stores/ContactStore'
-import { groupStore} from "../stores/GroupStore";
 import { observer } from 'mobx-react';
 
 
@@ -41,9 +40,6 @@ class ContactsComponent extends React.Component<IProps> {
                     {contactStore.getContacts.map(c =>
                         <Person key={c.address} contact={c} classes={classes} handleClickContact={this.handleClickContact}/>
                     )}
-                    {groupStore.getGroups.map(g =>
-                        <Group key={g.address} contact={g} classes={classes} handleClickGroup={this.handleClickContact}/>
-                    )}
                 </List>
             </React.Fragment>
         );
@@ -63,27 +59,12 @@ class ContactsComponent extends React.Component<IProps> {
 
 function Person(props: any) {
     const link = `/chat/${props.contact.address}`;
-    props.state.isGroup = false;
     return (
         // tslint:disable-next-line:jsx-no-lambda
         <Link to={link} onClick={props.handleClickContact} className={props.classes.link}>
             <ListItem button>
                 <Avatar className={props.classes.avatar}>{(props.contact.name).charAt(0)}</Avatar>
                 <ListItemText primary={props.contact.name + ' ' + props.contact.secret} secondary={props.contact.address} />
-            </ListItem>
-        </Link>
-    )
-}
-
-function Group(props: any) {
-    const link = `/chat/${props.contact.address}/isGroup`;
-    props.state.isGroup = true;
-    return (
-        // tslint:disable-next-line:jsx-no-lambda
-        <Link to={link} onClick={props.handleClickContact} className={props.classes.link}>
-            <ListItem button>
-                <Avatar className={props.classes.avatar}>{(props.contact.name).charAt(0)}</Avatar>
-                <ListItemText primary={props.contact.name} secondary={props.contact.address} />
             </ListItem>
         </Link>
     )

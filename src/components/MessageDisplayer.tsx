@@ -6,7 +6,6 @@ import { contactStore } from '../stores/ContactStore';
 import { settingStore } from 'src/stores/SettingStore';
 import { getDateString } from 'src/utils';
 import { ContactConfirmator } from './ContactConfirmator';
-import {groupStore} from "../stores/GroupStore";
 
 interface IPorps {
     classes: any;
@@ -75,18 +74,11 @@ export class MessageDisplayerComponent extends React.Component<IPorps, {}> {
 
     public render() {
         const { classes } = this.props
-        if(classes.isGroup) {
-            if(groupStore.currentGroup === undefined) {
-                return (
-                    <ContactConfirmator />
-                )
-            }
-        } else {
-            if(contactStore.currentContact !== undefined && !contactStore.currentContact.isActivated){
-                return (
-                    <ContactConfirmator />
-                )
-            }
+
+        if(contactStore.currentContact !== undefined && !contactStore.currentContact.isActivated){
+            return (
+                <ContactConfirmator />
+            )
         }
 
         return (
@@ -105,11 +97,9 @@ export class MessageDisplayerComponent extends React.Component<IPorps, {}> {
                     ) : <p>{contactStore.currentContact === undefined ? "select a contact to display" : `loading messages for ${contactStore.currentContact.address}`}</p>}
                 </ul>
             </div>
-
         );
     }
 }
-
 
 function MessageComponent(props: any) {
     return <li className={props.ownMessage ? props.classes.left : props.classes.right} >

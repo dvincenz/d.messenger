@@ -63,6 +63,9 @@ const styles: StyleRulesCallback = theme => ({
     padding: 25,
     backgroundColor: '#F5F5F5'
     ,
+  },
+  seedTextbox:{
+    width: '100%'
   }
 });
 
@@ -151,7 +154,7 @@ class LoginComponent extends React.Component<IPorps, IState> {
                       <Button variant="outlined" color="primary" onClick={this.handleNewContact}>
                         Create a new account
                       </Button>
-                      {this.state.isNewAccountDialogShow && <NewAccount open={true} handleClose={this.handleNewAccountDialogClose} seed={this.state.seed}/>}
+                      {this.state.isNewAccountDialogShow && <NewAccount classes={this.props.classes} open={true} handleClose={this.handleNewAccountDialogClose} seed={this.state.seed}/>}
                     </Grid>
                   </Grid>
                 </div>
@@ -199,7 +202,6 @@ class LoginComponent extends React.Component<IPorps, IState> {
 }
 
 function NewAccount(props: any) {
-  // FIXME: make the dialog wider
   return (
       <Dialog
         open={props.open}
@@ -207,18 +209,22 @@ function NewAccount(props: any) {
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogTitle id="alert-dialog-title">{"Your new fresh seed"}</DialogTitle>
+        <DialogTitle id="alert-dialog-title">Your new fresh seed</DialogTitle>
         <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            Your newly generated seed is: <br/>
-            <TextField value={props.seed} inputProps={{size: 81}} id="newSeed"/><br/><br/>
-            Write it down! You will need it to login into your account!<br/>
-            It will get copied to your clipboard.
+          <DialogContentText  id="alert-dialog-description">
+              Keep your seed save. It's your access token to your messages on d.messenger
           </DialogContentText>
+          <TextField 
+            multiline 
+            className={props.classes.seedTextbox} 
+            value={props.seed} 
+            inputProps={{size: 81}} 
+            id={"newSeed"}
+            />
         </DialogContent>
         <DialogActions>
           <Button onClick={props.handleClose} color="primary">
-            Ok
+            Copy seed & Close
           </Button>
         </DialogActions>
       </Dialog>

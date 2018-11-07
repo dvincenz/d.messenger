@@ -1,27 +1,32 @@
 # d.messenger
 Distributed messenger.
 
-work in progress...
+This is a messenger that is able to communicate without using a server connection. Messages will be send over IOTA Tangle and WebRtc is using to update online status. This project was build during a university task and is a proof of concept for blockchain technologies and peer2peer communication.
 
-## Short description
-This repo contains an PoC of a distributed messenger. Messages are stored in the IOTA tangle and for online status webRTC is used. Following features are implemented or are planned to implement:
+Feel free to fork the project or contribute to this project to make it usable as opensource independently messenger.
+
+Right now you should be able to send and resive messages. Check the feature list or simply clone the porject and try your self. **Messages will not be encripted, every one can read your messages - feature need to be implemented**
+
+## Features
 - [x] send and store messages in the tangle
-- [ ] get all chats from seed
+- [x] get all chats from seed
 - [x] contact request
-- [ ] contact approve
-- [ ] online status
-- [ ] group chat
-- [ ] send messages if both users are online ober webRTC
-- [ ] login with different seeds
+- [x] contact approve
+- [x] online status
+- [x] group chat
+- [ ] send messages if both users are online over webRTC
+- [x] login with different seeds
 - [ ] local PoW (switch between local and remote PoW)
+- [ ] use local browser storage
 - [ ] ....and a lot more
 
 ### following NFR are on the task list
 - [ ] implement a suitable ui
-- [ ] encryption
+- [ ] encryption 
 - [ ] security audit
+- [ ] handle IOTA snapthots
 
-## INSTALL
+## Installation
 
 ### Prerequisites
 Node.js (8+)
@@ -46,6 +51,8 @@ npm install
 ```
 npm start
 ```
+
+5. Check your browser on Port 3000
 
 ## License
 Copyright 2018 @dvincenz, Dumeni Vincenz

@@ -5,7 +5,7 @@ This is a messenger that is able to communicate without using a server connectio
 
 Feel free to fork the project or contribute to this project to make it usable as opensource independently messenger.
 
-Right now you should be able to send and resive messages. Check the feature list or simply clone the porject and try your self. **Messages will not be encripted, every one can read your messages - feature need to be implemented**
+Right now you should be able to send and resive messages. Check the feature list or simply clone the porject and try it your self. **Messages will not be encripted, every one can read your messages - feature need to be implemented**
 
 ## Features
 - [x] send and store messages in the tangle

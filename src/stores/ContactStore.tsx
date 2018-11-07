@@ -182,33 +182,9 @@ export class ContactStore {
         )
     }
     // todo move logic to webRTC Service
-    public sendIce(contact: Contact, offer: boolean = true, ice?: any) {
+    public sendIce () {
         if(contact.webRtcClient === undefined){
             contact.webRtcClient = new WebRtcClient(offer)
-        }
-        const webRtcClient = contact.webRtcClient
-    
-        webRtcClient.peer.on('signal',(data: any) => {
-            const iceReqeust: IICERequest = {
-                address: contact.address,
-                iceObject: JSON.stringify(data),
-                method: MessageMethod.ICE,
-                secret: contact.secret,
-                time: new Date().getTime(),
-            }
-            settingStore.Iota.sendIceRequest(iceReqeust)
-        })
-        webRtcClient.peer.on('connect', () => {
-            webRtcClient.peer.send(JSON.stringify({status: ChatStatus.online}))
-        })
-        webRtcClient.peer.on('data', (data: any) => {
-            const dataObject = JSON.parse(data)
-            if(dataObject !== undefined && dataObject.status !== undefined){
-                contact.status = dataObject.status
-            }
-        })
-        if(ice !== undefined){
-            webRtcClient.peer.signal(JSON.stringify(ice))
         }
     }
 }

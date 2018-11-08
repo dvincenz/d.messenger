@@ -5,7 +5,6 @@ import { IContactRequest, IContactResponse, Permission, MessageMethod } from "..
 import { toContact } from "../utils/Mapper";
 import { IICERequest } from "src/services/iotaService/interfaces/IICERequest";
 import { WebRtcClient } from "src/services/webRTCService";
-import { ChatStatus } from "src/entities/WebRTCConnection";
 import { getRandomSeed } from "src/utils";
 
 export class ContactStore {
@@ -164,15 +163,7 @@ export class ContactStore {
                 }
                 const iceObject = JSON.parse(newestIce.iceObject)
                 if (iceObject.type === 'offer') {
-                    if(contact.webRtcClient !== undefined && contact.address < settingStore.myAddress){
-                        // destroy webRtc Client of the lowest address if a offer arrives and a offer was already send => can easy happened because established over iota take some time.
-                        contact.webRtcClient.peer.destroy();
-                        contact.webRtcClient = undefined;
-                        this.sendIce(contact, false, iceObject)
-                    }
-                    if(contact.webRtcClient === undefined){
-                        this.sendIce(contact, false, iceObject)
-                    }
+                    contact.setOnlineStatus()
                 } else {
                     this.getContactBySecret(i.secret).webRtcClient.peer.signal(JSON.stringify(iceObject))
                 }
@@ -180,12 +171,6 @@ export class ContactStore {
             )
         }
         )
-    }
-    // todo move logic to webRTC Service
-    public sendIce () {
-        if(contact.webRtcClient === undefined){
-            contact.webRtcClient = new WebRtcClient(offer)
-        }
     }
 }
 

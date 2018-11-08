@@ -30,7 +30,7 @@ export class MessageStore {
             yield settingStore.Iota.getMessages(address)
             const contact = contactStore.getContactByAddress(address)
             if (contact.webRtcClient === undefined && !contact.isGroup){
-                contactStore.sendIce(contact)
+                contact.setOnlineStatus();
             }            
             this.state = MessageStoreState.updated
         } catch (error) {

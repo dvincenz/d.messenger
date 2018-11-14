@@ -24,7 +24,7 @@ export class Iota extends EventHandler {
         super();
         this.provider = provider;
         this.seed = seed;
-        this.minWeightMagnitude = 14
+        this.minWeightMagnitude = 9
         this.connectWithNode();
         this.loadedHashes =  []
     }

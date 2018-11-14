@@ -8,8 +8,8 @@ import { contactStore } from './ContactStore';
 export class SettingStore {
     // todo not fill with default values => store values in browser local storage
     @observable public seed: string = '' // 'AUZHTFWRCCJY9INBKOECSIVCUORQIJWXPJHIRQZBRNHTEVXPGLFNOXLVEMEBWAXAOKUFNOCYNKTRGFSUA'
-    public host: string = 'http://13.93.79.127'
-    public port: number = 14267
+    public host: string = 'https://nodes.devnet.iota.org' // 'http://13.93.79.127'
+    public port: number = 443
     @observable public myAddress: string;
     public Iota: Iota;
     public myName: string = '';
@@ -32,3 +32,4 @@ export class SettingStore {
 }
 
 export const settingStore = new SettingStore();
+

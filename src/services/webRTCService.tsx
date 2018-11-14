@@ -12,13 +12,11 @@ export class WebRtcClient {
     constructor(contact: Contact, offer: boolean = true, ice?: string){
         this.contact = contact;
         this.peer = new SimplePeer({ initiator: offer, trickle: false })
-        console.log('init webrtc')
         this.peer.on('close', this.errorHandling)
         this.peer.on('connect', this.connectionHandling)
         this.peer.on('data', this.reciveData)
         this.peer.on('signal', this.signalHandling)
         if(ice !== undefined){
-            console.log(ice)
             this.peer.signal(ice)
         }
     }
@@ -31,7 +29,6 @@ export class WebRtcClient {
             secret: this.contact.secret,
             time: new Date().getTime(),
         }
-        console.log(iceReqeust)
         settingStore.Iota.sendIceRequest(iceReqeust)
     
     }

@@ -136,9 +136,6 @@ export class ContactStore {
     public subscribeForContactResponse () {
         settingStore.Iota.subscribe('contactResponse', (contacts: IContactResponse[]) => {
             contacts.forEach(c => {
-                console.log(c)
-                // tslint:disable-next-line:no-string-literal
-                console.log(this.contacts['UWBEWJVIAPFCDCHOGTCWHJKAFWGGTZRKTPNTIMEYDCUDZGGIDYUBPGDDAALZKCBXXFGEAQGHXXCHSVDXB'])
                 if(this.contacts[c.senderAddress] === undefined || (this.contacts[c.senderAddress] !== undefined && this.contacts[c.senderAddress].updateTime < c.time)){
                     if(settingStore.myAddress !== c.senderAddress){
                         this.contacts[c.senderAddress] = toContact(c, c.senderAddress, false)
@@ -166,8 +163,8 @@ export class ContactStore {
                     return
                 }
                 const iceObject = JSON.parse(newestIce.iceObject)
+                console.log(iceObject)
                 if (iceObject.type === 'offer') {
-                    console.log('get offer')
                     contact.setStatus(ChatStatus.online, newestIce.iceObject)
                 } else {
                     this.getContactBySecret(i.secret).webRtcClient.peer.signal(newestIce.iceObject)

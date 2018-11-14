@@ -6,6 +6,7 @@ import { toContact } from "../utils/Mapper";
 import { IICERequest } from "src/services/iotaService/interfaces/IICERequest";
 import { WebRtcClient } from "src/services/webRTCService";
 import { getRandomSeed } from "src/utils";
+import { ChatStatus } from "src/entities/WebRTCConnection";
 
 export class ContactStore {
     @computed get currentContact(): Contact {
@@ -166,9 +167,10 @@ export class ContactStore {
                 }
                 const iceObject = JSON.parse(newestIce.iceObject)
                 if (iceObject.type === 'offer') {
-                    contact.setOnlineStatus()
+                    console.log('get offer')
+                    contact.setStatus(ChatStatus.online, newestIce.iceObject)
                 } else {
-                    this.getContactBySecret(i.secret).webRtcClient.peer.signal(JSON.stringify(iceObject))
+                    this.getContactBySecret(i.secret).webRtcClient.peer.signal(newestIce.iceObject)
                 }
             }
             )

@@ -28,6 +28,7 @@ export function toContact(con: IContactRequest | IContactResponse, address: stri
         isDisplayed: true,
         status: ChatStatus.offline,
         isGroup: isGrp,
+        setStatus: Contact.prototype.setStatus
     }
     return contact
 }

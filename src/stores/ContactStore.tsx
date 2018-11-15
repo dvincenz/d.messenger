@@ -5,8 +5,8 @@ import { IContactRequest, IContactResponse, Permission, MessageMethod } from "..
 import { toContact } from "../utils/Mapper";
 import { IICERequest } from "src/services/iotaService/interfaces/IICERequest";
 import { WebRtcClient } from "src/services/webRTCService";
-import { ChatStatus } from "src/entities/WebRTCConnection";
 import { getRandomSeed } from "src/utils";
+import { ChatStatus } from "src/entities/WebRTCConnection";
 
 export class ContactStore {
     @computed get currentContact(): Contact {
@@ -166,53 +166,16 @@ export class ContactStore {
                     return
                 }
                 const iceObject = JSON.parse(newestIce.iceObject)
+                console.log(iceObject)
                 if (iceObject.type === 'offer') {
-                    if(contact.webRtcClient !== undefined && contact.address < settingStore.myAddress){
-                        // destroy webRtc Client of the lowest address if a offer arrives and a offer was already send => can easy happened because established over iota take some time.
-                        contact.webRtcClient.peer.destroy();
-                        contact.webRtcClient = undefined;
-                        this.sendIce(contact, false, iceObject)
-                    }
-                    if(contact.webRtcClient === undefined){
-                        this.sendIce(contact, false, iceObject)
-                    }
+                    contact.setStatus(ChatStatus.online, newestIce.iceObject)
                 } else {
-                    this.getContactBySecret(i.secret).webRtcClient.peer.signal(JSON.stringify(iceObject))
+                    this.getContactBySecret(i.secret).webRtcClient.peer.signal(newestIce.iceObject)
                 }
             }
             )
         }
         )
-    }
-    // todo move logic to webRTC Service
-    public sendIce(contact: Contact, offer: boolean = true, ice?: any) {
-        if(contact.webRtcClient === undefined){
-            contact.webRtcClient = new WebRtcClient(offer)
-        }
-        const webRtcClient = contact.webRtcClient
-    
-        webRtcClient.peer.on('signal',(data: any) => {
-            const iceReqeust: IICERequest = {
-                address: contact.address,
-                iceObject: JSON.stringify(data),
-                method: MessageMethod.ICE,
-                secret: contact.secret,
-                time: new Date().getTime(),
-            }
-            settingStore.Iota.sendIceRequest(iceReqeust)
-        })
-        webRtcClient.peer.on('connect', () => {
-            webRtcClient.peer.send(JSON.stringify({status: ChatStatus.online}))
-        })
-        webRtcClient.peer.on('data', (data: any) => {
-            const dataObject = JSON.parse(data)
-            if(dataObject !== undefined && dataObject.status !== undefined){
-                contact.status = dataObject.status
-            }
-        })
-        if(ice !== undefined){
-            webRtcClient.peer.signal(JSON.stringify(ice))
-        }
     }
 }
 

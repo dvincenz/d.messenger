@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Sender} from '../components';
 import { MessageDisplayer } from '../components/MessageDisplayer';
 import { AddContact } from '../components/AddContact';
-import { Button, AppBar, Toolbar, Typography, StyleRulesCallback, withStyles, TextField } from '@material-ui/core';
+import { Button, AppBar, Toolbar, Typography, StyleRulesCallback, withStyles } from '@material-ui/core';
 import { Contacts } from '../components/Contacts';
 import { contactStore } from '../stores/ContactStore';
 import { settingStore } from '../stores/SettingStore';

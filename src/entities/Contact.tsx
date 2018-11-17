@@ -20,14 +20,19 @@ export class Contact {
         // tslint:disable-next-line:no-unnecessary-initializer
         let ice = undefined
         try {
-            debugger;
             if (iceReqeust !== undefined) {
                 ice = iceReqeust.iceObject
+                const iceObject = JSON.parse(ice)
+                if(iceObject.type !== "offer"){
+                    this.webRtcClient.signal(ice);
+                    return;
+                }
             }
             if (this.webRtcClient !== undefined) {
                 // todo remove if connection establishment never fails. Need some more troubleshooting because connection initiation under some circumstances fails
                 console.log('webrtc Timestamp: ' + this.webRtcClient.timestampIcePublic + ' ice time: ' + iceReqeust.time + ' ' + (this.webRtcClient.timestampIcePublic > iceReqeust.time))
             }
+            
             if (this.webRtcClient !== undefined &&
                 (this.webRtcClient.timestampIcePublic > iceReqeust.time ||
                     this.webRtcClient.timestampIcePublic === undefined ||

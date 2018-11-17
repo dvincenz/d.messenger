@@ -163,20 +163,9 @@ export class ContactStore {
                 if (contact.updateTime < i.time && i.address === settingStore.myAddress) {
                     newestIce = i
                 }
-                if (newestIce === undefined) {
-                    return
-                }
-                const iceObject = JSON.parse(newestIce.iceObject)
-                console.log(iceObject)
-                if (iceObject.type === 'offer') {
-                    contact.setStatus(ChatStatus.online, newestIce)
-                } else {
-                    this.getContactBySecret(i.secret).webRtcClient.peer.signal(newestIce.iceObject)
-                }
-            }
-            )
-        }
-        )
+                contact.setStatus(ChatStatus.online, newestIce)
+            })
+        })
     }
 }
 

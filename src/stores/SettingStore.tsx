@@ -1,5 +1,5 @@
 
-import { observable, computed } from 'mobx'
+import { observable } from 'mobx'
 import { Iota } from '../services/iotaService';
 import { messageStore } from './MessageStore';
 import { contactStore } from './ContactStore';

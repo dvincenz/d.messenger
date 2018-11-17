@@ -4,7 +4,6 @@ import { settingStore } from "./SettingStore";
 import { IContactRequest, IContactResponse, Permission, MessageMethod } from "../services/iotaService/interfaces";
 import { toContact } from "../utils/Mapper";
 import { IICERequest } from "src/services/iotaService/interfaces/IICERequest";
-import { WebRtcClient } from "src/services/webRTCService";
 import { getRandomSeed } from "src/utils";
 import { ChatStatus } from "src/entities/WebRTCConnection";
 

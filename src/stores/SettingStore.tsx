@@ -12,22 +12,28 @@ export class SettingStore {
     public port: number = 443
     @observable public myAddress: string;
     public Iota: Iota;
-    public myName: string = '';
+    public myName: string = 'Dumeni Vincenz';
 
-    set seed(seed: string){
+    set seed(seed: string) {
         this._seed = seed;
-        window.sessionStorage.setItem('seed', seed);
     }
+
     get seed(){
         return this._seed;
     }
+
     @observable private _seed: string = '' 
     constructor(){
-        const sessionSeed = window.sessionStorage.getItem('seed')
+        const sessionSeed = window.localStorage.getItem('seed') === null ? window.sessionStorage.getItem('seed') : window.localStorage.getItem('seed');
         if(sessionSeed !== null){
             this._seed = sessionSeed
         }
     }
+
+    public saveSeed (seed: string, storage: boolean){
+        storage ? window.localStorage.setItem('seed', seed) : window.sessionStorage.setItem('seed', seed);
+    }
+
     public async setupMessanger() {
         this.Iota = new Iota(this.host + ':' + this.port, this.seed);
         messageStore.subscribeForMessages();

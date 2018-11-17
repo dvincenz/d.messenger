@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Sender} from '../components';
 import { MessageDisplayer } from '../components/MessageDisplayer';
 import { AddContact } from '../components/AddContact';
-import { Button, AppBar, Toolbar, Typography, StyleRulesCallback, withStyles } from '@material-ui/core';
+import { Button, StyleRulesCallback, withStyles } from '@material-ui/core';
 import { Contacts } from '../components/Contacts';
 import { contactStore } from '../stores/ContactStore';
 import { settingStore } from '../stores/SettingStore';
@@ -11,6 +11,7 @@ import { Redirect } from 'react-router';
 import { messageStore } from 'src/stores/MessageStore';
 import { CreateGroup } from "../components/CreateGroup";
 import { InviteContact } from "../components/InviteContact"
+import { TitleBaar } from 'src/components/TitleBaar';
 
 interface IState {
   addContactDialogOpen: boolean;
@@ -64,13 +65,7 @@ class ChatComponent extends React.Component<IProps, IState> {
     const isGroup = contactStore.currentContact && contactStore.currentContact.isGroup
     return (
       <React.Fragment>
-        <AppBar position="static" className={classes.appBar}>
-          <Toolbar>
-            <Typography component="h6" color="inherit" noWrap>
-              d.messanger - your public address: {settingStore.myAddress}
-            </Typography>
-          </Toolbar>
-        </AppBar>
+        <TitleBaar />
         <div id="contacts" className={classes.contacts}>
           <Button onClick={this.handleAddContactDialog}>Add Contact</Button>
           <Button onClick={this.handleCreateGroupDialog}>Create Group</Button>

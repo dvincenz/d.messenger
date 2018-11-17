@@ -73,6 +73,7 @@ interface IState {
   seed: string;
   isNewAccountDialogShow: boolean;
   textbox: any;
+  saveSeed: boolean;
 }
 
 @observer
@@ -84,6 +85,7 @@ class LoginComponent extends React.Component<IPorps, IState> {
       seed: '',
       isNewAccountDialogShow: false,
       textbox: null,
+      saveSeed: false,
     }
   }
 
@@ -126,7 +128,7 @@ class LoginComponent extends React.Component<IPorps, IState> {
                     <Grid item>
                       <FormControlLabel
                         control={
-                          <Checkbox value="save your seed in your browser" color="primary"/>
+                          <Checkbox checked={this.state.saveSeed} onChange={this.handleSaveSeed} value="save your seed in your browser" color="primary"/>
                         }
                         label="save your seed in your browser"
                       />
@@ -182,11 +184,16 @@ class LoginComponent extends React.Component<IPorps, IState> {
       seed: event.target.value,
       textbox: event.target
     })
-    
+  }
+
+  private handleSaveSeed = (event: React.ChangeEvent<HTMLInputElement>) => {
+    this.setState({
+      saveSeed: event.target.checked
+    })
   }
 
   private handleStoreSeed = () => {
-    settingStore.seed = this.state.seed;
+    settingStore.saveSeed(this.state.seed, this.state.saveSeed);
   }
 
   private handleNewContact = () => {
@@ -203,7 +210,7 @@ class LoginComponent extends React.Component<IPorps, IState> {
     this.setState({
       isNewAccountDialogShow: false
     })
-    settingStore.seed = this.state.seed;
+    settingStore.saveSeed(this.state.seed, this.state.saveSeed);
   }
 }
 

@@ -17,8 +17,6 @@ export class SettingStore {
     set seed(seed: string){
         this._seed = seed;
         window.sessionStorage.setItem('seed', seed);
-        console.log(window.sessionStorage)
-        debugger;
     }
     get seed(){
         return this._seed;

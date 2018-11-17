@@ -211,27 +211,29 @@ export class Iota extends EventHandler {
     // #### Helper Methods ###
 
     private convertToObject(tryt: string): any {
-        try {
-            const transaction = asTransactionObject(tryt);
-            if (transaction.signatureMessageFragment.replace(/9+$/, '') === '') {
-                return;
-            }
 
-            const object = this.parseMessage(trytesToAscii(transaction.signatureMessageFragment.replace(/9+$/, '')));
-
-            if (object === null || object === undefined) {
-                return;
-            }
-            if ((!object.message && object.method === MessageMethod.Message) || object.method === undefined || object.secret === undefined) {
-                return;
-            }
-            object.address = transaction.address;
-            object.hash = transaction.hash;
-            object.time = transaction.timestamp;
-            return object
-        } catch (error) {
-            debugger;
+        const transaction = asTransactionObject(tryt);
+        if (transaction.signatureMessageFragment.replace(/9+$/, '') === '') {
+            return;
         }
+        let object: any;
+        try {
+            object = this.parseMessage(trytesToAscii(transaction.signatureMessageFragment.replace(/9+$/, '')));
+        } catch (error) {
+            console.log('messages not designed for d.messenger are available on this address')
+            return;
+        }
+        if (object === null || object === undefined) {
+            return;
+        }
+        if ((!object.message && object.method === MessageMethod.Message) || object.method === undefined || object.secret === undefined) {
+            return;
+        }
+        object.address = transaction.address;
+        object.hash = transaction.hash;
+        object.time = transaction.timestamp;
+        return object
+
     }
 
     private stringify(message: IBaseMessage) {

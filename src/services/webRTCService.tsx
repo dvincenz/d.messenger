@@ -38,8 +38,6 @@ export class WebRtcClient {
             secret: this.contact.secret,
             time: new Date().getTime(),
         }
-         // todo remove if connection establishment never fails. Need some more troubleshooting because connection initiation under some circumstances fails
-        console.log('send ice on tangle' + iceReqeust.iceObject)
         this.timestampIcePublic = await settingStore.Iota.sendIceRequest(iceReqeust)
     
     }

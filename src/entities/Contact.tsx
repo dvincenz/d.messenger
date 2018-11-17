@@ -27,20 +27,13 @@ export class Contact {
                     this.webRtcClient.signal(ice);
                     return;
                 }
-            }
-            if (this.webRtcClient !== undefined) {
-                // todo remove if connection establishment never fails. Need some more troubleshooting because connection initiation under some circumstances fails
-                console.log('webrtc Timestamp: ' + this.webRtcClient.timestampIcePublic + ' ice time: ' + iceReqeust.time + ' ' + (this.webRtcClient.timestampIcePublic > iceReqeust.time))
-            }
-            
+            }            
             if (this.webRtcClient !== undefined &&
                 (this.webRtcClient.timestampIcePublic > iceReqeust.time ||
                     this.webRtcClient.timestampIcePublic === undefined ||
                     (this.webRtcClient.timestampIcePublic === iceReqeust.time && this.address > settingStore.myAddress)
                 )
             ){
-                // destroy webRtc Client if a offer arrives and a offer was already send => can easy happened because established over iota take some time.
-                console.log('destroy webRtc Client')
                 this.webRtcClient.peer.destroy();
                 this.webRtcClient = new WebRtcClient(this, false, ice)
                 return
@@ -49,7 +42,7 @@ export class Contact {
                 this.webRtcClient = new WebRtcClient(this, ice === undefined, ice)
             }
         } catch (error) {
-            console.log(error)
+            console.error(error)
         }
     }
 

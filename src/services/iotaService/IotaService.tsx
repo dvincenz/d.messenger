@@ -74,7 +74,8 @@ export class Iota extends EventHandler {
 
     public async sendIceRequest(ice: IICERequest){
         try{
-            await this.sendToTangle(ice)
+            const returnvalue = await this.sendToTangle(ice)
+            return returnvalue[0].timestamp
         }catch (error){
             console.error('error sending ice to tangle ' + error)
         }

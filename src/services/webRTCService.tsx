@@ -8,11 +8,16 @@ import { settingStore } from 'src/stores/SettingStore';
 export class WebRtcClient {
     public ice: string
     public peer: any;
+    public timestampIcePublic: number;
+    public isClosed: boolean;
     private contact: Contact
     constructor(contact: Contact, offer: boolean = true, ice?: string){
+         // todo remove if connection establishment never fails. Need some more troubleshooting because connection initiation under some circumstances fails
+        console.log('create webRtcObject, initator: ' + offer)
         this.contact = contact;
         this.peer = new SimplePeer({ initiator: offer, trickle: false })
-        this.peer.on('close', this.errorHandling)
+        this.peer.on('error', this.errorHandling)
+        this.peer.on('close', this.onClose)
         this.peer.on('connect', this.connectionHandling)
         this.peer.on('data', this.reciveData)
         this.peer.on('signal', this.signalHandling)
@@ -21,7 +26,11 @@ export class WebRtcClient {
         }
     }
 
-    private signalHandling = (data: any) => {
+    public async signal (ice: string){
+        await this.peer.signal(ice)
+    }
+
+    private signalHandling = async (data: any) => {
         const iceReqeust: IICERequest = {
             address: this.contact.address,
             iceObject: JSON.stringify(data),
@@ -29,7 +38,9 @@ export class WebRtcClient {
             secret: this.contact.secret,
             time: new Date().getTime(),
         }
-        settingStore.Iota.sendIceRequest(iceReqeust)
+         // todo remove if connection establishment never fails. Need some more troubleshooting because connection initiation under some circumstances fails
+        console.log('send ice on tangle' + iceReqeust.iceObject)
+        this.timestampIcePublic = await settingStore.Iota.sendIceRequest(iceReqeust)
     
     }
 
@@ -45,10 +56,14 @@ export class WebRtcClient {
     }
     
     private errorHandling = (err: any) => {
+        this.isClosed = true;
         console.error(err);
     }
 
-
+    private onClose = () => {
+        this.isClosed = true;
+        this.contact.status = ChatStatus.offline
+    }
 
 
 }

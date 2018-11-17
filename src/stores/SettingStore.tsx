@@ -1,5 +1,5 @@
 
-import { observable } from 'mobx'
+import { observable, computed } from 'mobx'
 import { Iota } from '../services/iotaService';
 import { messageStore } from './MessageStore';
 import { contactStore } from './ContactStore';
@@ -7,17 +7,29 @@ import { contactStore } from './ContactStore';
 
 export class SettingStore {
     // todo not fill with default values => store values in browser local storage
-    @observable public seed: string = '' 
+    
     public host: string = 'https://nodes.devnet.iota.org' 
     public port: number = 443
     @observable public myAddress: string;
     public Iota: Iota;
     public myName: string = '';
 
-    public setSeed (seed: string){
-        this.seed = seed;
+    set seed(seed: string){
+        this._seed = seed;
+        window.sessionStorage.setItem('seed', seed);
+        console.log(window.sessionStorage)
+        debugger;
     }
-
+    get seed(){
+        return this._seed;
+    }
+    @observable private _seed: string = '' 
+    constructor(){
+        const sessionSeed = window.sessionStorage.getItem('seed')
+        if(sessionSeed !== null){
+            this._seed = sessionSeed
+        }
+    }
     public async setupMessanger() {
         this.Iota = new Iota(this.host + ':' + this.port, this.seed);
         messageStore.subscribeForMessages();

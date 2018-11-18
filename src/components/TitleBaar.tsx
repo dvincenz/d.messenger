@@ -6,7 +6,6 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import { contactStore } from 'src/stores/ContactStore';
 import { ChatStatus } from 'src/entities/WebRTCConnection';
-import { Link } from 'react-router-dom';
 
 interface IPorps {
     classes: any;

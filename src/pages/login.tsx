@@ -74,6 +74,8 @@ interface IState {
   isNewAccountDialogShow: boolean;
   textbox: any;
   saveSeed: boolean;
+  userName: string;
+  userNameError: boolean
 }
 
 @observer
@@ -86,6 +88,8 @@ class LoginComponent extends React.Component<IPorps, IState> {
       isNewAccountDialogShow: false,
       textbox: null,
       saveSeed: false,
+      userName: '',
+      userNameError: false,
     }
   }
 
@@ -149,7 +153,7 @@ class LoginComponent extends React.Component<IPorps, IState> {
                   </Typography>
                   <Grid container spacing={16} justify="center">
                     <Grid item>
-                      <TextField label="Enter username"/>
+                      <TextField error={this.state.userNameError}  onChange={this.handleUserNameChange} value={this.state.userName} label="Enter username"/>
                     </Grid>
                     <Grid item>
                       <Button variant="outlined" color="primary" onClick={this.handleNewContact}>
@@ -186,6 +190,12 @@ class LoginComponent extends React.Component<IPorps, IState> {
     })
   }
 
+  private handleUserNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    this.setState({
+      userName: event.target.value
+    })
+  }
+
   private handleSaveSeed = (event: React.ChangeEvent<HTMLInputElement>) => {
     this.setState({
       saveSeed: event.target.checked
@@ -197,7 +207,11 @@ class LoginComponent extends React.Component<IPorps, IState> {
   }
 
   private handleNewContact = () => {
-    // TODO: add handling for the username
+    if(this.state.userName === ''){
+      this.setState({
+        userNameError: true,
+      })
+    }
     this.setState({
       seed: getRandomSeed(),
       isNewAccountDialogShow: true
@@ -210,6 +224,7 @@ class LoginComponent extends React.Component<IPorps, IState> {
     this.setState({
       isNewAccountDialogShow: false
     })
+    settingStore.myName = this.state.userName
     settingStore.saveSeed(this.state.seed, this.state.saveSeed);
   }
 }

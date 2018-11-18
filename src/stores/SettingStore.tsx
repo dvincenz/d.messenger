@@ -12,7 +12,7 @@ export class SettingStore {
     public port: number = 443
     @observable public myAddress: string;
     public Iota: Iota;
-    public myName: string = 'Dumeni Vincenz';
+    @observable private _myName: string;
 
     set seed(seed: string) {
         this._seed = seed;
@@ -22,16 +22,27 @@ export class SettingStore {
         return this._seed;
     }
 
+    set myName(name: string) {
+        window.localStorage.setItem('myName', name)
+        this._myName = name;
+    }
+
+    get myName(){
+        return this._myName;
+    }
+
     @observable private _seed: string = '' 
     constructor(){
         const sessionSeed = window.localStorage.getItem('seed') === null ? window.sessionStorage.getItem('seed') : window.localStorage.getItem('seed');
         if(sessionSeed !== null){
             this._seed = sessionSeed
+            this._myName = window.localStorage.getItem('myName')
         }
     }
 
     public saveSeed (seed: string, storage: boolean){
         storage ? window.localStorage.setItem('seed', seed) : window.sessionStorage.setItem('seed', seed);
+        this._seed = seed;
     }
 
     public async setupMessanger() {
@@ -42,7 +53,6 @@ export class SettingStore {
         await this.Iota.bootstrapMessenger();
         contactStore.subscribeForIce(); // hotfix to not get old Ice messages
         this.myAddress = this.Iota.myAddress;
-        // todo save myMessages with event subscriber on iota service
         console.log(this.myAddress)
     }
 }

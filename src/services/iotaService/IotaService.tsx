@@ -118,6 +118,9 @@ export class Iota extends EventHandler {
     private async sendToTangle(message: IBaseMessage) {
         const addr = message.address
         const trytesMessage = asciiToTrytes(this.stringify(message));
+        if(trytesMessage.length > 2187){
+            throw new Error('to long message, need to split over more messages => not implemented yet, your message will not be send')
+        }
         const transfer = [{
             address: addr,
             message: trytesMessage,

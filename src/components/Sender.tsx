@@ -57,12 +57,14 @@ export class SenderComponent extends React.Component<IPorps, IState> {
 
     private handleSubmit = (): void => {
         const msg = this.state.message;
-        this.setState({message: ''})
-        if(contactStore === undefined){
-            console.error('error, no address aviable')   
+        if(msg.trim().length > 0) {
+          this.setState({message: ''})
+          if (contactStore === undefined) {
+            console.error('error, no address aviable')
             return
+          }
+          messageStore.sendMessage(contactStore.currentContact as Contact, msg)
         }
-        messageStore.sendMessage(contactStore.currentContact as Contact, msg)
     }
     
     private handleInputChange = (event: React.ChangeEvent<HTMLInputElement>): void => {

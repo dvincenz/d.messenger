@@ -7,6 +7,7 @@
     "@iota/core": "^1.0.0-beta.5",
     "@iota/http-client": "^1.0.0-beta.5",
     "@material-ui/core": "^3.1.2",
+    "@material-ui/icons": "^3.0.1",
     "@types/iota.lib.js": "^0.4.0",
     "@types/react-router-dom": "^4.3.1",
     "@types/simple-peer": "^6.1.5",

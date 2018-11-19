@@ -4,7 +4,6 @@ import { settingStore } from "./SettingStore";
 import { IContactRequest, IContactResponse, Permission, MessageMethod } from "../services/iotaService/interfaces";
 import { toContact } from "../utils/Mapper";
 import { IICERequest } from "src/services/iotaService/interfaces/IICERequest";
-import { WebRtcClient } from "src/services/webRTCService";
 import { getRandomSeed } from "src/utils";
 import { ChatStatus } from "src/entities/WebRTCConnection";
 
@@ -34,7 +33,7 @@ export class ContactStore {
     public addContactRequest = flow(function *(this: ContactStore, address: string) {
         this.state = ContactStoreState.loading
         try {
-            yield settingStore.Iota.sendContactRequest(address, settingStore.myAddress, 'dvi', false)
+            yield settingStore.Iota.sendContactRequest(address, settingStore.myAddress, settingStore.myName, false)
             this.state = ContactStoreState.updated
         } catch (error) {
             this.state = ContactStoreState.error
@@ -103,8 +102,19 @@ export class ContactStore {
 
 
 
-    public addContact (contact: Contact) {
-        this.contacts[contact.address] = contact;
+    public addContact (contact: IContactRequest | IContactResponse) {
+        if(settingStore.myAddress !== contact.senderAddress){
+            if(this.contacts[contact.senderAddress] === undefined || this.contacts[contact.senderAddress].updateTime < contact.time){
+                this.contacts[contact.senderAddress] = toContact(contact, contact.senderAddress, (contact as IContactRequest).isGroup === true);
+            }
+        }
+        if(settingStore.myAddress !== undefined && settingStore.myAddress !== contact.address){
+            if(this.contacts[contact.address] === undefined || this.contacts[contact.address].updateTime < contact.time){
+                const currentName = this.contacts[contact.address].name
+                this.contacts[contact.address] = toContact(contact, contact.address, (contact as IContactRequest).isGroup === true);
+                this.contacts[contact.address].name = currentName !== undefined ? currentName : this.contacts[contact.address].name
+            }
+        }
     }
 
     public getContactBySecret(secret:string): Contact{
@@ -120,32 +130,18 @@ export class ContactStore {
         return this.contacts[address]
     }
 
-    public subscribeForContactRequests () {
+    public subscribeForContactRequests() {
         settingStore.Iota.subscribe('contactRequest', (contacts: IContactRequest[]) => {
             contacts.forEach(c => {
-                if(this.contacts[c.senderAddress] === undefined && settingStore.myAddress !== c.senderAddress){
-                    this.contacts[c.senderAddress] = toContact(c, c.senderAddress, c.isGroup)
-                }
-                if(this.contacts[c.address] === undefined && settingStore.myAddress !== c.address && settingStore.myAddress !== undefined){
-                    this.contacts[c.address] = toContact(c, c.address, c.isGroup)
-                }
+                this.addContact(c)
             })
         })
     }
 
-    public subscribeForContactResponse () {
+    public subscribeForContactResponse() {
         settingStore.Iota.subscribe('contactResponse', (contacts: IContactResponse[]) => {
             contacts.forEach(c => {
-                if(this.contacts[c.senderAddress] === undefined || (this.contacts[c.senderAddress] !== undefined && this.contacts[c.senderAddress].updateTime < c.time)){
-                    if(settingStore.myAddress !== c.senderAddress){
-                        this.contacts[c.senderAddress] = toContact(c, c.senderAddress, false)
-                    }
-                }
-                if(this.contacts[c.address] === undefined || (this.contacts[c.address] !== undefined && this.contacts[c.address].updateTime < c.time)){
-                    if(settingStore.myAddress !== c.address && settingStore.myAddress !== undefined){
-                        this.contacts[c.address] = toContact(c, c.address, false)
-                    }
-                }
+                this.addContact(c)
             })
         })
     }

@@ -49,7 +49,7 @@ export class MessageStore {
             secret: reciver.secret,
             reciverAddress: reciver.address,
             message: messageText,
-            time: new Date().getTime(),
+            time: parseInt(new Date().getTime().toString().substr(0,10), 10),
             status: MessageStatus.Sending,
             toITextMessage: Message.prototype.toITextMessage // bad typescript hack
         }

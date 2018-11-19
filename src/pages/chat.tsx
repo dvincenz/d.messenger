@@ -70,10 +70,10 @@ class ChatComponent extends React.Component<IProps, IState> {
           <Button onClick={this.handleAddContactDialog}>Add Contact</Button>
           <Button onClick={this.handleCreateGroupDialog}>Create Group</Button>
          
-          <AddContact open={this.state.addContactDialogOpen} />
-          <CreateGroup open={this.state.createGroupDialogOpen} />
+          <AddContact open={settingStore.addContactDialogOpen} />
+          <CreateGroup open={settingStore.createGroupDialogOpen} />
            {isGroup && <Button onClick={this.handleInviteContactDialog}>Invite Contact</Button>}
-            {isGroup &&<InviteContact open={this.state.inviteContactDialogOpen} />}
+            {isGroup &&<InviteContact open={settingStore.inviteContactDialogOpen} />}
           <Contacts />
         </div>
         <main id="main" className={classes.main}>
@@ -105,26 +105,27 @@ class ChatComponent extends React.Component<IProps, IState> {
   } 
 
   private handleAddContactDialog = () => {
+    settingStore.addContactDialogOpen = true
     this.setState({
       addContactDialogOpen: true,
     })
   }
 
   private handleCreateGroupDialog = () => {
+    settingStore.createGroupDialogOpen = true
     this.setState({
       createGroupDialogOpen: true,
     })
   }
 
   private handleInviteContactDialog = () => {
+    settingStore.inviteContactDialogOpen = true
     if(contactStore.currentContact !== undefined && contactStore.currentContact.isGroup) {
         this.setState({
             inviteContactDialogOpen: true,
         })
     }
   }
-
-
 }
 
 export const Chat = withStyles(styles)(ChatComponent);

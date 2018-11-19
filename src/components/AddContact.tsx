@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Button, TextField, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@material-ui/core';
 import { isValidChecksum } from '@iota/checksum';
 import { contactStore } from 'src/stores/ContactStore';
+import {settingStore} from "../stores/SettingStore";
 
 
 interface IPorps {
@@ -89,6 +90,7 @@ export class AddContact extends React.Component<IPorps, IState> {
     }
 
     private handleClose = () => {
+        settingStore.addContactDialogOpen = false
         this.setState({
             open: false
         })
@@ -104,6 +106,7 @@ export class AddContact extends React.Component<IPorps, IState> {
             return;
         }
 
+        settingStore.addContactDialogOpen = false
         contactStore.addContactRequest(this.state.address).then(
             () => this.setState({ 
                 open: false,

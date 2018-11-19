@@ -7,7 +7,11 @@ import { contactStore } from './ContactStore';
 
 export class SettingStore {
     // todo not fill with default values => store values in browser local storage
-    
+
+    public addContactDialogOpen: boolean = false
+    public createGroupDialogOpen: boolean = false
+    public inviteContactDialogOpen: boolean = false
+
     public host: string = 'https://nodes.devnet.iota.org' 
     public port: number = 443
     @observable public myAddress: string;

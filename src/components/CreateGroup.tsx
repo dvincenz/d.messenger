@@ -1,11 +1,13 @@
 import * as React from 'react';
 import { Button, TextField, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@material-ui/core';
 import {contactStore} from "../stores/ContactStore";
+import {settingStore} from "../stores/SettingStore";
 
 
 interface IPorps {
     open: boolean;
 }
+
 interface IState {
     open: boolean,
     name: string,
@@ -86,12 +88,14 @@ export class CreateGroup extends React.Component<IPorps, IState> {
     }
 
     private handleClose = () => {
+        settingStore.createGroupDialogOpen = false
         this.setState({
             open: false
         })
     }
 
     private handleSave = () => {
+        settingStore.createGroupDialogOpen = false
         contactStore.createGroup(this.state.name).then(
             () => this.setState({
                 open: false,

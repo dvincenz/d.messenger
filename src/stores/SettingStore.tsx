@@ -5,12 +5,17 @@ import { messageStore } from './MessageStore';
 import { contactStore } from './ContactStore';
 
 
+export enum ActiveDialog {
+    AddContact,
+    CreateGroup,
+    InviteContact,
+    Default,
+}
+
 export class SettingStore {
     // todo not fill with default values => store values in browser local storage
 
-    public addContactDialogOpen: boolean = false
-    public createGroupDialogOpen: boolean = false
-    public inviteContactDialogOpen: boolean = false
+    public activeDialog: ActiveDialog = ActiveDialog.Default
 
     public host: string = 'https://nodes.devnet.iota.org' 
     public port: number = 443

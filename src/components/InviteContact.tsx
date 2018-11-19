@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Button, TextField, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@material-ui/core';
 import {contactStore} from "../stores/ContactStore";
-import {settingStore} from "../stores/SettingStore";
+import {ActiveDialog, settingStore} from "../stores/SettingStore";
 
 
 interface IPorps {
@@ -88,7 +88,7 @@ export class InviteContact extends React.Component<IPorps, IState> {
     }
 
     private handleClose = () => {
-        settingStore.inviteContactDialogOpen = false
+        settingStore.activeDialog = ActiveDialog.Default
         this.setState({
             open: false
         })
@@ -98,7 +98,7 @@ export class InviteContact extends React.Component<IPorps, IState> {
         const groupAddr: string = contactStore.currentContact.address
         const groupName: string = contactStore.currentContact.name
 
-        settingStore.inviteContactDialogOpen = false
+        settingStore.activeDialog = ActiveDialog.Default
         contactStore.inviteContact(this.state.address, groupAddr, groupName).then(
             () => this.setState({
                 open: false,

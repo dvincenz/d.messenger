@@ -44,20 +44,22 @@ export class MessageStore {
         this.fetchMessages(filterAddress);
     }
     public sendMessage = flow(function* (this: MessageStore, reciver: Contact, messageText: string) {
-        this.state = MessageStoreState.sending
-        const msg: Message = {
+        if(messageText.trim().length > 0) {
+          this.state = MessageStoreState.sending
+          const msg: Message = {
             secret: reciver.secret,
             reciverAddress: reciver.address,
             message: messageText,
             time: new Date().getTime(),
             status: MessageStatus.Sending,
             toITextMessage: Message.prototype.toITextMessage // bad typescript hack
-        }
-        this.messages.push(msg);
-        try {
+          }
+          this.messages.push(msg);
+          try {
             yield settingStore.Iota.sendMessage(msg.toITextMessage())
-        } catch (error) {
+          } catch (error) {
             this.state = MessageStoreState.error
+          }
         }
     })
 

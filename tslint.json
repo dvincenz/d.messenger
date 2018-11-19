@@ -23,7 +23,8 @@
     "jsx-boolean-value": false,
     "object-literal-sort-keys": false,
     "no-unused-expression": [true, "allow-fast-null-checks"],
-    "no-unused-variable": {"severity": "warning"} 
+    "no-unused-variable": {"severity": "warning"},
+    "variable-name": false
      
   }
 }

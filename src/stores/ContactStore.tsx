@@ -153,7 +153,7 @@ export class ContactStore {
     public subscribeForIce() {
         settingStore.Iota.subscribe('ice', (ice: IICERequest[]) => {
             ice.forEach(i => {
-                let newestIce: IICERequest
+                // let newestIce: IICERequest
                 // todo check if connection is obsolate
                 const contact = this.getContactBySecret(i.secret)
                 if(contact === undefined)
@@ -161,10 +161,10 @@ export class ContactStore {
                     return
                 }
                 if (contact.updateTime < i.time && i.address === settingStore.myAddress) {
-                    newestIce = i
+                    contact.setStatus(ChatStatus.online, i)
                 }
-                contact.setStatus(ChatStatus.online, newestIce)
             })
+            
         })
     }
 }

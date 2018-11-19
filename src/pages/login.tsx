@@ -186,7 +186,7 @@ class LoginComponent extends React.Component<IPorps, IState> {
   }
 
   private handleStoreSeed = () => {
-    settingStore.setSeed(this.state.seed);
+    settingStore.seed = this.state.seed;
   }
 
   private handleNewContact = () => {
@@ -203,7 +203,7 @@ class LoginComponent extends React.Component<IPorps, IState> {
     this.setState({
       isNewAccountDialogShow: false
     })
-    settingStore.setSeed(this.state.seed);
+    settingStore.seed = this.state.seed;
   }
 }
 

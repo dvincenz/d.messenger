@@ -5,6 +5,9 @@ import { contactStore } from 'src/stores/ContactStore';
 import { ActiveDialog, settingStore } from "../stores/SettingStore";
 import { observer } from "mobx-react";
 
+interface IPorps {
+    open: boolean,
+}
 
 interface IState {
     address: string,
@@ -13,8 +16,8 @@ interface IState {
 }
 
 @observer
-export class AddContact extends React.Component<{}, IState> {
-    constructor(props: any) {
+export class AddContact extends React.Component<IPorps, IState> {
+    constructor(props: IPorps) {
         super(props);
         this.state = {
             address: '',

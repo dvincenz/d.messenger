@@ -5,7 +5,7 @@ import { AddContact } from '../components/AddContact';
 import { Button, StyleRulesCallback, withStyles } from '@material-ui/core';
 import { Contacts } from '../components/Contacts';
 import { contactStore } from '../stores/ContactStore';
-import { settingStore } from '../stores/SettingStore';
+import {ActiveDialog, settingStore} from '../stores/SettingStore';
 import { observer } from 'mobx-react';
 import { Redirect } from 'react-router';
 import { messageStore } from 'src/stores/MessageStore';
@@ -14,9 +14,6 @@ import { InviteContact } from "../components/InviteContact"
 import { TitleBaar } from 'src/components/TitleBaar';
 
 interface IState {
-  addContactDialogOpen: boolean;
-  createGroupDialogOpen: boolean;
-  inviteContactDialogOpen: boolean;
   currentAddress: string;
   ice: string;
 }
@@ -50,9 +47,6 @@ class ChatComponent extends React.Component<IProps, IState> {
   constructor(props: IProps){
     super(props);
     this.state = {
-      addContactDialogOpen: false,
-      createGroupDialogOpen: false,
-      inviteContactDialogOpen: false,
       currentAddress: '',
       ice: ''
     }
@@ -70,10 +64,10 @@ class ChatComponent extends React.Component<IProps, IState> {
           <Button onClick={this.handleAddContactDialog}>Add Contact</Button>
           <Button onClick={this.handleCreateGroupDialog}>Create Group</Button>
          
-          <AddContact open={this.state.addContactDialogOpen} />
-          <CreateGroup open={this.state.createGroupDialogOpen} />
+          <AddContact/>
+          <CreateGroup/>
            {isGroup && <Button onClick={this.handleInviteContactDialog}>Invite Contact</Button>}
-            {isGroup &&<InviteContact open={this.state.inviteContactDialogOpen} />}
+            {isGroup &&<InviteContact/>}
           <Contacts />
         </div>
         <main id="main" className={classes.main}>
@@ -105,26 +99,18 @@ class ChatComponent extends React.Component<IProps, IState> {
   } 
 
   private handleAddContactDialog = () => {
-    this.setState({
-      addContactDialogOpen: true,
-    })
+    settingStore.activeDialog = ActiveDialog.AddContact
   }
 
   private handleCreateGroupDialog = () => {
-    this.setState({
-      createGroupDialogOpen: true,
-    })
+    settingStore.activeDialog = ActiveDialog.CreateGroup
   }
 
   private handleInviteContactDialog = () => {
     if(contactStore.currentContact !== undefined && contactStore.currentContact.isGroup) {
-        this.setState({
-            inviteContactDialogOpen: true,
-        })
+        settingStore.activeDialog = ActiveDialog.InviteContact
     }
   }
-
-
 }
 
 export const Chat = withStyles(styles)(ChatComponent);

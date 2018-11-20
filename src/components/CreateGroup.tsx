@@ -1,39 +1,21 @@
 import * as React from 'react';
 import { Button, TextField, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@material-ui/core';
 import {contactStore} from "../stores/ContactStore";
+import {ActiveDialog, settingStore} from "../stores/SettingStore";
+import {observer} from "mobx-react";
 
 
-interface IPorps {
-    open: boolean;
-}
 interface IState {
-    open: boolean,
     name: string,
     disableInput: boolean,
     error: string,
-    bevoreOpen:boolean,
 }
 
-export class CreateGroup extends React.Component<IPorps, IState> {
-    public static getDerivedStateFromProps(props: IPorps, state: IState) {
-        if (state.open !== state.bevoreOpen){
-            return {
-                bevoreOpen: state.open,
-            }
-        }
-        if (props.open !== state.open) {
-            return {
-                open: props.open,
-                bevoreOpen: props.open
-            };
-        }
-        return null;
-    }
-    constructor(props: IPorps) {
+@observer
+export class CreateGroup extends React.Component<{}, IState> {
+    constructor(props: any) {
         super(props);
         this.state = {
-            open: props.open,
-            bevoreOpen: props.open,
             name: '',
             disableInput: false,
             error: ''
@@ -44,7 +26,7 @@ export class CreateGroup extends React.Component<IPorps, IState> {
         return (
             <div>
                 <Dialog
-                    open={this.state.open}
+                    open={settingStore.activeDialog === ActiveDialog.CreateGroup}
                     onClose={this.handleClose}
                     aria-labelledby="form-dialog-title"
                 >
@@ -86,15 +68,13 @@ export class CreateGroup extends React.Component<IPorps, IState> {
     }
 
     private handleClose = () => {
-        this.setState({
-            open: false
-        })
+        settingStore.activeDialog = ActiveDialog.Default
     }
 
     private handleSave = () => {
+        settingStore.activeDialog = ActiveDialog.Default
         contactStore.createGroup(this.state.name).then(
             () => this.setState({
-                open: false,
                 disableInput: false,
             })
         );

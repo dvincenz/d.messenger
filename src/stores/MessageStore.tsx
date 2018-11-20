@@ -50,7 +50,7 @@ export class MessageStore {
             secret: reciver.secret,
             reciverAddress: reciver.address,
             message: messageText,
-            time: new Date().getTime(),
+            time: parseInt(new Date().getTime().toString().substr(0,10), 10),
             status: MessageStatus.Sending,
             toITextMessage: Message.prototype.toITextMessage // bad typescript hack
           }
@@ -78,7 +78,7 @@ export class MessageStore {
 
     private addMessages = (messages: ITextMessage[]) => {
         messages.forEach(m => this.messages.push(toMessage(m)))
-        this.messages = this.messages.slice().sort((a, b) => a.time > b.time ? 1 : -1); // sort messages by time
+        this.messages = this.messages.slice().sort((a, b) => a.time - b.time); // sort messages by time
     }
 
     

@@ -36,7 +36,14 @@ export class SenderComponent extends React.Component<IPorps, IState> {
         const { classes } = this.props
         return (
             <div>        
-                <TextField className={classes.textbox} disabled={contactStore.currentContact === undefined} value={this.state.message} onChange={this.handleInputChange}  label="Message"   />
+                <TextField
+                  className={classes.textbox}
+                  disabled={contactStore.currentContact === undefined}
+                  value={this.state.message}
+                  onChange={this.handleInputChange}
+                  onKeyPress={this.handleReturn}
+                  label="Message"
+                />
                 <Button 
                     disabled={contactStore.currentContact === undefined}
                     className={classes.button}
@@ -51,15 +58,21 @@ export class SenderComponent extends React.Component<IPorps, IState> {
     private handleSubmit = (): void => {
         const msg = this.state.message;
         this.setState({message: ''})
-        if(contactStore === undefined){
-            console.error('error, no address aviable')   
-            return
+        if (contactStore === undefined) {
+          console.error('error, no address aviable')
+          return
         }
         messageStore.sendMessage(contactStore.currentContact as Contact, msg)
     }
     
     private handleInputChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
-        this.setState({message: event.target.value})    
+        this.setState({message: event.target.value})
+    }
+
+    private handleReturn = (event: React.KeyboardEvent): void => {
+        if(event.key === 'Enter') {
+            this.handleSubmit();
+        }
     }
 }
 

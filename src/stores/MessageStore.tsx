@@ -44,20 +44,22 @@ export class MessageStore {
         this.fetchMessages(filterAddress);
     }
     public sendMessage = flow(function* (this: MessageStore, reciver: Contact, messageText: string) {
-        this.state = MessageStoreState.sending
-        const msg: Message = {
+        if(messageText.trim().length > 0) {
+          this.state = MessageStoreState.sending
+          const msg: Message = {
             secret: reciver.secret,
             reciverAddress: reciver.address,
             message: messageText,
-            time: new Date().getTime(),
+            time: parseInt(new Date().getTime().toString().substr(0,10), 10),
             status: MessageStatus.Sending,
             toITextMessage: Message.prototype.toITextMessage // bad typescript hack
-        }
-        this.messages.push(msg);
-        try {
+          }
+          this.messages.push(msg);
+          try {
             yield settingStore.Iota.sendMessage(msg.toITextMessage())
-        } catch (error) {
+          } catch (error) {
             this.state = MessageStoreState.error
+          }
         }
     })
 
@@ -76,7 +78,7 @@ export class MessageStore {
 
     private addMessages = (messages: ITextMessage[]) => {
         messages.forEach(m => this.messages.push(toMessage(m)))
-        this.messages = this.messages.slice().sort((a, b) => a.time > b.time ? 1 : -1); // sort messages by time
+        this.messages = this.messages.slice().sort((a, b) => a.time - b.time); // sort messages by time
     }
 
     

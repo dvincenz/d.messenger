@@ -64,10 +64,10 @@ class ChatComponent extends React.Component<IProps, IState> {
           <Button onClick={this.handleAddContactDialog}>Add Contact</Button>
           <Button onClick={this.handleCreateGroupDialog}>Create Group</Button>
          
-          <AddContact open={settingStore.activeDialog === ActiveDialog.AddContact} />
-          <CreateGroup open={settingStore.activeDialog === ActiveDialog.CreateGroup} />
+          <AddContact/>
+          <CreateGroup/>
            {isGroup && <Button onClick={this.handleInviteContactDialog}>Invite Contact</Button>}
-            {isGroup &&<InviteContact open={settingStore.activeDialog === ActiveDialog.InviteContact} />}
+            {isGroup &&<InviteContact/>}
           <Contacts />
         </div>
         <main id="main" className={classes.main}>

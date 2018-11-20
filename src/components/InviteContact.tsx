@@ -5,10 +5,6 @@ import {ActiveDialog, settingStore} from "../stores/SettingStore";
 import {observer} from "mobx-react";
 
 
-interface IPorps {
-    open: boolean,
-}
-
 interface IState {
     address: string,
     disableInput: boolean,
@@ -16,8 +12,8 @@ interface IState {
 }
 
 @observer
-export class InviteContact extends React.Component<IPorps, IState> {
-    constructor(props: IPorps) {
+export class InviteContact extends React.Component<{}, IState> {
+    constructor(props: any) {
         super(props);
         this.state = {
             address: '',

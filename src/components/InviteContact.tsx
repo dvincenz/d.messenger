@@ -2,40 +2,20 @@ import * as React from 'react';
 import { Button, TextField, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@material-ui/core';
 import {contactStore} from "../stores/ContactStore";
 import {ActiveDialog, settingStore} from "../stores/SettingStore";
+import {observer} from "mobx-react";
 
-
-interface IPorps {
-    open: boolean;
-}
 
 interface IState {
-    open: boolean,
     address: string,
     disableInput: boolean,
     error: string,
-    bevoreOpen:boolean,
 }
 
-export class InviteContact extends React.Component<IPorps, IState> {
-    public static getDerivedStateFromProps(props: IPorps, state: IState) {
-        if (state.open !== state.bevoreOpen){
-            return {
-                bevoreOpen: state.open,
-            }
-        }
-        if (props.open !== state.open) {
-            return {
-                open: props.open,
-                bevoreOpen: props.open
-            };
-        }
-        return null;
-    }
-    constructor(props: IPorps) {
+@observer
+export class InviteContact extends React.Component<{}, IState> {
+    constructor(props: any) {
         super(props);
         this.state = {
-            open: props.open,
-            bevoreOpen: props.open,
             address: '',
             disableInput: false,
             error: ''
@@ -46,7 +26,7 @@ export class InviteContact extends React.Component<IPorps, IState> {
         return (
             <div>
                 <Dialog
-                    open={this.state.open}
+                    open={settingStore.activeDialog === ActiveDialog.InviteContact}
                     onClose={this.handleClose}
                     aria-labelledby="form-dialog-title"
                 >
@@ -89,9 +69,6 @@ export class InviteContact extends React.Component<IPorps, IState> {
 
     private handleClose = () => {
         settingStore.activeDialog = ActiveDialog.Default
-        this.setState({
-            open: false
-        })
     }
 
     private handleSave = () => {
@@ -101,7 +78,6 @@ export class InviteContact extends React.Component<IPorps, IState> {
         settingStore.activeDialog = ActiveDialog.Default
         contactStore.inviteContact(this.state.address, groupAddr, groupName).then(
             () => this.setState({
-                open: false,
                 disableInput: false,
             })
         )

@@ -15,7 +15,7 @@ export enum ActiveDialog {
 export class SettingStore {
     // todo not fill with default values => store values in browser local storage
 
-    public activeDialog: ActiveDialog = ActiveDialog.Default
+    @observable public activeDialog: ActiveDialog = ActiveDialog.Default
 
     public host: string = 'https://nodes.devnet.iota.org' 
     public port: number = 443

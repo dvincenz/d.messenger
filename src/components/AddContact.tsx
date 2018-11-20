@@ -2,42 +2,21 @@ import * as React from 'react';
 import { Button, TextField, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@material-ui/core';
 import { isValidChecksum } from '@iota/checksum';
 import { contactStore } from 'src/stores/ContactStore';
-import {ActiveDialog, settingStore} from "../stores/SettingStore";
+import { ActiveDialog, settingStore } from "../stores/SettingStore";
+import { observer } from "mobx-react";
 
-
-interface IPorps {
-    open: boolean;
-}
 
 interface IState {
-    open: boolean,
     address: string,
     disableInput: boolean,
     error: string,
-    bevoreOpen:boolean,
 }
 
-export class AddContact extends React.Component<IPorps, IState> {
-    public static getDerivedStateFromProps(props: IPorps, state: IState) {
-        if (state.open !== state.bevoreOpen){
-            return {
-                bevoreOpen: state.open,
-            }
-        }
-        if (props.open !== state.open) {
-            return {
-                open: props.open,
-                bevoreOpen: props.open
-            };
-        }
-        return null;
-    }
-
-    constructor(props: IPorps) {
+@observer
+export class AddContact extends React.Component<{}, IState> {
+    constructor(props: any) {
         super(props);
         this.state = {
-            open: props.open,
-            bevoreOpen: props.open,
             address: '',
             disableInput: false,
             error: ''
@@ -48,7 +27,7 @@ export class AddContact extends React.Component<IPorps, IState> {
         return (
             <div>
                 <Dialog
-                    open={this.state.open}
+                    open={settingStore.activeDialog === ActiveDialog.AddContact}
                     onClose={this.handleClose}
                     aria-labelledby="form-dialog-title"
                 >
@@ -91,9 +70,6 @@ export class AddContact extends React.Component<IPorps, IState> {
 
     private handleClose = () => {
         settingStore.activeDialog = ActiveDialog.Default
-        this.setState({
-            open: false
-        })
     }
 
     private handleSave = () =>{
@@ -108,8 +84,7 @@ export class AddContact extends React.Component<IPorps, IState> {
 
         settingStore.activeDialog = ActiveDialog.Default
         contactStore.addContactRequest(this.state.address).then(
-            () => this.setState({ 
-                open: false,
+            () => this.setState({
                 disableInput: false, 
             })
         );

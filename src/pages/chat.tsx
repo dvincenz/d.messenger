@@ -14,9 +14,6 @@ import { InviteContact } from "../components/InviteContact"
 import { TitleBaar } from 'src/components/TitleBaar';
 
 interface IState {
-  addContactDialogOpen: boolean;
-  createGroupDialogOpen: boolean;
-  inviteContactDialogOpen: boolean;
   currentAddress: string;
   ice: string;
 }
@@ -50,9 +47,6 @@ class ChatComponent extends React.Component<IProps, IState> {
   constructor(props: IProps){
     super(props);
     this.state = {
-      addContactDialogOpen: false,
-      createGroupDialogOpen: false,
-      inviteContactDialogOpen: false,
       currentAddress: '',
       ice: ''
     }
@@ -106,24 +100,15 @@ class ChatComponent extends React.Component<IProps, IState> {
 
   private handleAddContactDialog = () => {
     settingStore.activeDialog = ActiveDialog.AddContact
-    this.setState({
-      addContactDialogOpen: true,
-    })
   }
 
   private handleCreateGroupDialog = () => {
     settingStore.activeDialog = ActiveDialog.CreateGroup
-    this.setState({
-      createGroupDialogOpen: true,
-    })
   }
 
   private handleInviteContactDialog = () => {
-    settingStore.activeDialog = ActiveDialog.InviteContact
     if(contactStore.currentContact !== undefined && contactStore.currentContact.isGroup) {
-        this.setState({
-            inviteContactDialogOpen: true,
-        })
+        settingStore.activeDialog = ActiveDialog.InviteContact
     }
   }
 }

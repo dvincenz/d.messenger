@@ -194,8 +194,10 @@ export class Iota extends EventHandler {
         try {
             const hashes = await this.api.findTransactions(query)
             const newHashes = arrayDiff(this.loadedHashes, hashes)
-            trytes = await this.api.getTrytes(newHashes)
-            this.loadedHashes = this.loadedHashes.concat(newHashes)
+            if(newHashes.length > 0){
+                trytes = await this.api.getTrytes(newHashes)
+                this.loadedHashes = this.loadedHashes.concat(newHashes)
+            }
         } catch (error) { 
             console.error(error);
             return [];

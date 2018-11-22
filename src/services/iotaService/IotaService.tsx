@@ -239,7 +239,7 @@ export class Iota extends EventHandler {
         try {
             object = this.parseMessage(trytesToAscii(transaction.signatureMessageFragment.replace(/9+$/, '')));
         } catch (error) {
-            // Possible bundle
+            console.log('messages not designed for d.messenger are available on this address');
             return;
         }
         return this.checkObject(object, transaction);

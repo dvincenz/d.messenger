@@ -17,6 +17,7 @@ import { observer } from 'mobx-react';
 import { settingStore } from '../stores/SettingStore';
 import { getRandomSeed } from "../utils";
 import { NewAccountDialog } from "../components/NewAccountDialog";
+import { EncriptionService } from 'src/services/encriptionService';
 
 
 const styles: StyleRulesCallback = theme => ({
@@ -226,6 +227,7 @@ class LoginComponent extends React.Component<IPorps, IState> {
     })
     settingStore.myName = this.state.userName
     settingStore.saveSeed(this.state.seed, this.state.saveSeed);
+    settingStore.newUser = true;
   }
 }
 

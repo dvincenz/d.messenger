@@ -5,6 +5,8 @@ import { IBaseMessage, MessageMethod, ITextMessage, IContactResponse, Permission
 import { getRandomSeed, arrayDiff } from '../../utils';
 import { EventHandler } from '../../utils/EventHandler';
 import { IICERequest } from './interfaces/IICERequest';
+import { IAddress } from './interfaces/IAddress';
+import { INVALID_TAG } from '@iota/core/typings/errors';
 
 
 export class Iota extends EventHandler {
@@ -19,6 +21,8 @@ export class Iota extends EventHandler {
     private loadedHashes: string[];
     private isCallRunning: boolean = false;
     private isBootStrapped: boolean = false;
+    private broadcastAddress = 'DMESSENGERDMESSENGERDMESSENGERDMESSENGERDMESSENGERDMESSENGERDMESSENGERDMESSENGER'
+
 
     constructor(provider: string, seed: string) {
         super();
@@ -44,6 +48,22 @@ export class Iota extends EventHandler {
     public async sendMessage(message: ITextMessage) {
         // todo may do some checks of used simboles and size of message to prevent errors
         return await this.sendToTangle(message);
+    }
+
+    public async publishMyPublicKey(key: string, myName: string) {
+        if(this.isBootStrapped !== true){
+            throw new Error("IOTA Service is not bootstraped, please Bootstrap first the service bevore you publish your contact")
+        }
+        const toPublishAddress: IAddress = {
+            address: this.broadcastAddress,
+            method: MessageMethod.AddressPublish,
+            myAddress: this.myAddress,
+            publicKey: key,
+            secret: '',
+            time: Date.now(),
+            tag: myName
+        } 
+        return await this.sendToTangle(toPublishAddress)
     }
 
     public async sendContactRequest(addr: string, ownAddress: string, myName: string, isGrp: boolean) {
@@ -117,14 +137,23 @@ export class Iota extends EventHandler {
 
     private async sendToTangle(message: IBaseMessage) {
         const addr = message.address
+        let inputTag = ''
+        if((message as IAddress).tag !== undefined){
+            inputTag = asciiToTrytes(((message as IAddress).tag))
+            if(inputTag.length > 27){
+                throw new Error("the tag is to big message can not be published")
+            }
+        }
         const trytesMessage = asciiToTrytes(this.stringify(message));
         if(trytesMessage.length > 2187){
-            throw new Error('to long message, need to split over more messages => not implemented yet, your message will not be send')
+            throw new Error('to long message, ' + trytesMessage.length + ' need to split over more messages => not implemented yet, your message will not be send')
         }
+        
         const transfer = [{
             address: addr,
             message: trytesMessage,
             value: 0,
+            tag: inputTag,
         }];
         
         try{

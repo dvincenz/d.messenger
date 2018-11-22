@@ -12,6 +12,7 @@ export enum MessageMethod {
     ContactResponse,
     Message,
     ICE,
+    AddressPublish,
 }
 
 export enum Permission {

@@ -14,6 +14,7 @@ export class Contact {
     public isDisplayed: boolean;
     public status: ChatStatus = ChatStatus.offline
     public isGroup: boolean;
+    public publicKey: string;
 
     public setStatus(chatStatus: ChatStatus, iceReqeust?: IICERequest) {
         // tslint:disable-next-line:no-unnecessary-initializer

@@ -208,25 +208,14 @@ export class Iota extends EventHandler {
             return [];
         }
         const convertedObjects: IBaseMessage[] = [];
-        const possibleBundleObjects: any[] = [];
+
+        const bundleObjects: any[] = trytes.filter((tryt: any) => {
+            const transaction: Transaction = asTransactionObject(tryt);
+            return transaction.lastIndex > 0;
+        });
 
         trytes.forEach((tryt: any) => {
-            const object = this.convertToObject(tryt)
-            if (object !== undefined) {
-                convertedObjects.push(object);
-            } else {
-                possibleBundleObjects.push(tryt);
-            }
-        });
-
-        const bundleObjects = possibleBundleObjects.filter((tryt: any) => {
-            const transaction: Transaction = asTransactionObject(tryt);
-            return transaction.currentIndex === 0 && transaction.lastIndex > 0;
-        });
-
-        bundleObjects.forEach((tryt: any) => {
-            const object = this.convertBundleToObject(tryt, possibleBundleObjects);
-            console.log(object);
+            const object = this.convertToObject(tryt, bundleObjects)
             if (object !== undefined) {
                 convertedObjects.push(object);
             }
@@ -237,13 +226,14 @@ export class Iota extends EventHandler {
 
     // #### Helper Methods ###
 
-    private convertToObject(tryt: string): any {
+    private convertToObject(tryt: string, bundleObjects: any[]): any {
 
         const transaction = asTransactionObject(tryt);
-        if (transaction.signatureMessageFragment.replace(/9+$/, '') === ''
-            || transaction.lastIndex > 0) {
-            // If lastIndex is bigger than 0, the transaction is part of a bundle.
+        if (transaction.signatureMessageFragment.replace(/9+$/, '') === '') {
             return;
+        }
+        if(transaction.lastIndex > 0 && transaction.currentIndex === 0) {
+            return this.convertBundleToObject(tryt, bundleObjects);
         }
         let object: any;
         try {
@@ -255,7 +245,7 @@ export class Iota extends EventHandler {
         return this.checkObject(object, transaction);
     }
 
-    private convertBundleToObject(tryt: any, bundleObjects: any[]): any {
+    private convertBundleToObject(tryt: string, bundleObjects: any[]): any {
         const transaction: Transaction = asTransactionObject(tryt);
         const signatureMessageFragmentTryt: string =
             bundleObjects

@@ -87,7 +87,7 @@ class ChatComponent extends React.Component<IProps, IState> {
 
   public componentDidMount () {
     if(settingStore.seed !== ''){
-      settingStore.().then( () =>{
+      settingStore.setupMessanger().then( () =>{
         this.setAddress(this.props.match.params.address)
       })
     }

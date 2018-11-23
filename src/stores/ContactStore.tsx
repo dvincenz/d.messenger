@@ -1,13 +1,12 @@
 import { flow, observable, computed } from "mobx";
 import { Contact } from "../entities";
 import { settingStore } from "./SettingStore";
-import { IContactRequest, IContactResponse, Permission, MessageMethod } from "../services/iotaService/interfaces";
+import { IContactRequest, IContactResponse, Permission } from "../services/iotaService/interfaces";
 import { toContact } from "../utils/Mapper";
 import { IICERequest } from "src/services/iotaService/interfaces/IICERequest";
 import { getRandomSeed } from "src/utils";
 import { ChatStatus } from "src/entities/WebRTCConnection";
 import { EncriptionService } from "src/services/encriptionService";
-import { settings } from "cluster";
 
 export class ContactStore {
     @computed get currentContact(): Contact {

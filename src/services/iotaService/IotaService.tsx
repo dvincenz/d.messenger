@@ -79,6 +79,10 @@ export class Iota extends EventHandler {
         return await this.sendToTangle(message)
     }
 
+    public async searchContactByName(name: string){
+        this.getFromTangle([this.broadcastAddress], name);
+    }
+
     public async sendContactResponse(addr: string, permission: Permission, ownAddress: string, myName: string, key: string) {
         const message: IContactResponse = {
             method: MessageMethod.ContactResponse,
@@ -144,7 +148,7 @@ export class Iota extends EventHandler {
                 throw new Error("the tag is to big message can not be published")
             }
         }
-        const trytesMessage = asciiToTrytes(this.stringify(message));
+        const trytesMessage = asciiToTrytes(this.encript(message));
         if(trytesMessage.length > 2187){
             throw new Error('to long message, ' + trytesMessage.length + ' need to split over more messages => not implemented yet, your message will not be send')
         }
@@ -182,6 +186,7 @@ export class Iota extends EventHandler {
         const contactRequests: IContactRequest[] = []
         const contactResponse: IContactResponse[] = []
         const ice: IICERequest[] = []
+        const addressPublish: IAddress[] = []
         rawObjects.forEach((m: any) => {
             if(!this.isBootStrapped){
                 this.ownAddress = m.address;
@@ -203,6 +208,9 @@ export class Iota extends EventHandler {
                     }
                     break; 
                 }
+                case MessageMethod.AddressPublish:{
+                    addressPublish.push(m as IAddress)
+                }
                 case MessageMethod.ICE: {
                     ice.push(m as IICERequest)
                     break;
@@ -213,11 +221,13 @@ export class Iota extends EventHandler {
         contactRequests.length > 0 && this.publish('contactRequest', contactRequests)
         contactResponse.length && this.publish('contactResponse', contactResponse)
         ice.length > 0 && this.publish('ice', ice)
+        addressPublish.length > 0 && this.publish('contact', addressPublish)
     }
 
-    private async getFromTangle(addr: string[]) {
+    private async getFromTangle(addr: string[], tag?: string) {
         const query: any = {
             addresses: addr,
+            tag: tag !== undefined ? asciiToTrytes(tag) : []
         };
         let trytes: any = []
         try {

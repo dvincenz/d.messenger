@@ -227,22 +227,28 @@ export class Iota extends EventHandler {
     // #### Helper Methods ###
 
     private convertToObject(tryt: string, bundleObjects: any[]): any {
-
         const transaction = asTransactionObject(tryt);
+        let messageToConvert;
         if (transaction.signatureMessageFragment.replace(/9+$/, '') === '') {
             return;
         }
-        if(transaction.lastIndex > 0 && transaction.currentIndex === 0) {
-            return this.convertBundleToObject(tryt, bundleObjects);
+        if (transaction.lastIndex > 0 && transaction.currentIndex === 0) {
+            messageToConvert = this.convertBundleToObject(tryt, bundleObjects);
         }
-        let object: any;
-        try {
-            object = this.parseMessage(trytesToAscii(transaction.signatureMessageFragment.replace(/9+$/, '')));
-        } catch (error) {
-            console.log('messages not designed for d.messenger are available on this address');
-            return;
+        if (transaction.lastIndex === 0) {
+            messageToConvert = transaction.signatureMessageFragment
         }
-        return this.checkObject(object, transaction);
+        if (messageToConvert !== undefined) {
+            let object: any;
+            try {
+                object = this.parseMessage(trytesToAscii(messageToConvert.replace(/9+$/, '')));
+            } catch (error) {
+                console.log('messages not designed for d.messenger are available on this address');
+                return;
+            }
+            return this.checkObject(object, transaction);
+        }
+        return
     }
 
     private convertBundleToObject(tryt: string, bundleObjects: any[]): any {
@@ -261,15 +267,7 @@ export class Iota extends EventHandler {
                     return trx.signatureMessageFragment;
                 })
                 .join('');
-        let object;
-        try {
-            object = this.parseMessage(trytesToAscii(signatureMessageFragmentTryt.replace(/9+$/, '')));
-        } catch (error) {
-            console.log('messages not designed for d.messenger are available on this address');
-            return;
-        }
-
-        return this.checkObject(object, transaction);
+        return signatureMessageFragmentTryt
     }
 
 

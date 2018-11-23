@@ -95,6 +95,9 @@ class LoginComponent extends React.Component<IPorps, IState> {
 
   public render() {
     const {classes} = this.props;
+    if (settingStore.Iota !== undefined) {
+      location.reload(true);
+    }
     if (settingStore.seed !== '') {
       return <Redirect to={{pathname: '/chat'}}/>;
     }

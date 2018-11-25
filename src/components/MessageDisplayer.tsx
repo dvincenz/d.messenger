@@ -46,6 +46,7 @@ const styles: StyleRulesCallback = theme => ({ // todo fix sizes with theme.spac
     },
     text: {
         paddingRight: 25,
+        wordBreak: "break-all",
     },
     time: {
         color: '#6d6d6d',

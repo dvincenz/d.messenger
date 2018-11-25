@@ -1,18 +1,26 @@
-import { composeAPI, AccountData } from '@iota/core'
-import { asciiToTrytes, trytesToAscii } from '@iota/converter'
-import { asTransactionObject } from '@iota/transaction-converter'
-import { IBaseMessage, MessageMethod, ITextMessage, IContactResponse, Permission, IContactRequest } from '../../services/iotaService/interfaces';
-import { getRandomSeed, arrayDiff } from '../../utils';
-import { EventHandler } from '../../utils/EventHandler';
-import { IICERequest } from './interfaces/IICERequest';
+import {composeAPI, AccountData} from '@iota/core'
+import {asciiToTrytes, trytesToAscii} from '@iota/converter'
+import {asTransactionObject} from '@iota/transaction-converter'
+import {
+    IBaseMessage,
+    MessageMethod,
+    ITextMessage,
+    IContactResponse,
+    Permission,
+    IContactRequest
+} from '../../services/iotaService/interfaces';
+import {getRandomSeed, arrayDiff} from '../../utils';
+import {EventHandler} from '../../utils/EventHandler';
+import {IICERequest} from './interfaces/IICERequest';
+import {Transaction} from "@iota/core/typings/types";
 import { IAddress } from './interfaces/IAddress';
-import { INVALID_TAG } from '@iota/core/typings/errors';
 
 
 export class Iota extends EventHandler {
     public get myAddress(): string {
         return this.ownAddress;
     }
+
     private provider: string;
     private seed: string;
     private ownAddress: string;
@@ -30,16 +38,16 @@ export class Iota extends EventHandler {
         this.seed = seed;
         this.minWeightMagnitude = 9
         this.connectWithNode();
-        this.loadedHashes =  []
+        this.loadedHashes = []
     }
 
     public async getMessages(addr: string) {
         try {
-            if(this.bootstrapMessenger){
+            if (this.bootstrapMessenger) {
                 await this.getObjectsFromTangle([addr]);
             }
             return;
-        } catch (error){
+        } catch (error) {
             console.error(error)
             return;
         }
@@ -96,11 +104,11 @@ export class Iota extends EventHandler {
         return await this.sendToTangle(message)
     }
 
-    public async sendIceRequest(ice: IICERequest){
-        try{
+    public async sendIceRequest(ice: IICERequest) {
+        try {
             const returnvalue = await this.sendToTangle(ice)
             return returnvalue[0].timestamp
-        }catch (error){
+        } catch (error) {
             console.error('error sending ice to tangle ' + error)
         }
     }
@@ -108,31 +116,31 @@ export class Iota extends EventHandler {
     // #### Internale Methods ####
     public async bootstrapMessenger() {
         const accountData: AccountData = await this.api.getAccountData(this.seed)
-        try{
+        try {
             await this.getObjectsFromTangle(accountData.addresses as [])
-        } catch(error){
+        } catch (error) {
             console.error(error);
         }
-        if(this.ownAddress === undefined){
+        if (this.ownAddress === undefined) {
             this.ownAddress = await this.api.getNewAddress(this.seed)
         }
         this.isBootStrapped = true;
         setInterval(async () => {
             await this.checkForNewMessages();
-          }, 5000);
+        }, 5000);
     }
 
     // #### Internal Methods ####
 
-    private async checkForNewMessages(){
-        if(this.isCallRunning){
+    private async checkForNewMessages() {
+        if (this.isCallRunning) {
             return;
         }
         this.isCallRunning = true;
-        try{
+        try {
             this.getObjectsFromTangle([this.ownAddress])
-        } catch (error){
-            console.error('error fetching message: '+ error);
+        } catch (error) {
+            console.error('error fetching message: ' + error);
         } finally {
             this.isCallRunning = false;
         }
@@ -148,22 +156,21 @@ export class Iota extends EventHandler {
                 throw new Error("the tag is to big message can not be published")
             }
         }
-        const trytesMessage = asciiToTrytes(this.encript(message));
+        const trytesMessage = asciiToTrytes(this.stringify(message));
         if(trytesMessage.length > 2187){
             throw new Error('to long message, ' + trytesMessage.length + ' need to split over more messages => not implemented yet, your message will not be send')
         }
-        
         const transfer = [{
             address: addr,
             message: trytesMessage,
             value: 0,
             tag: inputTag,
         }];
-        
-        try{
+
+        try {
             const trytes = await this.api.prepareTransfers(this.seed, transfer)
             return await this.api.sendTrytes(trytes, 2, this.minWeightMagnitude)
-        } catch (error){
+        } catch (error) {
             console.error(error);
             return
         }
@@ -188,7 +195,7 @@ export class Iota extends EventHandler {
         const ice: IICERequest[] = []
         const addressPublish: IAddress[] = []
         rawObjects.forEach((m: any) => {
-            if(!this.isBootStrapped){
+            if (!this.isBootStrapped) {
                 this.ownAddress = m.address;
             }
             switch (m.method) {
@@ -197,16 +204,16 @@ export class Iota extends EventHandler {
                     break;
                 }
                 case MessageMethod.ContactRequest: {
-                    if(this.ownAddress === undefined || (this.ownAddress === m.address || m.senderAddress === this.ownAddress)){
+                    if (this.ownAddress === undefined || (this.ownAddress === m.address || m.senderAddress === this.ownAddress)) {
                         contactRequests.push(m as IContactRequest)
                     }
                     break;
                 }
                 case MessageMethod.ContactResponse: {
-                    if(this.ownAddress === undefined || (this.ownAddress === m.address || m.senderAddress === this.ownAddress)){
+                    if (this.ownAddress === undefined || (this.ownAddress === m.address || m.senderAddress === this.ownAddress)) {
                         contactResponse.push(m as IContactResponse)
                     }
-                    break; 
+                    break;
                 }
                 case MessageMethod.AddressPublish:{
                     addressPublish.push(m as IAddress)
@@ -242,43 +249,68 @@ export class Iota extends EventHandler {
             return [];
         }
         const convertedObjects: IBaseMessage[] = [];
+
+        const bundleObjects: any[] = trytes.filter((tryt: any) => {
+            const transaction: Transaction = asTransactionObject(tryt);
+            return transaction.lastIndex > 0;
+        });
+
         trytes.forEach((tryt: any) => {
-            const object = this.convertToObject(tryt)
-            if(object !== undefined){
+            const object = this.convertToObject(tryt, bundleObjects)
+            if (object !== undefined) {
                 convertedObjects.push(object);
-            } 
-        })
+            }
+        });
 
         return convertedObjects;
     }
 
     // #### Helper Methods ###
 
-    private convertToObject(tryt: string): any {
-
+    private convertToObject(tryt: string, bundleObjects: any[]): any {
         const transaction = asTransactionObject(tryt);
+        let messageToConvert;
         if (transaction.signatureMessageFragment.replace(/9+$/, '') === '') {
             return;
         }
-        let object: any;
-        try {
-            object = this.parseMessage(trytesToAscii(transaction.signatureMessageFragment.replace(/9+$/, '')));
-        } catch (error) {
-            console.log('messages not designed for d.messenger are available on this address')
-            return;
+        if (transaction.lastIndex > 0 && transaction.currentIndex === 0) {
+            messageToConvert = this.convertBundleToObject(tryt, bundleObjects);
         }
-        if (object === null || object === undefined) {
-            return;
+        if (transaction.lastIndex === 0) {
+            messageToConvert = transaction.signatureMessageFragment
         }
-        if ((!object.message && object.method === MessageMethod.Message) || object.method === undefined || object.secret === undefined) {
-            return;
+        if (messageToConvert !== undefined) {
+            let object: any;
+            try {
+                object = this.parseMessage(trytesToAscii(messageToConvert.replace(/9+$/, '')));
+            } catch (error) {
+                console.log('messages not designed for d.messenger are available on this address');
+                return;
+            }
+            return this.checkObject(object, transaction);
         }
-        object.address = transaction.address;
-        object.hash = transaction.hash;
-        object.time = transaction.timestamp;
-        return object
-
+        return
     }
+
+    private convertBundleToObject(tryt: string, bundleObjects: any[]): any {
+        const transaction: Transaction = asTransactionObject(tryt);
+        const signatureMessageFragmentTryt: string =
+            bundleObjects
+                .map((bundleTryt: any) => {
+                    const trx: Transaction = asTransactionObject(bundleTryt);
+                    return trx;
+                })
+                .filter((trx: Transaction) => {
+                    return trx.bundle === transaction.bundle;
+                })
+                .sort((a: Transaction, b: Transaction) => a.currentIndex - b.currentIndex)
+                .map((trx: Transaction) => {
+                    return trx.signatureMessageFragment;
+                })
+                .join('');
+        return signatureMessageFragmentTryt
+    }
+
 
     private stringify(message: IBaseMessage) {
         delete message.address;
@@ -294,5 +326,18 @@ export class Iota extends EventHandler {
             return null;
         }
         return JSON.parse(str);
+    }
+
+    private checkObject(object: any, transaction: Transaction) {
+        if (object === null || object === undefined) {
+            return;
+        }
+        if ((!object.message && object.method === MessageMethod.Message) || object.method === undefined || object.secret === undefined) {
+            return;
+        }
+        object.address = transaction.address;
+        object.hash = transaction.hash;
+        object.time = transaction.timestamp;
+        return object;
     }
 }

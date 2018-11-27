@@ -1,47 +1,50 @@
-export function getRandomSeed(length: number = 81){                      
-    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ9"; 
-    const randomValues = new Uint32Array(length);       
-    const result = new Array(length);             
+export function getRandomSeed(length: number = 81) {
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ9";
+    const randomValues = new Uint32Array(length);
+    const result = new Array(length);
 
-    window.crypto.getRandomValues(randomValues);      
+    window.crypto.getRandomValues(randomValues);
 
-    let cursor = 0;                                   
-    for (let i = 0; i < randomValues.length; i++) {   
-        cursor += randomValues[i];                    
-        result[i] = chars[cursor % chars.length];     
+    let cursor = 0;
+    for (let i = 0; i < randomValues.length; i++) {
+        cursor += randomValues[i];
+        result[i] = chars[cursor % chars.length];
     }
-    return result.join('');    
+    return result.join('');
 }
 
 export function getDateString(timestamp: number): string {
+    // TODO?: rewrite this using momentJS
     let date: Date = new Date()
-    if(timestamp > 9999999999){
+    if (timestamp > 9999999999) {
         date = new Date(timestamp);
-    }else{
-        date = new Date(timestamp*1000);
+    } else {
+        date = new Date(timestamp * 1000);
     }
     const now = new Date();
-    if(date.toDateString() === now.toDateString()){
-        return date.getHours() + ':' +  date.getMinutes();
+    if (date.toDateString() === now.toDateString()) {
+        return ('0' + date.getHours()).slice(-2) + ':' + ('0' + date.getMinutes()).slice(-2);
     }
-    if(new Date(date.getDate() - 1).toDateString() === now.toDateString()){
-        return 'yesterday ' + date.getHours() + ':' +  date.getMinutes();
+    if (new Date(date.getDate() - 1).toDateString() === now.toDateString()) {
+        return 'yesterday ' + ('0' + date.getHours()).slice(-2) + ':' + ('0' + date.getMinutes()).slice(-2);
     }
-    return date.getDate() + '.' + date.getMonth() + ' ' + date.getHours() + ':' +  date.getMinutes();
+    return ('0' + date.getDate()).slice(-2) + '.' + ('0' + date.getMonth()).slice(-2) + ' '
+        + ('0' + date.getHours()).slice(-2) + ':' + ('0' + date.getMinutes()).slice(-2);
+
 }
 
 
 export async function asyncForEach(array: any, callback: any) {
     for (let index = 0; index < array.length; index++) {
-      await callback(array[index], index, array)
+        await callback(array[index], index, array)
     }
-  } 
+}
 
 // todo implement more efficient array diff method.
-export function arrayDiff(baseArray: string[], toSearch: string[]){
+export function arrayDiff(baseArray: string[], toSearch: string[]) {
     const diff: string[] = []
     toSearch.forEach(s => {
-        if(!baseArray.find(f => f === s)){
+        if (!baseArray.find(f => f === s)) {
             diff.push(s)
         }
     });

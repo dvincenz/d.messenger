@@ -163,6 +163,11 @@ export class ContactStore {
             
         })
     }
+
+    public dispose() {
+        this.contacts = {};
+        this._currentContact = '';
+    }
 }
 
 

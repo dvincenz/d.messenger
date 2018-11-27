@@ -76,6 +76,10 @@ export class MessageStore {
         this.messages.push(messages)
     }
 
+    public dispose() {
+        this.messages = [];
+    }
+
     private addMessages = (messages: ITextMessage[]) => {
         messages.forEach(m => this.messages.push(toMessage(m)))
         this.messages = this.messages.slice().sort((a, b) => a.time - b.time); // sort messages by time

@@ -13,6 +13,8 @@ import {getRandomSeed, arrayDiff} from '../../utils';
 import {EventHandler} from '../../utils/EventHandler';
 import {IICERequest} from './interfaces/IICERequest';
 import {Transaction} from "@iota/core/typings/types";
+import Timer = NodeJS.Timer;
+
 
 
 export class Iota extends EventHandler {
@@ -28,6 +30,7 @@ export class Iota extends EventHandler {
     private loadedHashes: string[];
     private isCallRunning: boolean = false;
     private isBootStrapped: boolean = false;
+    private checkForNewMessageTimer: Timer;
 
     constructor(provider: string, seed: string) {
         super();
@@ -90,6 +93,10 @@ export class Iota extends EventHandler {
         }
     }
 
+    public dispose() {
+        clearInterval(this.checkForNewMessageTimer);
+    }
+
     // #### Internale Methods ####
     public async bootstrapMessenger() {
         const accountData: AccountData = await this.api.getAccountData(this.seed)
@@ -102,7 +109,7 @@ export class Iota extends EventHandler {
             this.ownAddress = await this.api.getNewAddress(this.seed)
         }
         this.isBootStrapped = true;
-        setInterval(async () => {
+        this.checkForNewMessageTimer = setInterval(async () => {
             await this.checkForNewMessages();
         }, 5000);
     }

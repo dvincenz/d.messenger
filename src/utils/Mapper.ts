@@ -18,19 +18,14 @@ export function toMessage(baseMessage: ITextMessage): Message {
 }
 
 export function toContact(con: IContactRequest | IContactResponse, address: string, isGrp: boolean): Contact {
-    const contact: Contact = {
-        address,
-        name: con.name,
-        isActivated: (isGrp) || ((con as IContactResponse).level !== undefined && (con as IContactResponse).level === Permission.accepted),
-        secret: con.secret,
-        updateTime: con.time,
-        isDisplayed: true,
-        status: ChatStatus.offline,
-        isGroup: isGrp,
-        setStatus: Contact.prototype.setStatus,
-        publicKey: null,
-    }
-    return contact
+    return new Contact (
+            con.name,    
+            address, 
+            con.time, 
+            true,
+            (isGrp) || ((con as IContactResponse).level !== undefined && (con as IContactResponse).level === Permission.accepted),
+            isGrp,
+            con.secret)
 }
 
 export function toIce(ice: IICERequest){

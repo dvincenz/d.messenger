@@ -3,8 +3,6 @@ import { observable } from 'mobx'
 import { Iota } from '../services/iotaService';
 import { messageStore } from './MessageStore';
 import { contactStore } from './ContactStore';
-import { EncriptionService } from 'src/services/encriptionService';
-import { Key } from 'readline';
 
 
 export enum ActiveDialog {
@@ -16,13 +14,12 @@ export enum ActiveDialog {
 
 export class SettingStore {
     @observable public activeDialog: ActiveDialog = ActiveDialog.Default
-    public ready: boolean;
+    @observable public ready: boolean;
     public host: string = 'https://nodes.devnet.iota.org' 
     public port: number = 443
     @observable public myAddress: string;
     public Iota: Iota;
     public newUser: boolean
-    public encriptionService: EncriptionService = new EncriptionService(); // todo: use DI and not singletons
     @observable private _myName: string;
     private _privateKey: string
  
@@ -75,12 +72,14 @@ export class SettingStore {
         messageStore.subscribeForMessages();
         contactStore.subscribeForContactRequests();
         contactStore.subscribeForContactResponse();
+        contactStore.subscribeForPublicKey();
         await this.Iota.bootstrapMessenger();
         contactStore.subscribeForIce(); // hotfix to not get old Ice messages
         this.myAddress = this.Iota.myAddress;
         if(this.newUser === true){
             contactStore.publishUser();
         }
+
         this.ready = true;
         console.log(this.myAddress)
     }

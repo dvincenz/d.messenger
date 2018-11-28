@@ -6,6 +6,7 @@ import { toMessage } from '../utils/Mapper'
 import { ITextMessage } from '../services/iotaService/interfaces';
 import { contactStore } from './ContactStore';
 import { ChatStatus } from 'src/entities/WebRTCConnection';
+import { EncriptionService } from 'src/services/encriptionService';
 
 export class MessageStore {
     @computed get getMessagesFromAddress () {

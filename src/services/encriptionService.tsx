@@ -18,27 +18,24 @@ export class EncriptionService {
         if(reciver.publicKey === undefined){
             throw new Error("no public key aviable for this contact to be able to encript message")
         }
-        const armoredKey = await this.armorPublicKey(this.toByteArray(reciver.publicKey))
+        const byteKey = this.toUnit8Array(reciver.publicKey)
+        const armoredKey = await this.armorPublicKey(byteKey)
         const optionsEncript = {
             message: OpenPGP.message.fromText(message),       
             publicKeys: (await OpenPGP.key.readArmored(armoredKey)).keys,
         }
-        OpenPGP.encrypt(optionsEncript).then(async (ciphertext) => {
-            const encrypted = await this.dearmor(ciphertext.data)
-            return encrypted
-        }).then(encrypted => {
-            console.log(this.toBase64(encrypted).length)
-            return this.toBase64(encrypted)     
-        })
+        const ciphertext = await OpenPGP.encrypt(optionsEncript)
+        const encrypted = await this.dearmor(ciphertext.data)
+        return this.toBase64(encrypted)     
     }
 
     public static async decript(encriptedMessage: string, privateKey: string, seed: string) {
-        const armoredPrivateKey = await this.armorPrivateKey(this.toByteArray(privateKey))
+        const armoredPrivateKey = await this.armorPrivateKey(this.toUnit8Array(privateKey))
         const key = (await OpenPGP.key.readArmored(armoredPrivateKey)).keys[0];
         key.decrypt(seed);
 
         const optionsDescript = {
-            message: await OpenPGP.message.readArmored(await this.armoreMessage(this.toByteArray(encriptedMessage))),
+            message: await OpenPGP.message.readArmored(await this.armoreMessage(this.toUnit8Array(encriptedMessage))),
             privateKeys: [key]
         }
         OpenPGP.decrypt(optionsDescript).then((plaintext: any) => {
@@ -48,9 +45,8 @@ export class EncriptionService {
     }
 
     private static async dearmor (key: string) {
-        const privateKey = await OpenPGP.armor.decode(key)
-        const deedObject = await privateKey.data.getReader().read()
-        console.log(deedObject)
+        const dearmorKey = await OpenPGP.armor.decode(key)
+        const deedObject = await dearmorKey.data.getReader().read()
         return deedObject.value
     }
 
@@ -66,7 +62,6 @@ export class EncriptionService {
         return OpenPGP.armor.encode(OpenPGP.enums.armor.message, bytes, 0, 0)
     }
 
-
     private static ua2text (ua: any) {
         let s = '';
         for (const m of ua) {
@@ -77,16 +72,13 @@ export class EncriptionService {
     private static toBase64(arrayBuffer: number[]){
         return btoa(String.fromCharCode(...arrayBuffer));
     }
-    private static toByteArray(base64: string) {
+    private static toUnit8Array(base64: string) {
         const binary_string = window.atob(base64);
         const len = binary_string.length;
         const bytes = new Uint8Array(len);
         for (let i = 0; i < len; i++) {
             bytes[i] = binary_string.charCodeAt(i);
         }
-        return bytes.buffer;
+        return new Uint8Array(bytes.buffer);
     }
 }   
-
-
-

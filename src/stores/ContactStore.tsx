@@ -7,6 +7,7 @@ import { IICERequest } from "src/services/iotaService/interfaces/IICERequest";
 import { getRandomSeed } from "src/utils";
 import { ChatStatus } from "src/entities/WebRTCConnection";
 import { EncriptionService } from "src/services/encriptionService";
+import { IAddress } from "src/services/iotaService/interfaces/IAddress";
 
 export class ContactStore {
     @computed get currentContact(): Contact {
@@ -100,10 +101,7 @@ export class ContactStore {
     @observable private contacts = {};
     // tslint:disable-next-line:variable-name
     @observable private _currentContact?: string;
-
-
-
-    public addContact (contact: IContactRequest | IContactResponse) {
+    public async addContact (contact: IContactRequest | IContactResponse) {
         if(settingStore.myAddress !== contact.senderAddress){
             if(this.contacts[contact.senderAddress] === undefined || this.contacts[contact.senderAddress].updateTime < contact.time){
                 this.contacts[contact.senderAddress] = toContact(contact, contact.senderAddress, (contact as IContactRequest).isGroup === true);
@@ -114,6 +112,7 @@ export class ContactStore {
                 const currentName = this.contacts[contact.address].name
                 this.contacts[contact.address] = toContact(contact, contact.address, (contact as IContactRequest).isGroup === true);
                 this.contacts[contact.address].name = currentName !== undefined ? currentName : this.contacts[contact.address].name
+
             }
         }
     }
@@ -165,11 +164,25 @@ export class ContactStore {
         })
     }
 
+    public subscribeForPublicKey() {
+        settingStore.Iota.subscribe('contact', (contacts: IAddress[]) => {
+            console.log(contacts)
+            contacts.forEach(c => {
+                console.log(c)
+                if (this.contacts[c.myAddress] !== undefined) {
+                    
+                    this.contacts[c.myAddress].publicKey = c.publicKey
+                }
+            })
+        })
+    }
+
     public async publishUser() {
         const keys = await EncriptionService.createKey(settingStore.myName, settingStore.seed)
         settingStore.privateKey = keys.privateKey
         await settingStore.Iota.publishMyPublicKey(keys.publicKey, settingStore.myName)
     }
+
 }
 
 

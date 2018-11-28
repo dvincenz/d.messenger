@@ -1,6 +1,7 @@
 import {composeAPI, AccountData} from '@iota/core'
 import {asciiToTrytes, trytesToAscii} from '@iota/converter'
 import {asTransactionObject} from '@iota/transaction-converter'
+import { addChecksum } from '@iota/checksum'
 import {
     IBaseMessage,
     MessageMethod,
@@ -29,7 +30,7 @@ export class Iota extends EventHandler {
     private loadedHashes: string[];
     private isCallRunning: boolean = false;
     private isBootStrapped: boolean = false;
-    private broadcastAddress = 'DMESSENGERDMESSENGERDMESSENGERDMESSENGERDMESSENGERDMESSENGERDMESSENGERDMESSENGER'
+    private broadcastAddress = 'DMESSENGERDMESSENGERDMESSENGERDMESSENGERDMESSENGERDMESSENGERDMESSENGERDMESSENGERD'
 
 
     constructor(provider: string, seed: string) {
@@ -88,7 +89,7 @@ export class Iota extends EventHandler {
     }
 
     public async searchContactByName(name: string){
-        this.getFromTangle([this.broadcastAddress], name);
+        return await this.getFromTangle([this.broadcastAddress], name);
     }
 
     public async sendContactResponse(addr: string, permission: Permission, ownAddress: string, myName: string, key: string) {
@@ -153,20 +154,18 @@ export class Iota extends EventHandler {
         if((message as IAddress).tag !== undefined){
             inputTag = asciiToTrytes(((message as IAddress).tag))
             if(inputTag.length > 27){
-                throw new Error("the tag is to big message can not be published")
+                throw new Error("the tag is to long can not be published")
             }
         }
+        
         const trytesMessage = asciiToTrytes(this.stringify(message));
-        if(trytesMessage.length > 2187){
-            throw new Error('to long message, ' + trytesMessage.length + ' need to split over more messages => not implemented yet, your message will not be send')
-        }
         const transfer = [{
             address: addr,
             message: trytesMessage,
             value: 0,
             tag: inputTag,
         }];
-
+        
         try {
             const trytes = await this.api.prepareTransfers(this.seed, transfer)
             return await this.api.sendTrytes(trytes, 2, this.minWeightMagnitude)
@@ -216,6 +215,7 @@ export class Iota extends EventHandler {
                     break;
                 }
                 case MessageMethod.AddressPublish:{
+                    console.log('got it')
                     addressPublish.push(m as IAddress)
                 }
                 case MessageMethod.ICE: {
@@ -224,6 +224,7 @@ export class Iota extends EventHandler {
                 }
             }
         })
+       
         messages.length > 0 && this.publish('message', messages)
         contactRequests.length > 0 && this.publish('contactRequest', contactRequests)
         contactResponse.length && this.publish('contactResponse', contactResponse)
@@ -234,7 +235,7 @@ export class Iota extends EventHandler {
     private async getFromTangle(addr: string[], tag?: string) {
         const query: any = {
             addresses: addr,
-            tag: tag !== undefined ? asciiToTrytes(tag) : []
+            tags: tag !== undefined ? [asciiToTrytes(tag)] : undefined
         };
         let trytes: any = []
         try {

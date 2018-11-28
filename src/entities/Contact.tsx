@@ -2,10 +2,11 @@ import { WebRtcClient } from "src/services/webRTCService";
 import { ChatStatus } from "./WebRTCConnection";
 import { IICERequest } from "src/services/iotaService/interfaces/IICERequest";
 import { settingStore } from "src/stores/SettingStore";
+import { IAddress } from "src/services/iotaService/interfaces/IAddress";
 
 export class Contact {
-    public name: string;
-    public address: string;
+    private _name: string;
+    private _address: string;
     public isActivated?: boolean;
     public secret: string;
     // todo geter seter and make property private
@@ -15,6 +16,35 @@ export class Contact {
     public status: ChatStatus = ChatStatus.offline
     public isGroup: boolean;
     public publicKey: string;
+
+    public get address () {return this._address;}
+    public set address (value: string) {
+        this._address = value  
+        this.getPublicKey()
+    }
+    public get name () {return this._name;}
+    public set name (value: string) {
+        this._name = value  
+        this.getPublicKey()
+    }
+    constructor(
+            name: string, 
+            address: string, 
+            updateTime: number, 
+            isDisplayed: boolean, 
+            isActivated: boolean, 
+            isGroup: boolean, 
+            secret: string){
+        this._address = address,
+        this._name = name, 
+        this.updateTime = updateTime,
+        this.isDisplayed = isDisplayed,
+        this.isGroup = isGroup,
+        this.isActivated = isActivated
+        this.secret = secret
+        this.getPublicKey();
+    }
+
 
     public setStatus(chatStatus: ChatStatus, iceReqeust?: IICERequest) {
         // tslint:disable-next-line:no-unnecessary-initializer
@@ -43,6 +73,13 @@ export class Contact {
             }
         } catch (error) {
             console.error(error)
+        }
+    }
+
+    private async getPublicKey(){
+        if(this.publicKey === undefined && this.name !== undefined){
+            const contact = (await settingStore.Iota.searchContactByName(this.name)).filter((c: IAddress) => c.myAddress === this.address)
+            this.publicKey = contact.length > 0 ? (contact[0] as IAddress).publicKey : undefined
         }
     }
 

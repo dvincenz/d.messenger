@@ -18,7 +18,6 @@ export class Contact {
     public status: ChatStatus = ChatStatus.offline
     public isGroup: boolean;
     public get publicKey(){
-        this.getPublicKey();
         return this._publicKey;
     };
 
@@ -52,7 +51,6 @@ export class Contact {
         this.isActivated = isActivated
         this.secret = secret
         this._publicKey = publicKey
-        this.getPublicKey();
     }
 
 
@@ -86,13 +84,13 @@ export class Contact {
         }
     }
 
-    private async getPublicKey(){
-        if(this._publicKey === undefined && this.name !== '' && this.requestedKey === false){
-            this.requestedKey = true;
+    public async getPublicKey(){
+        console.log('call get public key')
+        if(this._publicKey === undefined && this.name !== ''){
             const contact = (await settingStore.Iota.searchContactByName(this.name)).filter((c: IAddress) => c.myAddress === this.address)
+            console.log(contact);
             this._publicKey = contact.length > 0 ? (contact[0] as IAddress).publicKey : undefined
-            this.name =  contact.length > 0 ? (contact[0] as IAddress).tag : undefined
-            this.requestedKey = false;
+            this.name =  contact.length > 0 ? (contact[0] as IAddress).name : undefined
         }
     }
 

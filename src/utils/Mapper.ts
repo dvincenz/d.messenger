@@ -18,8 +18,8 @@ export function toMessage(baseMessage: ITextMessage): Message {
     return returnMessage;
 }
 
-export function toContact(con: IContactRequest | IContactResponse, address: string, isGrp: boolean): Contact {
-    return new Contact (
+export async function toContact(con: IContactRequest | IContactResponse, address: string, isGrp: boolean): Promise<Contact> {
+    const newContact =  new Contact (
             con.name,    
             address, 
             con.time, 
@@ -28,6 +28,8 @@ export function toContact(con: IContactRequest | IContactResponse, address: stri
             isGrp,
             con.secret,
             )
+    await newContact.getPublicKey();
+    return newContact;
 }
 
 

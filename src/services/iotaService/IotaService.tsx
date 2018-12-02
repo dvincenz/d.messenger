@@ -47,7 +47,7 @@ export class Iota extends EventHandler {
     public async getMessages(addr: string) {
         try {
             if (this.bootstrapMessenger) {
-                await this.getObjectsFromTangle([addr]);
+                await this.getObjectsFromTangle([addr], [MessageMethod.ContactRequest, MessageMethod.ContactResponse, MessageMethod.Message]);
             }
             return;
         } catch (error) {
@@ -72,7 +72,7 @@ export class Iota extends EventHandler {
             publicKey: key,
             secret: '',
             time: Date.now(),
-            tag: myName
+            name: myName
         } 
         return await this.sendToTangle(toPublishAddress)
     }
@@ -91,7 +91,8 @@ export class Iota extends EventHandler {
     }
 
     public async searchContactByName(name: string){
-        return await this.getFromTangle([this.broadcastAddress], name, true); 
+        const contacts = await this.getFromTangle([this.broadcastAddress], [name], true);
+        return contacts.filter(c => (c as IAddress).name !== undefined && (c as IAddress).myAddress !== undefined); 
     }
 
     public async sendContactResponse(addr: string, permission: Permission, ownAddress: string, myName: string, key: string) {
@@ -120,7 +121,7 @@ export class Iota extends EventHandler {
     public async bootstrapMessenger() {
         const accountData: AccountData = await this.api.getAccountData(this.seed)
         try {
-            await this.getObjectsFromTangle(accountData.addresses as [])
+            await this.getObjectsFromTangle(accountData.addresses as [], [MessageMethod.ContactRequest, MessageMethod.ContactResponse, MessageMethod.Message])
         } catch (error) {
             console.error(error);
         }
@@ -133,15 +134,13 @@ export class Iota extends EventHandler {
         }, 5000);
     }
 
-    // #### Internal Methods ####
-
     private async checkForNewMessages() {
         if (this.isCallRunning) {
             return;
         }
         this.isCallRunning = true;
         try {
-            this.getObjectsFromTangle([this.ownAddress])
+            this.getObjectsFromTangle([this.ownAddress], [MessageMethod.ContactRequest, MessageMethod.ContactResponse, MessageMethod.ICE, MessageMethod.Message])
         } catch (error) {
             console.error('error fetching message: ' + error);
         } finally {
@@ -152,15 +151,11 @@ export class Iota extends EventHandler {
 
     private async sendToTangle(message: IBaseMessage) {
         const addr = message.address
-        let inputTag = ''
-        if((message as IAddress).tag !== undefined){
-            inputTag = asciiToTrytes(((message as IAddress).tag))
-            if(inputTag.length > 27){
-                throw new Error("the tag is to long can not be published")
-            }
-        }
-        
-        const trytesMessage = asciiToTrytes(await this.stringify(message));
+        let inputTag = asciiToTrytes(message.method.toString())
+        if(message.method === MessageMethod.AddressPublish){
+            inputTag = asciiToTrytes(((message as IAddress).name)).substring(0, 27)
+        }        
+        const trytesMessage = asciiToTrytes(await this.encript(message));
         const transfer = [{
             address: addr,
             message: trytesMessage,
@@ -188,8 +183,8 @@ export class Iota extends EventHandler {
         });
     }
 
-    private async getObjectsFromTangle(addr: string[]) {
-        const rawObjects = await this.getFromTangle(addr);
+    private async getObjectsFromTangle(addr: string[], tags: MessageMethod[] = []) {
+        const rawObjects = await this.getFromTangle(addr, tags.map(t => t.toString()));
         const messages: ITextMessage[] = []
         const contactRequests: IContactRequest[] = []
         const contactResponse: IContactResponse[] = []
@@ -217,7 +212,9 @@ export class Iota extends EventHandler {
                     break;
                 }
                 case MessageMethod.AddressPublish:{
-                    addressPublish.push(m as IAddress)
+                    if(m.name !== undefined && m.myaddress !== undefined){
+                        addressPublish.push(m as IAddress)
+                    }
                 }
                 case MessageMethod.ICE: {
                     ice.push(m as IICERequest)
@@ -233,10 +230,10 @@ export class Iota extends EventHandler {
         addressPublish.length > 0 && this.publish('contact', addressPublish)
     }
 
-    private async getFromTangle(addr: string[], tag?: string, ignoreCache = false) {
+    private async getFromTangle(addr: string[], tags: string[], ignoreCache = false) {
         const query: any = {
             addresses: addr,
-            tags: tag !== undefined ? [asciiToTrytes(tag).substring(0,27)] : undefined
+            tags: tags.length > 0 !== undefined ? tags.map(t => asciiToTrytes(t)) : undefined
         };
         let trytes: any = []
         try {
@@ -256,7 +253,7 @@ export class Iota extends EventHandler {
             const transaction: Transaction = asTransactionObject(tryt);
             return transaction.lastIndex > 0;
         });
-
+        
         await asyncForEach(trytes, async (tryt: any) => {
             const object = await this.convertToObject(tryt, bundleObjects)
             if (object !== undefined) {
@@ -283,11 +280,12 @@ export class Iota extends EventHandler {
         if (messageToConvert !== undefined) {
             let object: any;
             try {
-                object = await this.parseMessage(trytesToAscii(messageToConvert.replace(/9+$/, '')));
+                object = await this.decript(trytesToAscii(messageToConvert.replace(/9+$/, '')));
             } catch (error) {
                 console.log('messages not designed for d.messenger are available on this address');
                 return;
             }
+
             return this.checkObject(object, transaction);
         }
         return
@@ -313,22 +311,22 @@ export class Iota extends EventHandler {
     }
 
 
-    private stringify(message: IBaseMessage) {
+    private encript(message: IBaseMessage) {
         const addr = message.address
         delete message.address;
         delete message.hash;
         delete message.time;
+        delete message.method;
         if(addr === this.broadcastAddress){
             return JSON.stringify(message)
         }
         return EncriptionService.encript(JSON.stringify(message), addr);
     }
 
-    private async parseMessage(str: string) {
+    private async decript(str: string) {
         let object;
         try {
-            throw new Error('badf')
-            // object = JSON.parse((await EncriptionService.decript(str)) as string);
+            object = JSON.parse((await EncriptionService.decript(str)) as string);
         } catch (e) {
             try {
                 object = JSON.parse(str);
@@ -340,10 +338,15 @@ export class Iota extends EventHandler {
     }
 
     private checkObject(object: any, transaction: Transaction) {
+        console.log(object)
         if (object === null || object === undefined) {
             return;
         }
-        if ((!object.message && object.method === MessageMethod.Message) || object.method === undefined) {
+        object.method = parseInt(trytesToAscii(transaction.tag.replace(/9+$/, '')),10)
+        if ((!object.method && object.method === MessageMethod.Message) || object.method === undefined) {
+            return;
+        }
+        if(transaction.address === this.broadcastAddress && (object.name === undefined || object.myAddress === undefined)){
             return;
         }
         object.address = transaction.address;

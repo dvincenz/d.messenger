@@ -35,7 +35,7 @@ export class ContactStore {
     public addContactRequest = flow(function *(this: ContactStore, address: IAddress) {
         this.state = ContactStoreState.loading
         try {
-            this.contacts[address.myAddress] = new Contact(address.tag, address.myAddress, address.time, false, false, false, address.secret, address.publicKey)
+            this.contacts[address.myAddress] = new Contact(address.name, address.myAddress, address.time, false, false, false, address.secret, address.publicKey)
             yield settingStore.Iota.sendContactRequest(address.myAddress, settingStore.myAddress, settingStore.myName, false)
             this.state = ContactStoreState.updated
         } catch (error) {
@@ -105,7 +105,7 @@ export class ContactStore {
     public async addOrUpdateContact (contact: IContactRequest | IContactResponse) {
         if(settingStore.myAddress !== contact.senderAddress ){
             if(this.contacts[contact.senderAddress] === undefined){
-                this.contacts[contact.senderAddress] = toContact(contact, contact.senderAddress, (contact as IContactRequest).isGroup === true);
+                this.contacts[contact.senderAddress] = await toContact(contact, contact.senderAddress, (contact as IContactRequest).isGroup === true);
                 return
             }
             if (this.contacts[contact.senderAddress].updateTime < contact.time){
@@ -115,7 +115,7 @@ export class ContactStore {
         }
         if(settingStore.myAddress !== undefined && settingStore.myAddress !== contact.address){
             if(this.contacts[contact.address] === undefined){
-                this.contacts[contact.address] = toContact(contact, contact.address, (contact as IContactRequest).isGroup === true);
+                this.contacts[contact.address] = await toContact(contact, contact.address, (contact as IContactRequest).isGroup === true);
                 return
             }
             if(this.contacts[contact.address].updateTime < contact.time){

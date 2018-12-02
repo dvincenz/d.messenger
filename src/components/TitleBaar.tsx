@@ -138,7 +138,7 @@ class TitleBaarComponent extends React.Component<IPorps, IState> {
     private logout = () => {
         window.sessionStorage.clear()
         window.localStorage.clear()
-        settingStore.seed = ''
+        settingStore.seed = null
     }
 }
 

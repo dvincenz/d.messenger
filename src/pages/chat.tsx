@@ -53,7 +53,7 @@ class ChatComponent extends React.Component<IProps, IState> {
   }
   public render() {
     const { classes } = this.props
-    if (settingStore.seed === '') {
+    if (settingStore.seed === null) {
       return <Redirect to={{ pathname: '/login' }} />;
     }
     if (!settingStore.ready){
@@ -86,7 +86,7 @@ class ChatComponent extends React.Component<IProps, IState> {
   }
 
   public componentDidMount () {
-    if(settingStore.seed !== ''){
+    if(settingStore.seed !== null){
       settingStore.setupMessanger().then( () =>{
         this.setAddress(this.props.match.params.address)
       })

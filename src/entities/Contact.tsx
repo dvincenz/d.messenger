@@ -3,11 +3,13 @@ import { ChatStatus } from "./WebRTCConnection";
 import { IICERequest } from "src/services/iotaService/interfaces/IICERequest";
 import { settingStore } from "src/stores/SettingStore";
 import { IAddress } from "src/services/iotaService/interfaces/IAddress";
+import { observable } from "mobx";
 
 export class Contact {
     private _name: string;
     private _address: string;
-    public isActivated?: boolean;
+    private _publicKey: string;
+    @observable public isActivated?: boolean;
     public secret: string;
     // todo geter seter and make property private
     public webRtcClient?: WebRtcClient;
@@ -15,17 +17,23 @@ export class Contact {
     public isDisplayed: boolean;
     public status: ChatStatus = ChatStatus.offline
     public isGroup: boolean;
-    public publicKey: string;
+    public get publicKey(){
+        this.getPublicKey();
+        return this._publicKey;
+    };
+
+    public set publicKey(key: string){
+        this._publicKey = key;
+    }
+    private requestedKey: boolean
 
     public get address () {return this._address;}
     public set address (value: string) {
         this._address = value  
-        this.getPublicKey()
     }
     public get name () {return this._name;}
     public set name (value: string) {
         this._name = value  
-        this.getPublicKey()
     }
     constructor(
             name: string, 
@@ -33,8 +41,9 @@ export class Contact {
             updateTime: number, 
             isDisplayed: boolean, 
             isActivated: boolean, 
-            isGroup: boolean, 
-            secret: string){
+            isGroup?: boolean, 
+            secret?: string,
+            publicKey?: string){
         this._address = address,
         this._name = name, 
         this.updateTime = updateTime,
@@ -42,6 +51,7 @@ export class Contact {
         this.isGroup = isGroup,
         this.isActivated = isActivated
         this.secret = secret
+        this._publicKey = publicKey
         this.getPublicKey();
     }
 
@@ -77,9 +87,12 @@ export class Contact {
     }
 
     private async getPublicKey(){
-        if(this.publicKey === undefined && this.name !== undefined){
+        if(this._publicKey === undefined && this.name !== '' && this.requestedKey === false){
+            this.requestedKey = true;
             const contact = (await settingStore.Iota.searchContactByName(this.name)).filter((c: IAddress) => c.myAddress === this.address)
-            this.publicKey = contact.length > 0 ? (contact[0] as IAddress).publicKey : undefined
+            this._publicKey = contact.length > 0 ? (contact[0] as IAddress).publicKey : undefined
+            this.name =  contact.length > 0 ? (contact[0] as IAddress).tag : undefined
+            this.requestedKey = false;
         }
     }
 

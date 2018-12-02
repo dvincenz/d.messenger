@@ -15,16 +15,19 @@ export enum ActiveDialog {
 export class SettingStore {
     @observable public activeDialog: ActiveDialog = ActiveDialog.Default
     @observable public ready: boolean;
-    public host: string = 'https://nodes.devnet.iota.org' 
+    public host: string = 'https://nodes.devnet.thetangle.org' // 'https://nodes.devnet.iota.org' 
     public port: number = 443
     @observable public myAddress: string;
     public Iota: Iota;
-    public newUser: boolean
+    public newUser: boolean;
+    public saveUserData: boolean = false;
     @observable private _myName: string;
     private _privateKey: string
- 
+    private _publicKey: string
+    @observable private _seed: string;
 
     set seed(seed: string) {
+        this.setKey('seed', seed)
         this._seed = seed;
     }
     get seed(){
@@ -32,7 +35,7 @@ export class SettingStore {
     }
 
     set privateKey(key: string){
-        window.localStorage.setItem('privatePGPEncripted', key)
+        window.sessionStorage.setItem('privatePGPEncripted', key)
         console.log('private PGP key, (encripted): ' + key)
         // todo an other place to save the key
         this._privateKey = key
@@ -41,8 +44,17 @@ export class SettingStore {
         return this._privateKey
     }
 
+    set publicKey(key: string){
+        this.setKey('publicPGP', key)
+        this._publicKey = key
+    }
+    get publicKey(){
+        // todo search for key on the tangel if key is not set
+        return this._publicKey
+    }
+
     set myName(name: string) {
-        window.localStorage.setItem('myName', name)
+        this.setKey('myName', name)
         this._myName = name;
     }
 
@@ -50,14 +62,12 @@ export class SettingStore {
         return this._myName;
     }
 
-    @observable private _seed: string = '' 
+    
     constructor(){
-        const sessionSeed = window.localStorage.getItem('seed') === null ? window.sessionStorage.getItem('seed') : window.localStorage.getItem('seed');
-        if(sessionSeed !== null){
-            this._seed = sessionSeed
-        }
-        this._myName = window.localStorage.getItem('myName')
-        this._privateKey = window.localStorage.getItem('privatePGPEncripted')
+        this._seed = this.getKey('seed');
+        this._myName = this.getKey('myName')
+        this._privateKey = this.getKey('privatePGPEncripted')
+        this._publicKey = this.getKey('publicPGP')
         this.ready = false;
     }
 
@@ -82,6 +92,18 @@ export class SettingStore {
 
         this.ready = true;
         console.log(this.myAddress)
+    }
+
+    private getKey(key: string){
+        return window.localStorage.getItem(key) === null ? window.sessionStorage.getItem(key) : window.localStorage.getItem(key);
+    }
+
+    private setKey(key: string, value:string){
+        if(this.saveUserData){
+            window.localStorage.setItem(key, value);
+            return
+        }
+        window.sessionStorage.setItem(key, value);
     }
 
 }

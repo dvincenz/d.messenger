@@ -24,7 +24,6 @@ export class Contact {
     public set publicKey(key: string){
         this._publicKey = key;
     }
-    private requestedKey: boolean
 
     public get address () {return this._address;}
     public set address (value: string) {
@@ -85,10 +84,8 @@ export class Contact {
     }
 
     public async getPublicKey(){
-        console.log('call get public key')
         if(this._publicKey === undefined && this.name !== ''){
             const contact = (await settingStore.Iota.searchContactByName(this.name)).filter((c: IAddress) => c.myAddress === this.address)
-            console.log(contact);
             this._publicKey = contact.length > 0 ? (contact[0] as IAddress).publicKey : undefined
             this.name =  contact.length > 0 ? (contact[0] as IAddress).name : undefined
         }

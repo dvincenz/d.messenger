@@ -1,7 +1,6 @@
 import {composeAPI, AccountData} from '@iota/core'
 import {asciiToTrytes, trytesToAscii} from '@iota/converter'
 import {asTransactionObject} from '@iota/transaction-converter'
-import { addChecksum } from '@iota/checksum'
 import {
     IBaseMessage,
     MessageMethod,
@@ -16,7 +15,6 @@ import {IICERequest} from './interfaces/IICERequest';
 import {Transaction} from "@iota/core/typings/types";
 import { IAddress } from './interfaces/IAddress';
 import { EncriptionService } from '../encriptionService';
-import { contactStore } from 'src/stores/ContactStore';
 
 
 export class Iota extends EventHandler {
@@ -122,6 +120,10 @@ export class Iota extends EventHandler {
         const accountData: AccountData = await this.api.getAccountData(this.seed)
         try {
             await this.getObjectsFromTangle(accountData.addresses as [], [MessageMethod.ContactRequest, MessageMethod.ContactResponse, MessageMethod.Message])
+            // tofix hack: add old ice request to hash cache to prevent loading old ice request on startup messanger
+            const query = {addresses: accountData.addresses as [], tags: [asciiToTrytes(MessageMethod.ICE.toString())] }
+            const hashes = await this.api.findTransactions(query)
+            this.loadedHashes = this.loadedHashes.concat(hashes)
         } catch (error) {
             console.error(error);
         }
@@ -240,8 +242,8 @@ export class Iota extends EventHandler {
             const hashes = await this.api.findTransactions(query)
             const newHashes = arrayDiff(this.loadedHashes, hashes)
             if((ignoreCache && hashes.length > 0) || newHashes.length > 0){
-                trytes = await this.api.getTrytes(ignoreCache ? hashes : newHashes)
                 this.loadedHashes = this.loadedHashes.concat(newHashes)
+                trytes = await this.api.getTrytes(ignoreCache ? hashes : newHashes)
             }
             
         } catch (error) { 
@@ -338,7 +340,6 @@ export class Iota extends EventHandler {
     }
 
     private checkObject(object: any, transaction: Transaction) {
-        console.log(object)
         if (object === null || object === undefined) {
             return;
         }

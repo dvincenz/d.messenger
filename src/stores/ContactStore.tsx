@@ -7,7 +7,7 @@ import { IICERequest } from "src/services/iotaService/interfaces/IICERequest";
 import { getRandomSeed } from "src/utils";
 import { ChatStatus } from "src/entities/WebRTCConnection";
 import { EncriptionService } from "src/services/encriptionService";
-import { IAddress } from "src/services/iotaService/interfaces/IAddress";
+import { IPublicContact } from "src/services/iotaService/interfaces/IPublicContact";
 
 export class ContactStore {
     @computed get currentContact(): Contact {
@@ -32,7 +32,7 @@ export class ContactStore {
         return contactsArray
     }
 
-    public addContactRequest = flow(function *(this: ContactStore, address: IAddress) {
+    public addContactRequest = flow(function *(this: ContactStore, address: IPublicContact) {
         this.state = ContactStoreState.loading
         try {
             this.contacts[address.myAddress] = new Contact(address.name, address.myAddress, address.time, false, false, false, '', address.publicKey)
@@ -123,7 +123,6 @@ export class ContactStore {
                 return
             }
         }
-        console.log(this.contacts);
     }
 
     private UpdateContact(contact: IContactRequest | IContactResponse, address: string) {
@@ -180,7 +179,7 @@ export class ContactStore {
     }
 
     public subscribeForPublicKey() {
-        settingStore.Iota.subscribe('contact', (contacts: IAddress[]) => {
+        settingStore.Iota.subscribe('contact', (contacts: IPublicContact[]) => {
             console.log(contacts)
             contacts.forEach(c => {
                 console.log(c)

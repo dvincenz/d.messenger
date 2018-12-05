@@ -13,7 +13,7 @@ import {getRandomSeed, arrayDiff, asyncForEach} from '../../utils';
 import {EventHandler} from '../../utils/EventHandler';
 import {IICERequest} from './interfaces/IICERequest';
 import {Transaction} from "@iota/core/typings/types";
-import { IAddress } from './interfaces/IAddress';
+import { IPublicContact } from './interfaces/IPublicContact';
 import { EncriptionService } from '../encriptionService';
 
 
@@ -63,7 +63,7 @@ export class Iota extends EventHandler {
         if(this.isBootStrapped !== true){
             throw new Error("IOTA Service is not bootstraped, please Bootstrap first the service bevore you publish your contact")
         }
-        const toPublishAddress: IAddress = {
+        const toPublishAddress: IPublicContact = {
             address: this.broadcastAddress,
             method: MessageMethod.AddressPublish,
             myAddress: this.myAddress,
@@ -91,7 +91,7 @@ export class Iota extends EventHandler {
 
     public async searchContactByName(name: string){
         const contacts = await this.getFromTangle([this.broadcastAddress], [name], true);
-        return contacts.filter(c => (c as IAddress).name !== undefined && (c as IAddress).myAddress !== undefined); 
+        return contacts.filter(c => (c as IPublicContact).name !== undefined && (c as IPublicContact).myAddress !== undefined); 
     }
 
     public async sendContactResponse(addr: string, permission: Permission, ownAddress: string, myName: string, key: string) {
@@ -158,7 +158,7 @@ export class Iota extends EventHandler {
         let trytesMessage: any
         let inputTag = asciiToTrytes(message.method.toString())
         if(message.method === MessageMethod.AddressPublish){
-            inputTag = asciiToTrytes(((message as IAddress).name)).substring(0, 27)
+            inputTag = asciiToTrytes(((message as IPublicContact).name)).substring(0, 27)
         }
         if(message.isEncripted){
             trytesMessage = asciiToTrytes(await EncriptionService.encript(this.stringify(message), addr));
@@ -198,7 +198,7 @@ export class Iota extends EventHandler {
         const contactRequests: IContactRequest[] = []
         const contactResponse: IContactResponse[] = []
         const ice: IICERequest[] = []
-        const addressPublish: IAddress[] = []
+        const addressPublish: IPublicContact[] = []
         rawObjects.forEach((m: any) => {
             if (!this.isBootStrapped) {
                 this.ownAddress = m.address;
@@ -222,7 +222,7 @@ export class Iota extends EventHandler {
                 }
                 case MessageMethod.AddressPublish:{
                     if(m.name !== undefined && m.myaddress !== undefined){
-                        addressPublish.push(m as IAddress)
+                        addressPublish.push(m as IPublicContact)
                     }
                 }
                 case MessageMethod.ICE: {

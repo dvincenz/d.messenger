@@ -72,11 +72,14 @@ export class CreateGroup extends React.Component<{}, IState> {
     }
 
     private handleSave = () => {
-        settingStore.activeDialog = ActiveDialog.Default
+
         contactStore.createGroup(this.state.name).then(
-            () => this.setState({
-                disableInput: false,
-            })
+            () => {
+                this.setState({
+                    disableInput: false,
+                })
+                settingStore.activeDialog = ActiveDialog.Default
+            }
         );
     }
 }

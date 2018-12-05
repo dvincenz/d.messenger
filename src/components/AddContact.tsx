@@ -4,15 +4,14 @@ import { isValidChecksum } from '@iota/checksum';
 import { contactStore } from 'src/stores/ContactStore';
 import { ActiveDialog, settingStore } from "../stores/SettingStore";
 import { observer } from "mobx-react";
-import { IAddress } from 'src/services/iotaService/interfaces/IAddress';
-import { Contact } from 'src/entities';
+import { IPublicContact } from 'src/services/iotaService/interfaces/IPublicContact';
 
 
 interface IState {
     name: string,
     disableInput: boolean,
     error: string,
-    contacts: IAddress[],
+    contacts: IPublicContact[],
     searchingContact: boolean,
     selectedAddress: string
 }
@@ -130,9 +129,9 @@ class AddContactComponent extends React.Component<IPorps, IState> {
             })
             settingStore.Iota.searchContactByName(this.state.name).then(c =>{
                 this.setState({
-                    contacts: c.map(i => i as IAddress),
+                    contacts: c.map(i => i as IPublicContact),
                     searchingContact: false,
-                    selectedAddress: c.length === 1 ?  (c[0] as IAddress).myAddress : "noValue"
+                    selectedAddress: c.length === 1 ?  (c[0] as IPublicContact).myAddress : "noValue"
                 
                 })
             })

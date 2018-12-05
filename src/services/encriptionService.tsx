@@ -1,5 +1,4 @@
 import * as OpenPGP from 'openpgp';
-import { Contact } from 'src/entities';
 import { contactStore } from 'src/stores/ContactStore';
 import { settingStore } from 'src/stores/SettingStore';
 
@@ -64,16 +63,10 @@ export class EncriptionService {
         return OpenPGP.armor.encode(OpenPGP.enums.armor.message, bytes, 0, 0)
     }
 
-    private static ua2text (ua: any) {
-        let s = '';
-        for (const m of ua) {
-            s += String.fromCharCode(m);
-        }
-        return s;
-    }
     private static toBase64(arrayBuffer: number[]){
         return btoa(String.fromCharCode(...arrayBuffer));
     }
+    
     private static toUnit8Array(base64: string) {
         const binary_string = window.atob(base64);
         const len = binary_string.length;

@@ -2,7 +2,7 @@ import { WebRtcClient } from "src/services/webRTCService";
 import { ChatStatus } from "./WebRTCConnection";
 import { IICERequest } from "src/services/iotaService/interfaces/IICERequest";
 import { settingStore } from "src/stores/SettingStore";
-import { IAddress } from "src/services/iotaService/interfaces/IAddress";
+import { IPublicContact } from "src/services/iotaService/interfaces/IPublicContact";
 import { observable } from "mobx";
 
 export class Contact {
@@ -85,9 +85,9 @@ export class Contact {
 
     public async getPublicKey(){
         if(this._publicKey === undefined && this.name !== '' && this.isGroup === false){
-            const contact = (await settingStore.Iota.searchContactByName(this.name)).filter((c: IAddress) => c.myAddress === this.address)
-            this._publicKey = contact.length > 0 ? (contact[0] as IAddress).publicKey : undefined
-            this.name =  contact.length > 0 ? (contact[0] as IAddress).name : undefined
+            const contact = (await settingStore.Iota.searchContactByName(this.name)).filter((c: IPublicContact) => c.myAddress === this.address)
+            this._publicKey = contact.length > 0 ? (contact[0] as IPublicContact).publicKey : undefined
+            this.name =  contact.length > 0 ? (contact[0] as IPublicContact).name : undefined
         }
     }
 

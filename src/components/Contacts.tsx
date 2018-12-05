@@ -73,11 +73,10 @@ const Person = observer((props: any) => {
     const link = `/chat/${props.contact.address}`;
     return (
         // tslint:disable-next-line:jsx-no-lambda
-
         <Link to={link} onClick={props.handleClickContact} className={props.classes.link}>
             <ListItem button>
-                <Avatar className={props.contact.status === ChatStatus.offline ? props.classes.avatar : props.classes.avatarActive}>{(props.contact.name).charAt(0).toLocaleUpperCase()}</Avatar>
-                <ListItemText primary={props.contact.name + ' ' + props.contact.secret} secondary={props.contact.address} />
+                <Avatar className={props.contact.status === ChatStatus.offline ? props.classes.avatar : props.classes.avatarActive}>{props.contact.name && (props.contact.name).charAt(0).toLocaleUpperCase()}</Avatar>
+               <ListItemText primary={props.contact.name + ' ' + props.contact.secret} secondary={props.contact.address} />}
             </ListItem>
         </Link>
     )

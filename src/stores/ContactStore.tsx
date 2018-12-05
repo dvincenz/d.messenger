@@ -35,7 +35,7 @@ export class ContactStore {
     public addContactRequest = flow(function *(this: ContactStore, address: IAddress) {
         this.state = ContactStoreState.loading
         try {
-            this.contacts[address.myAddress] = new Contact(address.name, address.myAddress, address.time, false, false, false, address.secret, address.publicKey)
+            this.contacts[address.myAddress] = new Contact(address.name, address.myAddress, address.time, false, false, false, '', address.publicKey)
             yield settingStore.Iota.sendContactRequest(address.myAddress, settingStore.myAddress, settingStore.myName, false)
             this.state = ContactStoreState.updated
         } catch (error) {
@@ -80,7 +80,7 @@ export class ContactStore {
         this.state = ContactStoreState.loading
         try {
             const groupAddr = getRandomSeed(81)
-            yield settingStore.Iota.sendContactRequest(settingStore.myAddress, groupAddr, name, true)
+            yield settingStore.Iota.sendContactRequest(settingStore.myAddress, groupAddr, name, false)
             this.state = ContactStoreState.updated
         } catch (error) {
             this.state = ContactStoreState.error
@@ -123,6 +123,7 @@ export class ContactStore {
                 return
             }
         }
+        console.log(this.contacts);
     }
 
     private UpdateContact(contact: IContactRequest | IContactResponse, address: string) {

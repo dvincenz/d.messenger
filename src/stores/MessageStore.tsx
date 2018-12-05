@@ -6,7 +6,6 @@ import { toMessage } from '../utils/Mapper'
 import { ITextMessage } from '../services/iotaService/interfaces';
 import { contactStore } from './ContactStore';
 import { ChatStatus } from 'src/entities/WebRTCConnection';
-import { EncriptionService } from 'src/services/encriptionService';
 
 export class MessageStore {
     @computed get getMessagesFromAddress () {
@@ -45,7 +44,9 @@ export class MessageStore {
         this.fetchMessages(filterAddress);
     }
     public sendMessage = flow(function* (this: MessageStore, reciver: Contact, messageText: string) {
-        if(messageText.trim().length > 0) {
+        if(messageText.trim().length === 0) {
+            return;
+        }
           this.state = MessageStoreState.sending
           const msg: Message = {
             secret: reciver.secret,
@@ -57,11 +58,11 @@ export class MessageStore {
           }
           this.messages.push(msg);
           try {
-            yield settingStore.Iota.sendMessage(msg.toITextMessage())
+            yield settingStore.Iota.sendMessage(msg.toITextMessage(!reciver.isGroup))
           } catch (error) {
             this.state = MessageStoreState.error
           }
-        }
+        
     })
 
     public subscribeForMessages = () =>{

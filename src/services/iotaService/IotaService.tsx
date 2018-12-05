@@ -68,9 +68,9 @@ export class Iota extends EventHandler {
             method: MessageMethod.AddressPublish,
             myAddress: this.myAddress,
             publicKey: key,
-            secret: '',
             time: Date.now(),
-            name: myName
+            name: myName,
+            isEncripted: false,
         } 
         return await this.sendToTangle(toPublishAddress)
     }
@@ -84,6 +84,7 @@ export class Iota extends EventHandler {
             senderAddress: ownAddress,
             time: new Date().getTime(),
             isGroup: isGrp,
+            isEncripted: !isGrp
         }
         return await this.sendToTangle(message)
     }
@@ -101,7 +102,8 @@ export class Iota extends EventHandler {
             level: permission,
             address: addr,
             senderAddress: ownAddress,
-            time: new Date().getTime()
+            time: new Date().getTime(),
+            isEncripted: true
         }
         return await this.sendToTangle(message)
     }
@@ -153,11 +155,16 @@ export class Iota extends EventHandler {
 
     private async sendToTangle(message: IBaseMessage) {
         const addr = message.address
+        let trytesMessage: any
         let inputTag = asciiToTrytes(message.method.toString())
         if(message.method === MessageMethod.AddressPublish){
             inputTag = asciiToTrytes(((message as IAddress).name)).substring(0, 27)
-        }        
-        const trytesMessage = asciiToTrytes(await this.encript(message));
+        }
+        if(message.isEncripted){
+            trytesMessage = asciiToTrytes(await EncriptionService.encript(this.stringify(message), addr));
+        }else{
+            trytesMessage = asciiToTrytes(this.stringify(message));
+        }
         const transfer = [{
             address: addr,
             message: trytesMessage,
@@ -313,16 +320,13 @@ export class Iota extends EventHandler {
     }
 
 
-    private encript(message: IBaseMessage) {
-        const addr = message.address
+    private stringify(message: IBaseMessage) {
         delete message.address;
         delete message.hash;
         delete message.time;
         delete message.method;
-        if(addr === this.broadcastAddress){
-            return JSON.stringify(message)
-        }
-        return EncriptionService.encript(JSON.stringify(message), addr);
+        delete message.isEncripted
+        return JSON.stringify(message);
     }
 
     private async decript(str: string) {

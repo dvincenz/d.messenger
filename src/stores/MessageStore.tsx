@@ -48,17 +48,20 @@ export class MessageStore {
             return;
         }
           this.state = MessageStoreState.sending
+          const randomHash = Math.random().toString();
           const msg: Message = {
             secret: reciver.secret,
             reciverAddress: reciver.address,
             message: messageText,
             time: parseInt(new Date().getTime().toString().substr(0,10), 10),
             status: MessageStatus.Sending,
+            hash: randomHash,
             toITextMessage: Message.prototype.toITextMessage // bad typescript hack
           }
           this.messages.push(msg);
           try {
-            yield settingStore.Iota.sendMessage(msg.toITextMessage(!reciver.isGroup))
+            const answer = yield settingStore.Iota.sendMessage(msg.toITextMessage(!reciver.isGroup))
+            this.messages.find(m => m.hash === randomHash).hash = answer[0].hash;
           } catch (error) {
             this.state = MessageStoreState.error
           }
@@ -74,12 +77,13 @@ export class MessageStore {
             
         })
     }
-    public addMessage (messages: Message){
-        this.messages.push(messages)
-    }
 
     private addMessages = (messages: ITextMessage[]) => {
-        messages.forEach(m => this.messages.push(toMessage(m)))
+        messages.forEach(m => {
+            if (this.messages.findIndex(s => s.hash === m.hash) === -1) {
+                this.messages.push(toMessage(m))
+            }
+        })
         this.messages = this.messages.slice().sort((a, b) => a.time - b.time); // sort messages by time
     }
 

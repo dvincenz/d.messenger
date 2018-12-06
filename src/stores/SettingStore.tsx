@@ -76,6 +76,15 @@ export class SettingStore {
         this._seed = seed;
     }
 
+    public dispose() {
+        this._myName = undefined;
+        this._seed = '';
+        this.myAddress = undefined;
+        this.Iota.dispose();
+        messageStore.dispose();
+        contactStore.dispose();
+    }
+
     public async setupMessanger() {
         this.ready = false;
         this.Iota = new Iota(this.host + ':' + this.port, this.seed);

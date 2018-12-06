@@ -197,6 +197,10 @@ export class ContactStore {
         await settingStore.Iota.publishMyPublicKey(keys.publicKey, settingStore.myName)
     }
 
+    public dispose() {
+        this.contacts = {};
+        this._currentContact = '';
+    }
 }
 
 

@@ -78,6 +78,10 @@ export class MessageStore {
         })
     }
 
+    public dispose() {
+        this.messages = [];
+    }
+
     private addMessages = (messages: ITextMessage[]) => {
         messages.forEach(m => {
             if (this.messages.findIndex(s => s.hash === m.hash) === -1) {

@@ -1,11 +1,13 @@
 import { flow, observable, computed } from "mobx";
 import { Contact } from "../entities";
 import { settingStore } from "./SettingStore";
-import { IContactRequest, IContactResponse, Permission, MessageMethod } from "../services/iotaService/interfaces";
+import { IContactRequest, IContactResponse, Permission } from "../services/iotaService/interfaces";
 import { toContact } from "../utils/Mapper";
 import { IICERequest } from "src/services/iotaService/interfaces/IICERequest";
 import { getRandomSeed } from "src/utils";
 import { ChatStatus } from "src/entities/WebRTCConnection";
+import { EncriptionService } from "src/services/encriptionService";
+import { IPublicContact } from "src/services/iotaService/interfaces/IPublicContact";
 
 export class ContactStore {
     @computed get currentContact(): Contact {
@@ -30,10 +32,11 @@ export class ContactStore {
         return contactsArray
     }
 
-    public addContactRequest = flow(function *(this: ContactStore, address: string) {
+    public addContactRequest = flow(function *(this: ContactStore, address: IPublicContact) {
         this.state = ContactStoreState.loading
         try {
-            yield settingStore.Iota.sendContactRequest(address, settingStore.myAddress, settingStore.myName, false)
+            this.contacts[address.myAddress] = new Contact(address.name, address.myAddress, address.time, false, false, false, '', address.publicKey)
+            yield settingStore.Iota.sendContactRequest(address.myAddress, settingStore.myAddress, settingStore.myName, false)
             this.state = ContactStoreState.updated
         } catch (error) {
             this.state = ContactStoreState.error
@@ -77,7 +80,7 @@ export class ContactStore {
         this.state = ContactStoreState.loading
         try {
             const groupAddr = getRandomSeed(81)
-            yield settingStore.Iota.sendContactRequest(settingStore.myAddress, groupAddr, name, true)
+            yield settingStore.Iota.sendContactRequest(settingStore.myAddress, groupAddr, name, false)
             this.state = ContactStoreState.updated
         } catch (error) {
             this.state = ContactStoreState.error
@@ -99,22 +102,33 @@ export class ContactStore {
     @observable private contacts = {};
     // tslint:disable-next-line:variable-name
     @observable private _currentContact?: string;
-
-
-
-    public addContact (contact: IContactRequest | IContactResponse) {
-        if(settingStore.myAddress !== contact.senderAddress){
-            if(this.contacts[contact.senderAddress] === undefined || this.contacts[contact.senderAddress].updateTime < contact.time){
-                this.contacts[contact.senderAddress] = toContact(contact, contact.senderAddress, (contact as IContactRequest).isGroup === true);
+    public async addOrUpdateContact (contact: IContactRequest | IContactResponse) {
+        if(settingStore.myAddress !== contact.senderAddress ){
+            if(this.contacts[contact.senderAddress] === undefined){
+                this.contacts[contact.senderAddress] = await toContact(contact, contact.senderAddress, (contact as IContactRequest).isGroup === true);
+                return
+            }
+            if (this.contacts[contact.senderAddress].updateTime < contact.time){
+                this.UpdateContact(contact, contact.senderAddress);
+                return
             }
         }
         if(settingStore.myAddress !== undefined && settingStore.myAddress !== contact.address){
-            if(this.contacts[contact.address] === undefined || this.contacts[contact.address].updateTime < contact.time){
-                const currentName = this.contacts[contact.address].name
-                this.contacts[contact.address] = toContact(contact, contact.address, (contact as IContactRequest).isGroup === true);
-                this.contacts[contact.address].name = currentName !== undefined ? currentName : this.contacts[contact.address].name
+            if(this.contacts[contact.address] === undefined){
+                this.contacts[contact.address] = await toContact(contact, contact.address, (contact as IContactRequest).isGroup === true);
+                return
+            }
+            if(this.contacts[contact.address].updateTime < contact.time){
+                this.UpdateContact(contact, contact.address);
+                return
             }
         }
+    }
+
+    private UpdateContact(contact: IContactRequest | IContactResponse, address: string) {
+        this.contacts[address].isActivated = (contact as IContactResponse).level !== undefined && (contact as IContactResponse).level === Permission.accepted;
+        this.contacts[address].UpdateTiem = contact.time;
+        this.contacts[address].name = contact.name !== undefined ? contact.name : this.contacts[address].name;
     }
 
     public getContactBySecret(secret:string): Contact{
@@ -133,7 +147,7 @@ export class ContactStore {
     public subscribeForContactRequests() {
         settingStore.Iota.subscribe('contactRequest', (contacts: IContactRequest[]) => {
             contacts.forEach(c => {
-                this.addContact(c)
+                this.addOrUpdateContact(c)
             })
         })
     }
@@ -141,7 +155,7 @@ export class ContactStore {
     public subscribeForContactResponse() {
         settingStore.Iota.subscribe('contactResponse', (contacts: IContactResponse[]) => {
             contacts.forEach(c => {
-                this.addContact(c)
+                this.addOrUpdateContact(c)
             })
         })
     }
@@ -162,6 +176,25 @@ export class ContactStore {
             })
             
         })
+    }
+
+    public subscribeForPublicKey() {
+        settingStore.Iota.subscribe('contact', (contacts: IPublicContact[]) => {
+            console.log(contacts)
+            contacts.forEach(c => {
+                console.log(c)
+                if (this.contacts[c.myAddress] !== undefined) {
+                    this.contacts[c.myAddress].publicKey = c.publicKey
+                }
+            })
+        })
+    }
+
+    public async publishUser() {
+        const keys = await EncriptionService.createKey(settingStore.myName, settingStore.seed)
+        settingStore.privateKey = keys.privateKey
+        settingStore.publicKey = keys.publicKey
+        await settingStore.Iota.publishMyPublicKey(keys.publicKey, settingStore.myName)
     }
 
     public dispose() {

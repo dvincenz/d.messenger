@@ -10,18 +10,20 @@ export class Message {
     public time: number
     public secret: string
 
-    public toITextMessage(): ITextMessage{
+    public toITextMessage(isEncripted: boolean = true): ITextMessage{
         const message: ITextMessage = {
             secret: this.secret,
             address: contactStore.getContactBySecret(this.secret).address,
             message: this.message,
             method:  MessageMethod.Message,
             time: new Date().getTime(),
+            isEncripted
         }
         return message
     }
 
 }
+
 
 export enum MessageStatus {
     Read,

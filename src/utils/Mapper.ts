@@ -2,8 +2,6 @@ import { ITextMessage, IContactRequest, IContactResponse, Permission } from "../
 import { Message, Contact, MessageStatus } from "../entities";
 import { IICERequest } from "src/services/iotaService/interfaces/IICERequest";
 import { Ice } from "src/entities/Ice";
-import { ChatStatus } from "src/entities/WebRTCConnection";
-import { settingStore } from "src/stores/SettingStore";
 
 export function toMessage(baseMessage: ITextMessage): Message {
     const returnMessage: Message = {
@@ -18,20 +16,20 @@ export function toMessage(baseMessage: ITextMessage): Message {
     return returnMessage;
 }
 
-export function toContact(con: IContactRequest | IContactResponse, address: string, isGrp: boolean): Contact {
-    const contact: Contact = {
-        address,
-        name: con.name,
-        isActivated: (isGrp) || ((con as IContactResponse).level !== undefined && (con as IContactResponse).level === Permission.accepted),
-        secret: con.secret,
-        updateTime: con.time,
-        isDisplayed: true,
-        status: ChatStatus.offline,
-        isGroup: isGrp,
-        setStatus: Contact.prototype.setStatus
-    }
-    return contact
+export async function toContact(con: IContactRequest | IContactResponse, address: string, isGrp: boolean): Promise<Contact> {
+    const newContact =  new Contact (
+            con.name,    
+            address, 
+            con.time, 
+            true,
+            (isGrp) || ((con as IContactResponse).level !== undefined && (con as IContactResponse).level === Permission.accepted),
+            isGrp,
+            con.secret,
+            )
+    await newContact.getPublicKey();
+    return newContact;
 }
+
 
 export function toIce(ice: IICERequest){
     const returnIce: Ice = {

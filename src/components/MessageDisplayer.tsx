@@ -81,10 +81,10 @@ export class MessageDisplayerComponent extends React.Component<IPorps, {}> {
                 <ContactConfirmator />
             )
         }
-
         return (
             <div className={classes.chatroom}>
                 <ul className={classes.chats}>
+                    
                     {messageStore !== undefined && messageStore.getMessagesFromAddress.length > 0 ? messageStore.getMessagesFromAddress.map(
                         msg => {
                             return <MessageComponent

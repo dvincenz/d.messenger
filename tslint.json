@@ -24,7 +24,8 @@
     "object-literal-sort-keys": false,
     "no-unused-expression": [true, "allow-fast-null-checks"],
     "no-unused-variable": {"severity": "warning"},
-    "variable-name": false
+    "variable-name": false,
+    "member-ordering": false
      
   }
 }

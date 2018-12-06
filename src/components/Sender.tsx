@@ -59,7 +59,7 @@ export class SenderComponent extends React.Component<IPorps, IState> {
         const msg = this.state.message;
         this.setState({message: ''})
         if (contactStore === undefined) {
-          console.error('error, no address aviable')
+          console.error('error, no address available')
           return
         }
         messageStore.sendMessage(contactStore.currentContact as Contact, msg)

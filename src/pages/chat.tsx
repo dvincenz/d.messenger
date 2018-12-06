@@ -53,8 +53,15 @@ class ChatComponent extends React.Component<IProps, IState> {
   }
   public render() {
     const { classes } = this.props
-    if (settingStore.seed === '') {
+    if (settingStore.seed === null) {
       return <Redirect to={{ pathname: '/login' }} />;
+    }
+    if (!settingStore.ready){
+      return (
+        <React.Fragment>
+          Loading... (todo: make some crazy fancy loading bar or what ever)
+        </React.Fragment>
+      )
     }
     const isGroup = contactStore.currentContact && contactStore.currentContact.isGroup
     return (
@@ -79,7 +86,7 @@ class ChatComponent extends React.Component<IProps, IState> {
   }
 
   public componentDidMount () {
-    if(settingStore.seed !== ''){
+    if(settingStore.seed !== null){
       settingStore.setupMessanger().then( () =>{
         this.setAddress(this.props.match.params.address)
       })

@@ -5,4 +5,5 @@ export interface IContactRequest extends IBaseMessage {
     senderAddress: string,
     name: string,
     isGroup: boolean,
+    secret: string,
 }

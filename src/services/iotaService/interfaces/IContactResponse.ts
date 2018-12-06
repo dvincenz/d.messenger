@@ -5,4 +5,5 @@ export interface IContactResponse extends IBaseMessage {
     address: string,
     senderAddress: string,
     name: string,
+    secret: string,
 }

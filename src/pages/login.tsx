@@ -95,7 +95,7 @@ class LoginComponent extends React.Component<IPorps, IState> {
 
   public render() {
     const {classes} = this.props;
-    if (settingStore.seed !== '') {
+    if (settingStore.seed !== null) {
       return <Redirect to={{pathname: '/chat'}}/>;
     }
     return (
@@ -203,7 +203,8 @@ class LoginComponent extends React.Component<IPorps, IState> {
   }
 
   private handleStoreSeed = () => {
-    settingStore.saveSeed(this.state.seed, this.state.saveSeed);
+    settingStore.saveUserData = this.state.saveSeed;
+    settingStore.seed = this.state.seed;
   }
 
   private handleNewContact = () => {
@@ -224,8 +225,9 @@ class LoginComponent extends React.Component<IPorps, IState> {
     this.setState({
       isNewAccountDialogShow: false
     })
+    settingStore.newUser = true;
     settingStore.myName = this.state.userName
-    settingStore.saveSeed(this.state.seed, this.state.saveSeed);
+    settingStore.seed = this.state.seed; 
   }
 }
 

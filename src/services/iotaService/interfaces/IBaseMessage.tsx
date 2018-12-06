@@ -4,7 +4,7 @@ export interface IBaseMessage {
     address: string;
     hash?: string;
     time: number;
-    secret: string;
+    isEncripted: boolean;
 }
 
 export enum MessageMethod {
@@ -12,6 +12,7 @@ export enum MessageMethod {
     ContactResponse,
     Message,
     ICE,
+    AddressPublish
 }
 
 export enum Permission {

@@ -37,6 +37,7 @@ export class WebRtcClient {
             method: MessageMethod.ICE,
             secret: this.contact.secret,
             time: new Date().getTime(),
+            isEncripted: true,
         }
         this.timestampIcePublic = await settingStore.Iota.sendIceRequest(iceReqeust)
     

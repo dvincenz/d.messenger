@@ -22,7 +22,7 @@ Right now you should be able to send and resive messages. Check the feature list
 
 ### following NFR are on the task list
 - [ ] implement a suitable ui
-- [ ] encryption 
+- [x] encryption 
 - [ ] security audit
 - [ ] handle IOTA snapthots
 

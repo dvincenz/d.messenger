@@ -40,7 +40,6 @@ export class WebRtcClient {
             isEncripted: true,
         }
         this.timestampIcePublic = await settingStore.Iota.sendIceRequest(iceReqeust)
-    
     }
 
     private reciveData = (data: any) => {
@@ -63,6 +62,4 @@ export class WebRtcClient {
         this.isClosed = true;
         this.contact.status = ChatStatus.offline
     }
-
-
 }

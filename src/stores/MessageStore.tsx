@@ -69,12 +69,11 @@ export class MessageStore {
     })
 
     public subscribeForMessages = () =>{
-        settingStore.Iota.subscribe('message', (data: ITextMessage[]) => 
+        settingStore.Iota.subscribe('message', (data: ITextMessage[]) =>
         {
             if(data !== undefined){
                 this.addMessages(data)
             }
-            
         })
     }
 
@@ -90,8 +89,6 @@ export class MessageStore {
         })
         this.messages = this.messages.slice().sort((a, b) => a.time - b.time); // sort messages by time
     }
-
-    
 }
 
 export const messageStore = new MessageStore()

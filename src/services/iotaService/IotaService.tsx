@@ -157,7 +157,6 @@ export class Iota extends EventHandler {
         } finally {
             this.isCallRunning = false;
         }
-
     }
 
     private async sendToTangle(message: IBaseMessage) {

@@ -85,7 +85,7 @@ export class MessageDisplayerComponent extends React.Component<IPorps, {}> {
             <div className={classes.chatroom}>
                 <ul className={classes.chats}>
                     
-                    {messageStore !== undefined && messageStore.getMessagesFromAddress.length > 0 ? messageStore.getMessagesFromAddress.map(
+                    {messageStore !== undefined && messageStore.messages.length > 0 ? messageStore.messages.map(
                         msg => {
                             return <MessageComponent
                                 key={msg.time}

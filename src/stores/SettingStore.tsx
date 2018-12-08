@@ -35,8 +35,8 @@ export class SettingStore {
     }
 
     set privateKey(key: string){
-        window.sessionStorage.setItem('privatePGPEncripted', key)
-        console.log('private PGP key, (encripted): ' + key)
+        window.sessionStorage.setItem('privatePGP', key)
+        console.log('private PGP key: ' + key)
         // todo an other place to save the key
         this._privateKey = key
     }
@@ -66,7 +66,7 @@ export class SettingStore {
     constructor(){
         this._seed = this.getKey('seed');
         this._myName = this.getKey('myName')
-        this._privateKey = this.getKey('privatePGPEncripted')
+        this._privateKey = this.getKey('privatePGP')
         this._publicKey = this.getKey('publicPGP')
         this.ready = false;
     }

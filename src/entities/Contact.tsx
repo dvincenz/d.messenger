@@ -87,7 +87,7 @@ export class Contact {
         if(this._publicKey === undefined && this.name !== '' && this.isGroup === false){
             const contact = (await settingStore.Iota.searchContactByName(this.name)).filter((c: IPublicContact) => c.myAddress === this.address)
             this._publicKey = contact.length > 0 ? (contact[0] as IPublicContact).publicKey : undefined
-            this.name =  contact.length > 0 ? (contact[0] as IPublicContact).name : undefined
+            this.name =  contact.length > 0 ? (contact[0] as IPublicContact).name : this.name
         }
     }
 

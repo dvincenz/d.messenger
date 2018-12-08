@@ -50,13 +50,21 @@ export const ContactConfirmator = withStyles((theme) => ({
                     <Typography variant="display1" align="center" color="primary" gutterBottom>
                         contact request from {contactStore.currentContact.name}
                     </Typography>
-                    <Typography variant="body2" align="center" color="textSecondary" paragraph>
-                        {contactStore.currentContact.name} with the address {contactStore.currentContact.address} likes to communication with you over d.messenger. You can reject or accept the request.
-                </Typography>
-                    <div className={props.classes.buttonsContainer}>
+                    {contactStore.currentContact.publicKey !== undefined ? 
+                        <Typography variant="body2" align="center" color="textSecondary" paragraph>
                         
-                        <Button className={props.classes.buttons} disabled={loading} variant="contained" color="primary" onClick={() => contactStore.acceptCurrentContact()}>Accept</Button>
-                        <Button className={props.classes.buttons} disabled={loading} color="secondary" onClick={() => contactStore.rejectCurrentContact()}>Reject</Button>
+                            {contactStore.currentContact.name} with the address {contactStore.currentContact.address} likes to communication with you over d.messenger. You can reject or accept the request.
+                        }
+                        </Typography>
+                    : <Typography>
+                        {contactStore.currentContact.name} with the address {contactStore.currentContact.address} likes to communication with 
+                        you over d.messenger. But he didn't publish his publicKey. Until we can not found his public key we are not able to 
+                        send encrypted messages to {contactStore.currentContact.name}
+                    </Typography>
+                    }
+                    <div className={props.classes.buttonsContainer}>
+                        <Button className={props.classes.buttons} disabled={loading || contactStore.currentContact.publicKey === undefined} variant="contained" color="primary" onClick={() => contactStore.acceptCurrentContact()}>Accept</Button>
+                        <Button className={props.classes.buttons} disabled={loading ||  contactStore.currentContact.publicKey === undefined} color="secondary" onClick={() => contactStore.rejectCurrentContact()}>Reject</Button>
                     </div>
                 </div>
             </main>

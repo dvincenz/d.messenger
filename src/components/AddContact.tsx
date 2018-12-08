@@ -143,7 +143,6 @@ class AddContactComponent extends React.Component<IPorps, IState> {
     }
 
     private handleComboChange = (event: React.ChangeEvent<HTMLSelectElement>) =>{
-        console.log(event.target.value)
         this.setState({
             selectedAddress: event.target.value
         })

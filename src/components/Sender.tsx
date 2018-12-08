@@ -45,7 +45,7 @@ export class SenderComponent extends React.Component<IPorps, IState> {
                   label="Message"
                 />
                 <Button 
-                    disabled={contactStore.currentContact === undefined}
+                    disabled={contactStore.currentContact === undefined || (contactStore.currentContact.publicKey === undefined && !contactStore.currentContact.isGroup)}
                     className={classes.button}
                     variant="contained"
                     color="primary"  

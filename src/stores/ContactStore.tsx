@@ -35,7 +35,7 @@ export class ContactStore {
     public addContactRequest = flow(function *(this: ContactStore, address: IPublicContact) {
         this.state = ContactStoreState.loading
         try {
-            this.contacts[address.myAddress] = new Contact(address.name, address.myAddress, address.time, false, false, false, '', address.publicKey)
+            this.contacts[address.myAddress] = new Contact(address.name, address.myAddress, address.time, false, false, false, getRandomSeed(20), address.publicKey)
             yield settingStore.Iota.sendContactRequest(address.myAddress, settingStore.myAddress, settingStore.myName, false)
             this.state = ContactStoreState.updated
         } catch (error) {
@@ -180,9 +180,7 @@ export class ContactStore {
 
     public subscribeForPublicKey() {
         settingStore.Iota.subscribe('contact', (contacts: IPublicContact[]) => {
-            console.log(contacts)
             contacts.forEach(c => {
-                console.log(c)
                 if (this.contacts[c.myAddress] !== undefined) {
                     this.contacts[c.myAddress].publicKey = c.publicKey
                 }

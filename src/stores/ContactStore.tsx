@@ -81,7 +81,7 @@ export class ContactStore {
         this.state = ContactStoreState.loading
         try {
             const groupAddr = getRandomSeed(81)
-            yield settingStore.Iota.sendContactRequest(settingStore.myAddress, groupAddr, name, false)
+            yield settingStore.Iota.sendContactRequest(settingStore.myAddress, groupAddr, name, true)
             this.state = ContactStoreState.updated
         } catch (error) {
             this.state = ContactStoreState.error

@@ -8,6 +8,7 @@ import { getRandomSeed } from "src/utils";
 import { ChatStatus } from "src/entities/WebRTCConnection";
 import { EncriptionService } from "src/services/encriptionService";
 import { IPublicContact } from "src/services/iotaService/interfaces/IPublicContact";
+import { IContactParameters } from "src/entities/Contact";
 
 export class ContactStore {
     @computed get currentContact(): Contact {
@@ -36,7 +37,18 @@ export class ContactStore {
         this.state = ContactStoreState.loading
         try {
             const secret = getRandomSeed(20)
-            this.contacts[address.myAddress] = new Contact(address.name, address.myAddress, address.time, false, false, false, secret, address.publicKey)
+            const contactParameters: IContactParameters = {
+                name: address.name,
+                address: address.myAddress,
+                updateTime: address.time,
+                isDisplayed: true,
+                isActivated: false,
+                isGroup: false,
+                secret,
+                publicKey: address.publicKey,
+                isMyRequest: true,
+            }
+            this.contacts[address.myAddress] = new Contact(contactParameters);
             yield settingStore.Iota.sendContactRequest(address.myAddress, settingStore.myAddress, settingStore.myName, false, secret)
             this.state = ContactStoreState.updated
         } catch (error) {

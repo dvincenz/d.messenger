@@ -7,6 +7,7 @@ import { settingStore } from 'src/stores/SettingStore';
 import { getDateString } from 'src/utils';
 import { ContactConfirmator } from './ContactConfirmator';
 import MoodBadIcon from '@material-ui/icons/MoodBad';
+import { ContactWaiter } from './ContactWaiter';
 
 interface IPorps {
     classes: any;
@@ -91,7 +92,7 @@ export class MessageDisplayerComponent extends React.Component<IPorps, {}> {
 
     public render() {
         const { classes } = this.props
-
+        let content: any;
         const emptyList = (
             <div className={classes.emptyMessage}>
             <MoodBadIcon className={classes.icon}  />
@@ -101,15 +102,16 @@ export class MessageDisplayerComponent extends React.Component<IPorps, {}> {
             </div>
         )
 
-        if(contactStore.currentContact !== undefined && !contactStore.currentContact.isActivated){
-            return (
-                <ContactConfirmator />
-            )
+        if(contactStore.currentContact !== undefined && !contactStore.currentContact.isActivated && contactStore.currentContact.isMyRequest){
+            content = <ContactWaiter />
+        }
+        if(contactStore.currentContact !== undefined && !contactStore.currentContact.isActivated && !contactStore.currentContact.isMyRequest){
+            content = <ContactConfirmator />
         }
         return (
             <div className={classes.chatroom}>
+                {content !== undefined ? content :
                 <ul className={classes.chats}>
-                    
                     {messageStore !== undefined && messageStore.getMessagesFromAddress.length > 0 ? messageStore.getMessagesFromAddress.map(
                         msg => {
                             return <MessageComponent
@@ -121,7 +123,7 @@ export class MessageDisplayerComponent extends React.Component<IPorps, {}> {
                             />
                         }
                     ) : contactStore.currentContact === undefined ? <p>select a contact to display</p> : emptyList}
-                </ul>
+                </ul>}
             </div>
         );
     }

@@ -45,7 +45,7 @@ export const ContactConfirmator = withStyles((theme) => ({
     
     return (
         <React.Fragment>
-            <main className={props.classes.chatroom}>
+            {/* <main className={props.classes.chatroom}> */}
                 <div className={props.classes.contactRequest}>
                     <Typography variant="display1" align="center" color="primary" gutterBottom>
                         contact request from {contactStore.currentContact.name}
@@ -67,7 +67,7 @@ export const ContactConfirmator = withStyles((theme) => ({
                         <Button className={props.classes.buttons} disabled={loading ||  contactStore.currentContact.publicKey === undefined} color="secondary" onClick={() => contactStore.rejectCurrentContact()}>Reject</Button>
                     </div>
                 </div>
-            </main>
+            {/* </main> */}
             {loading && <LinearProgress className={props.classes.loader}  color="secondary" />}
         </React.Fragment>
     )

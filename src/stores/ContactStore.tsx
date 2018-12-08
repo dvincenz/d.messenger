@@ -11,6 +11,7 @@ import { IPublicContact } from "src/services/iotaService/interfaces/IPublicConta
 
 export class ContactStore {
     @computed get currentContact(): Contact {
+        console.log(this.contacts[this._currentContact])
         return this.contacts[this._currentContact]
     }
 
@@ -35,8 +36,9 @@ export class ContactStore {
     public addContactRequest = flow(function *(this: ContactStore, address: IPublicContact) {
         this.state = ContactStoreState.loading
         try {
-            this.contacts[address.myAddress] = new Contact(address.name, address.myAddress, address.time, false, false, false, getRandomSeed(20), address.publicKey)
-            yield settingStore.Iota.sendContactRequest(address.myAddress, settingStore.myAddress, settingStore.myName, false)
+            const secret = getRandomSeed(20)
+            this.contacts[address.myAddress] = new Contact(address.name, address.myAddress, address.time, false, false, false, secret, address.publicKey)
+            yield settingStore.Iota.sendContactRequest(address.myAddress, settingStore.myAddress, settingStore.myName, false, secret)
             this.state = ContactStoreState.updated
         } catch (error) {
             this.state = ContactStoreState.error

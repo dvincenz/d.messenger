@@ -82,7 +82,7 @@ export class Iota extends EventHandler {
         const message: IContactRequest = {
             method: MessageMethod.ContactRequest,
             name: myName,
-            secret: secret !== undefined? secret : getRandomSeed(20),
+            secret: secret !== undefined ? secret : getRandomSeed(20),
             address: addr,
             senderAddress: ownAddress,
             time: new Date().getTime(),

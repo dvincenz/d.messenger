@@ -1,11 +1,12 @@
 import * as React from 'react';
-import { StyleRulesCallback, withStyles } from '@material-ui/core';
+import { StyleRulesCallback, withStyles, Typography } from '@material-ui/core';
 import { messageStore } from '../stores/MessageStore';
 import { observer } from 'mobx-react';
 import { contactStore } from '../stores/ContactStore';
 import { settingStore } from 'src/stores/SettingStore';
 import { getDateString } from 'src/utils';
 import { ContactConfirmator } from './ContactConfirmator';
+import MoodBadIcon from '@material-ui/icons/MoodBad';
 
 interface IPorps {
     classes: any;
@@ -61,6 +62,21 @@ const styles: StyleRulesCallback = theme => ({ // todo fix sizes with theme.spac
         overflow: 'hidden',
         boxShadow: '0 0 8px 0 rgba(0,0,0, 0.3)'
 
+    },
+    emptyMessage: {
+        margin: '0 auto',
+        marginTop: '30px',
+        textAlign: 'center',
+        color: 'rgba(160, 160, 160, 0.87)'
+    },
+    icon:{
+        margin: '0 auto',
+        width: '100%',
+        fontSize: '80px'
+    },
+    errorText:{
+        fontSize: '20px',
+        color: 'rgba(160, 160, 160, 0.87)'
     }
 })
 
@@ -75,6 +91,15 @@ export class MessageDisplayerComponent extends React.Component<IPorps, {}> {
 
     public render() {
         const { classes } = this.props
+
+        const emptyList = (
+            <div className={classes.emptyMessage}>
+            <MoodBadIcon className={classes.icon}  />
+                <Typography className={classes.errorText}>
+                    [NO MESSAGES]
+                </Typography>
+            </div>
+        )
 
         if(contactStore.currentContact !== undefined && !contactStore.currentContact.isActivated){
             return (
@@ -95,7 +120,7 @@ export class MessageDisplayerComponent extends React.Component<IPorps, {}> {
                                 ownMessage={msg.reciverAddress.substring(0, 81) === settingStore.myAddress.substring(0, 81)}
                             />
                         }
-                    ) : <p>{contactStore.currentContact === undefined ? "select a contact to display" : `loading messages for ${contactStore.currentContact.address}`}</p>}
+                    ) : contactStore.currentContact === undefined ? <p>select a contact to display</p> : emptyList}
                 </ul>
             </div>
         );

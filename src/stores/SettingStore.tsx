@@ -78,7 +78,7 @@ export class SettingStore {
 
     public dispose() {
         this._myName = undefined;
-        this._seed = '';
+        this._seed = null;
         this.myAddress = undefined;
         this.Iota.dispose();
         messageStore.dispose();

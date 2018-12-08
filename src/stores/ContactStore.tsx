@@ -11,7 +11,6 @@ import { IPublicContact } from "src/services/iotaService/interfaces/IPublicConta
 
 export class ContactStore {
     @computed get currentContact(): Contact {
-        console.log(this.contacts[this._currentContact])
         return this.contacts[this._currentContact]
     }
 
@@ -130,7 +129,7 @@ export class ContactStore {
     private UpdateContact(contact: IContactRequest | IContactResponse, address: string) {
         this.contacts[address].isActivated = (contact as IContactResponse).level !== undefined && (contact as IContactResponse).level === Permission.accepted;
         this.contacts[address].UpdateTiem = contact.time;
-        this.contacts[address].name = contact.name !== undefined ? contact.name : this.contacts[address].name;
+        this.contacts[address].name = contact.name === undefined ? contact.name : this.contacts[address].name;
     }
 
     public getContactBySecret(secret:string): Contact{
@@ -165,14 +164,13 @@ export class ContactStore {
     public subscribeForIce() {
         settingStore.Iota.subscribe('ice', (ice: IICERequest[]) => {
             ice.forEach(i => {
-                // let newestIce: IICERequest
                 // todo check if connection is obsolate
                 const contact = this.getContactBySecret(i.secret)
                 if(contact === undefined)
                 {
                     return
                 }
-                if (contact.updateTime < i.time && i.address === settingStore.myAddress) {
+                if (contact.updateTime <= i.time && i.address === settingStore.myAddress) {
                     contact.setStatus(ChatStatus.online, i)
                 }
             })

@@ -15,7 +15,7 @@ export class Contact {
     public webRtcClient?: WebRtcClient;
     public updateTime: number;
     public isDisplayed: boolean;
-    public status: ChatStatus = ChatStatus.offline
+    @observable public status: ChatStatus = ChatStatus.offline
     public isGroup: boolean;
     public get publicKey(){
         return this._publicKey;
@@ -66,7 +66,7 @@ export class Contact {
                 }
             }            
             if (this.webRtcClient !== undefined &&
-                (this.webRtcClient.timestampIcePublic > iceReqeust.time ||
+                (this.webRtcClient.timestampIcePublic < iceReqeust.time ||
                     this.webRtcClient.timestampIcePublic === undefined ||
                     (this.webRtcClient.timestampIcePublic === iceReqeust.time && this.address > settingStore.myAddress)
                 )

@@ -5,17 +5,30 @@ import { settingStore } from "src/stores/SettingStore";
 import { IPublicContact } from "src/services/iotaService/interfaces/IPublicContact";
 import { observable } from "mobx";
 
+export interface IContactParameters{
+    name: string;
+    address: string;
+    updateTime: number; 
+    isDisplayed: boolean;
+    isMyRequest: boolean; 
+    isActivated: boolean; 
+    isGroup?: boolean;
+    secret?: string;
+    publicKey?: string;
+}
+
 export class Contact {
     private _name: string;
     private _address: string;
     private _publicKey: string;
     @observable public isActivated?: boolean;
+    public isMyRequest: boolean;
     public secret: string;
     // todo geter seter and make property private
     public webRtcClient?: WebRtcClient;
     public updateTime: number;
     public isDisplayed: boolean;
-    public status: ChatStatus = ChatStatus.offline
+    @observable public status: ChatStatus = ChatStatus.offline
     public isGroup: boolean;
     public get publicKey(){
         return this._publicKey;
@@ -33,23 +46,16 @@ export class Contact {
     public set name (value: string) {
         this._name = value  
     }
-    constructor(
-            name: string, 
-            address: string, 
-            updateTime: number, 
-            isDisplayed: boolean, 
-            isActivated: boolean, 
-            isGroup?: boolean, 
-            secret?: string,
-            publicKey?: string){
-        this._address = address,
-        this._name = name, 
-        this.updateTime = updateTime,
-        this.isDisplayed = isDisplayed,
-        this.isGroup = isGroup,
-        this.isActivated = isActivated
-        this.secret = secret
-        this._publicKey = publicKey
+    constructor(contact: IContactParameters){
+        this._address = contact.address,
+        this._name = contact.name, 
+        this.updateTime = contact.updateTime,
+        this.isDisplayed = contact.isDisplayed,
+        this.isGroup = contact.isGroup,
+        this.isActivated = contact.isActivated
+        this.secret = contact.secret
+        this._publicKey = contact.publicKey
+        this.isMyRequest = contact.isMyRequest
     }
 
 
@@ -66,7 +72,7 @@ export class Contact {
                 }
             }            
             if (this.webRtcClient !== undefined &&
-                (this.webRtcClient.timestampIcePublic > iceReqeust.time ||
+                (this.webRtcClient.timestampIcePublic < iceReqeust.time ||
                     this.webRtcClient.timestampIcePublic === undefined ||
                     (this.webRtcClient.timestampIcePublic === iceReqeust.time && this.address > settingStore.myAddress)
                 )
@@ -87,10 +93,22 @@ export class Contact {
         if(this._publicKey === undefined && this.name !== '' && this.isGroup === false){
             const contact = (await settingStore.Iota.searchContactByName(this.name)).filter((c: IPublicContact) => c.myAddress === this.address)
             this._publicKey = contact.length > 0 ? (contact[0] as IPublicContact).publicKey : undefined
-            this.name =  contact.length > 0 ? (contact[0] as IPublicContact).name : undefined
+            this.name =  contact.length > 0 ? (contact[0] as IPublicContact).name : this.name
         }
     }
 
+}
+
+export interface IContactParameters{
+    name: string;
+    address: string;
+    updateTime: number; 
+    isDisplayed: boolean;
+    isMyRequest: boolean; 
+    isActivated: boolean; 
+    isGroup?: boolean;
+    secret?: string;
+    publicKey?: string;
 }
 
 

@@ -36,6 +36,8 @@ const styles: StyleRulesCallback = theme => ({
   },
   contacts:{
     position: 'absolute',
+    height:'calc(100% - 64px)',
+    overflow: 'auto',
     left: 0,
     top: 64,
     width: 300,

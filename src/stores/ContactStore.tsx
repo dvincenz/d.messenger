@@ -8,6 +8,7 @@ import { getRandomSeed } from "src/utils";
 import { ChatStatus } from "src/entities/WebRTCConnection";
 import { EncriptionService } from "src/services/encriptionService";
 import { IPublicContact } from "src/services/iotaService/interfaces/IPublicContact";
+import { IContactParameters } from "src/entities/Contact";
 
 export class ContactStore {
     @computed get currentContact(): Contact {
@@ -35,8 +36,20 @@ export class ContactStore {
     public addContactRequest = flow(function *(this: ContactStore, address: IPublicContact) {
         this.state = ContactStoreState.loading
         try {
-            this.contacts[address.myAddress] = new Contact(address.name, address.myAddress, address.time, false, false, false, '', address.publicKey)
-            yield settingStore.Iota.sendContactRequest(address.myAddress, settingStore.myAddress, settingStore.myName, false)
+            const secret = getRandomSeed(20)
+            const contactParameters: IContactParameters = {
+                name: address.name,
+                address: address.myAddress,
+                updateTime: address.time,
+                isDisplayed: true,
+                isActivated: false,
+                isGroup: false,
+                secret,
+                publicKey: address.publicKey,
+                isMyRequest: true,
+            }
+            this.contacts[address.myAddress] = new Contact(contactParameters);
+            yield settingStore.Iota.sendContactRequest(address.myAddress, settingStore.myAddress, settingStore.myName, false, secret)
             this.state = ContactStoreState.updated
         } catch (error) {
             this.state = ContactStoreState.error
@@ -80,7 +93,7 @@ export class ContactStore {
         this.state = ContactStoreState.loading
         try {
             const groupAddr = getRandomSeed(81)
-            yield settingStore.Iota.sendContactRequest(settingStore.myAddress, groupAddr, name, false)
+            yield settingStore.Iota.sendContactRequest(settingStore.myAddress, groupAddr, name, true)
             this.state = ContactStoreState.updated
         } catch (error) {
             this.state = ContactStoreState.error
@@ -128,7 +141,7 @@ export class ContactStore {
     private UpdateContact(contact: IContactRequest | IContactResponse, address: string) {
         this.contacts[address].isActivated = (contact as IContactResponse).level !== undefined && (contact as IContactResponse).level === Permission.accepted;
         this.contacts[address].UpdateTiem = contact.time;
-        this.contacts[address].name = contact.name !== undefined ? contact.name : this.contacts[address].name;
+        this.contacts[address].name = contact.name === undefined ? contact.name : this.contacts[address].name;
     }
 
     public getContactBySecret(secret:string): Contact{
@@ -163,14 +176,13 @@ export class ContactStore {
     public subscribeForIce() {
         settingStore.Iota.subscribe('ice', (ice: IICERequest[]) => {
             ice.forEach(i => {
-                // let newestIce: IICERequest
                 // todo check if connection is obsolate
                 const contact = this.getContactBySecret(i.secret)
                 if(contact === undefined)
                 {
                     return
                 }
-                if (contact.updateTime < i.time && i.address === settingStore.myAddress) {
+                if (contact.updateTime <= i.time && i.address === settingStore.myAddress) {
                     contact.setStatus(ChatStatus.online, i)
                 }
             })
@@ -180,9 +192,7 @@ export class ContactStore {
 
     public subscribeForPublicKey() {
         settingStore.Iota.subscribe('contact', (contacts: IPublicContact[]) => {
-            console.log(contacts)
             contacts.forEach(c => {
-                console.log(c)
                 if (this.contacts[c.myAddress] !== undefined) {
                     this.contacts[c.myAddress].publicKey = c.publicKey
                 }

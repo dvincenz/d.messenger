@@ -19,12 +19,15 @@ const styles: StyleRulesCallback = theme => ({
         backgroundColor: '#00a02a'
     },
     list: {
-        overflow: 'hidden',
-        width: '280px',
+         width: '280px',
     },
     link: {
         textDecoration: 'none',
-    }
+    },
+    secondary: {
+        wordBreak: 'break-all',
+        fontSize: '8.5px',
+    },
 });
 
 
@@ -76,7 +79,10 @@ const Person = observer((props: any) => {
         <Link to={link} onClick={props.handleClickContact} className={props.classes.link}>
             <ListItem button>
                 <Avatar className={props.contact.status === ChatStatus.offline ? props.classes.avatar : props.classes.avatarActive}>{props.contact.name && (props.contact.name).charAt(0).toLocaleUpperCase()}</Avatar>
-               <ListItemText primary={props.contact.name + ' ' + props.contact.secret} secondary={props.contact.address} />}
+               <ListItemText 
+                classes={{ secondary: props.classes.secondary }}
+                primary={props.contact.name} 
+                secondary={props.contact.address} />
             </ListItem>
         </Link>
     )

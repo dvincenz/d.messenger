@@ -78,11 +78,11 @@ export class Iota extends EventHandler {
         return await this.sendToTangle(toPublishAddress)
     }
 
-    public async sendContactRequest(addr: string, ownAddress: string, myName: string, isGrp: boolean) {
+    public async sendContactRequest(addr: string, ownAddress: string, myName: string, isGrp: boolean, secret?: string) {
         const message: IContactRequest = {
             method: MessageMethod.ContactRequest,
             name: myName,
-            secret: getRandomSeed(20),
+            secret: secret !== undefined ? secret : getRandomSeed(20),
             address: addr,
             senderAddress: ownAddress,
             time: new Date().getTime(),

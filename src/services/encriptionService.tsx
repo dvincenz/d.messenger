@@ -48,6 +48,7 @@ export class EncriptionService {
     private static async dearmor (key: string) {
         const dearmorKey = await OpenPGP.armor.decode(key)
         const deedObject = await dearmorKey.data.getReader().read()
+        
         return deedObject.value
     }
 

@@ -34,18 +34,19 @@ export class SenderComponent extends React.Component<IPorps, IState> {
 
     public render() {
         const { classes } = this.props
+        const currentContact = contactStore.currentContact
         return (
             <div>        
                 <TextField
                   className={classes.textbox}
-                  disabled={contactStore.currentContact === undefined}
+                  disabled={currentContact === undefined}
                   value={this.state.message}
                   onChange={this.handleInputChange}
                   onKeyPress={this.handleReturn}
                   label="Message"
                 />
                 <Button 
-                    disabled={contactStore.currentContact === undefined}
+                    disabled={currentContact === undefined || (currentContact.publicKey === undefined && !currentContact.isGroup) || !currentContact.isActivated}
                     className={classes.button}
                     variant="contained"
                     color="primary"  

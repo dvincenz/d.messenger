@@ -15,8 +15,9 @@ import {
 import { Redirect } from 'react-router';
 import { observer } from 'mobx-react';
 import { settingStore } from '../stores/SettingStore';
-import { getRandomSeed } from "../utils";
 import { NewAccountDialog } from "../components/NewAccountDialog";
+import { key } from 'openpgp';
+import { isSeed, isBase64 } from 'src/utils';
 
 
 const styles: StyleRulesCallback = theme => ({
@@ -60,8 +61,11 @@ const styles: StyleRulesCallback = theme => ({
     backgroundColor: '#F5F5F5'
     ,
   },
-  seedTextbox:{
+  privatKeyTextbox:{
     width: '100%'
+  },
+  loginPrivateKey:{
+    width: '600px'
   }
 });
 
@@ -70,12 +74,14 @@ interface IPorps {
 }
 
 interface IState {
-  seed: string;
+  privateKey: string;
   isNewAccountDialogShow: boolean;
   textbox: any;
   saveSeed: boolean;
   userName: string;
-  userNameError: boolean
+  userNameError: boolean;
+  isLoading: boolean;
+  privateKeyError: string;
 }
 
 @observer
@@ -84,12 +90,14 @@ class LoginComponent extends React.Component<IPorps, IState> {
   constructor(props: IPorps) {
     super(props);
     this.state = {
-      seed: '',
+      isLoading: false,
+      privateKey: '',
       isNewAccountDialogShow: false,
       textbox: null,
       saveSeed: false,
       userName: '',
       userNameError: false,
+      privateKeyError: '',
     }
   }
 
@@ -124,17 +132,23 @@ class LoginComponent extends React.Component<IPorps, IState> {
                 <form onSubmit={this.handleStoreSeed}>
                   <Grid container spacing={16} justify="center">
                     <Grid item>
-                      <TextField value={this.state.seed} inputProps={{size: 81}} type="password" label="Seed"
-                                 onChange={this.handleSeedChange}/>
+                      <TextField 
+                        multiline
+                        className={classes.loginPrivateKey}
+                        value={this.state.privateKey}
+                        type="password"
+                        label={this.state.privateKeyError !== '' ? this.state.privateKeyError : 'Private key'}
+                        onChange={this.handleSeedChange}
+                        error={this.state.privateKeyError !== ''} />
                     </Grid>
                   </Grid>
                   <Grid container spacing={16}>
                     <Grid item>
                       <FormControlLabel
                         control={
-                          <Checkbox checked={this.state.saveSeed} onChange={this.handleSaveSeed} value="save your seed in your browser" color="primary"/>
+                          <Checkbox checked={this.state.saveSeed} onChange={this.handleSaveSeed} value="save your private key in your browser" color="primary"/>
                         }
-                        label="save your seed in your browser"
+                        label="save your private key in your browser"
                       />
                     </Grid>
                   </Grid>
@@ -148,7 +162,7 @@ class LoginComponent extends React.Component<IPorps, IState> {
                 </form>
                 <div className={classes.register}>
                   <Typography variant="body2" align="center" color="textSecondary" paragraph>
-                    You can register with enter your name, your browser will generate localy an seed that you can user
+                    You can register with enter your name, your browser will generate localy an private key that you can use
                     in the feature to access your chat.
                   </Typography>
                   <Grid container spacing={16} justify="center">
@@ -165,7 +179,8 @@ class LoginComponent extends React.Component<IPorps, IState> {
                         classes={this.props.classes} 
                         open 
                         handleClose={this.handleNewAccountDialogClose} 
-                        seed={this.state.seed}/>}
+                        privateKey={this.state.privateKey}
+                        isLoading={this.state.isLoading}/>}
                     </Grid>
                   </Grid>
                 </div>
@@ -185,7 +200,7 @@ class LoginComponent extends React.Component<IPorps, IState> {
 
   private handleSeedChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     this.setState({
-      seed: event.target.value,
+      privateKey: event.target.value,
       textbox: event.target
     })
   }
@@ -203,8 +218,15 @@ class LoginComponent extends React.Component<IPorps, IState> {
   }
 
   private handleStoreSeed = () => {
-    settingStore.saveUserData = this.state.saveSeed;
-    settingStore.seed = this.state.seed;
+    if(isSeed(this.state.privateKey.substring(0,81)) && isBase64(this.state.privateKey.substring(81))){
+      settingStore.saveUserData = this.state.saveSeed;
+      settingStore.seed = this.state.privateKey.substring(0,81);
+      settingStore.privateKey = this.state.privateKey.substring(81)
+      return
+    } 
+    this.setState({
+     privateKeyError: 'invalid private key, sorry!'
+    })
   }
 
   private handleNewContact = () => {
@@ -214,9 +236,16 @@ class LoginComponent extends React.Component<IPorps, IState> {
       })
     }
     this.setState({
-      seed: getRandomSeed(),
-      isNewAccountDialogShow: true
+      isLoading: true
     })
+    settingStore.createUser(this.state.userName).then(keys => {
+      this.setState({
+        privateKey: keys.seed + keys.privateKey,
+        isLoading: false,
+        isNewAccountDialogShow: true
+      })
+    })
+    
   }
 
   private handleNewAccountDialogClose = () => {
@@ -227,7 +256,7 @@ class LoginComponent extends React.Component<IPorps, IState> {
     })
     settingStore.newUser = true;
     settingStore.myName = this.state.userName
-    settingStore.seed = this.state.seed; 
+    settingStore.seed = this.state.privateKey.substring(0,81); 
   }
 }
 

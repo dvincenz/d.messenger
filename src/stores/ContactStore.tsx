@@ -201,10 +201,7 @@ export class ContactStore {
     }
 
     public async publishUser() {
-        const keys = await EncriptionService.createKey(settingStore.myName, settingStore.seed)
-        settingStore.privateKey = keys.privateKey
-        settingStore.publicKey = keys.publicKey
-        await settingStore.Iota.publishMyPublicKey(keys.publicKey, settingStore.myName)
+        await settingStore.Iota.publishMyPublicKey(settingStore.publicKey, settingStore.myName)
     }
 
     public dispose() {

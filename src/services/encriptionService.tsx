@@ -9,6 +9,8 @@ export class EncriptionService {
             curve: 'curve25519', 
         };
         const key = await OpenPGP.generateKey(options)
+        console.log(key.publicKeyArmored)
+
         return {
             publicKey: this.toBase64(await this.dearmor(key.publicKeyArmored)),
             privateKey: this.toBase64(await this.dearmor(key.privateKeyArmored))
@@ -27,8 +29,9 @@ export class EncriptionService {
         const armoredPersonalKey = await this.armorPublicKey(this.toUnit8Array(settingStore.publicKey))
         const optionsEncript = {
             message: OpenPGP.message.fromText(message),       
-            publicKeys: [(await OpenPGP.key.readArmored(armoredKey)).keys[0], (await OpenPGP.key.readArmored(armoredPersonalKey)).keys[0]],
+            publicKeys: [(await OpenPGP.key.readArmored(armoredKey)).keys[0], (await OpenPGP.key.readArmored(armoredPersonalKey)).keys[0]]
         }
+        console.log(optionsEncript)
         const ciphertext = await OpenPGP.encrypt(optionsEncript)
         const encrypted = await this.dearmor(ciphertext.data)
         return this.toBase64(encrypted)     
@@ -45,10 +48,19 @@ export class EncriptionService {
         return plaintext.data 
     }
 
-    private static async dearmor (key: string) {
+    public static async getUserPublicKeyAndName(privateKey: string){
+        const armoredPrivateKey = await this.armorPrivateKey(this.toUnit8Array(privateKey))
+        const key = (await OpenPGP.key.readArmored(armoredPrivateKey)).keys[0];
+        const value = {
+            name: key.getUserIds()[0],
+            publicKey: this.toBase64( await this.dearmor(key.toPublic().armor()))
+        }
+        return value
+    }
+
+    public static async dearmor (key: string) {
         const dearmorKey = await OpenPGP.armor.decode(key)
         const deedObject = await dearmorKey.data.getReader().read()
-        
         return deedObject.value
     }
 

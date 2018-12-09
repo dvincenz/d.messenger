@@ -59,7 +59,11 @@ export class Iota extends EventHandler {
 
     public async sendMessage(message: ITextMessage) {
         // todo may do some checks of used simboles and size of message to prevent errors
-        return await this.sendToTangle(message);
+        try{
+            return await this.sendToTangle(message);
+        }catch (err){
+            console.error(err);
+        }
     }
 
     public async publishMyPublicKey(key: string, myName: string) {

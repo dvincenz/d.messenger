@@ -3,6 +3,9 @@ import { observable } from 'mobx'
 import { Iota } from '../services/iotaService';
 import { messageStore } from './MessageStore';
 import { contactStore } from './ContactStore';
+import { getRandomSeed } from 'src/utils';
+import { EncriptionService } from 'src/services/encriptionService';
+import { ICredentials } from 'src/entities/ICredentials';
 
 
 export enum ActiveDialog {
@@ -36,8 +39,10 @@ export class SettingStore {
 
     set privateKey(key: string){
         window.sessionStorage.setItem('privatePGP', key)
-        console.log('private PGP key: ' + key)
-        // todo an other place to save the key
+        EncriptionService.getUserPublicKeyAndName(key).then(user => {
+            this._myName = user.name
+            this._publicKey = user.publicKey
+        })
         this._privateKey = key
     }
     get privateKey(){
@@ -98,9 +103,20 @@ export class SettingStore {
         if(this.newUser === true){
             contactStore.publishUser();
         }
-
         this.ready = true;
         console.log(this.myAddress)
+    }
+
+    public async createUser(name:string) {
+        const seed = getRandomSeed()
+        const keys = await EncriptionService.createKey(name, seed)
+        this.privateKey = keys.privateKey
+        this.publicKey = keys.publicKey
+        const credentials: ICredentials = {
+            seed,
+            privateKey: this.privateKey
+        }
+        return credentials
     }
 
     private getKey(key: string){

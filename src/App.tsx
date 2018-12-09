@@ -19,7 +19,7 @@ class App extends React.Component<{}, IState> {
     return (
 
       <div>
-        <BrowserRouter>
+        <BrowserRouter basename={'/d.messenger'}>
             <Switch>
               <Route path="/login" component={Login}  />
               <Route exact path="/chat/:address" component={Chat} />

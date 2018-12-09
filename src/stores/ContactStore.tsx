@@ -6,7 +6,6 @@ import { toContact } from "../utils/Mapper";
 import { IICERequest } from "src/services/iotaService/interfaces/IICERequest";
 import { getRandomSeed } from "src/utils";
 import { ChatStatus } from "src/entities/WebRTCConnection";
-import { EncriptionService } from "src/services/encriptionService";
 import { IPublicContact } from "src/services/iotaService/interfaces/IPublicContact";
 import { IContactParameters } from "src/entities/Contact";
 

@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { Typography, withStyles } from "@material-ui/core";
-import { observer } from 'mobx-react';
 import QuestionAnswerIcon from '@material-ui/icons/QuestionAnswer';
 
 // tslint:disable:jsx-no-lambda

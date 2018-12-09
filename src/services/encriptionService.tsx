@@ -9,8 +9,6 @@ export class EncriptionService {
             curve: 'curve25519', 
         };
         const key = await OpenPGP.generateKey(options)
-        console.log(key.publicKeyArmored)
-
         return {
             publicKey: this.toBase64(await this.dearmor(key.publicKeyArmored)),
             privateKey: this.toBase64(await this.dearmor(key.privateKeyArmored))
@@ -31,7 +29,6 @@ export class EncriptionService {
             message: OpenPGP.message.fromText(message),       
             publicKeys: [(await OpenPGP.key.readArmored(armoredKey)).keys[0], (await OpenPGP.key.readArmored(armoredPersonalKey)).keys[0]]
         }
-        console.log(optionsEncript)
         const ciphertext = await OpenPGP.encrypt(optionsEncript)
         const encrypted = await this.dearmor(ciphertext.data)
         return this.toBase64(encrypted)     

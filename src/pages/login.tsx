@@ -16,7 +16,6 @@ import { Redirect } from 'react-router';
 import { observer } from 'mobx-react';
 import { settingStore } from '../stores/SettingStore';
 import { NewAccountDialog } from "../components/NewAccountDialog";
-import { key } from 'openpgp';
 import { isSeed, isBase64 } from 'src/utils';
 
 

@@ -2,6 +2,7 @@
   "name": "d.messenger",
   "version": "0.1.0",
   "private": true,
+  "homepage": "http://dvincenz.github.io/d.messenger",
   "dependencies": {
     "@iota/checksum": "^1.0.0-beta.5",
     "@iota/core": "^1.0.0-beta.5",
@@ -25,7 +26,8 @@
   },
   "scripts": {
     "start": "react-scripts-ts start --fix",
-    "build": "react-scripts-ts build",
+    "predeploy": "react-scripts-ts build",
+    "deploy": "gh-pages -d build",
     "test": "react-scripts-ts test --env=jsdom",
     "eject": "react-scripts-ts eject"
   },
@@ -34,6 +36,7 @@
     "@types/node": "^10.11.2",
     "@types/react": "^16.4.14",
     "@types/react-dom": "^16.0.8",
+    "gh-pages": "^2.0.1",
     "typescript": "^3.1.1"
   }
 }

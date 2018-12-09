@@ -18,15 +18,15 @@ export function NewAccountDialog(props: any) {
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
     >
-      <DialogTitle id="alert-dialog-title">Your new fresh seed</DialogTitle>
+      <DialogTitle id="alert-dialog-title">Your local automated created private key</DialogTitle>
       <DialogContent>
         <DialogContentText  id="alert-dialog-description">
-          Keep your seed save. It's your access token to your messages on d.messenger
+          Keep your privateKey save. It's your access token to your messages on d.messenger
         </DialogContentText>
         <TextField
           multiline
-          className={props.classes.seedTextbox}
-          value={props.seed}
+          className={props.classes.privatKeyTextbox}
+          value={props.privateKey}
           inputProps={{size: 81}}
           onChange={props.handleSeedChange}
           autoFocus
@@ -34,8 +34,8 @@ export function NewAccountDialog(props: any) {
         />
       </DialogContent>
       <DialogActions>
-        <Button onClick={props.handleClose} color="primary">
-          Copy seed & Close
+        <Button onClick={props.handleClose} disabled={props.isLoading} color="primary">
+          Copy PrivateKey & Close
         </Button>
       </DialogActions>
     </Dialog>

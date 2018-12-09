@@ -3,8 +3,7 @@ import { Message, Contact, MessageStatus } from "../entities";
 import { IICERequest } from "src/services/iotaService/interfaces/IICERequest";
 import { Ice } from "src/entities/Ice";
 import { IContactParameters } from "src/entities/Contact";
-import { settings } from "cluster";
-import { SettingStore, settingStore } from "src/stores/SettingStore";
+import { settingStore } from "src/stores/SettingStore";
 
 export function toMessage(baseMessage: ITextMessage): Message {
     const returnMessage: Message = {

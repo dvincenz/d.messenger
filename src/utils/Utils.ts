@@ -33,6 +33,16 @@ export function getDateString(timestamp: number): string {
 
 }
 
+export function isSeed(seed: string){
+    const expression = RegExp('[9A-Z]{81}');
+    return expression.test(seed); 
+}
+
+
+export function isBase64(value: string){
+    const expression = RegExp('^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$');
+    return expression.test(value); 
+}
 
 export async function asyncForEach(array: any, callback: any) {
     for (let index = 0; index < array.length; index++) {

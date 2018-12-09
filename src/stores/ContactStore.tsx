@@ -6,7 +6,6 @@ import { toContact } from "../utils/Mapper";
 import { IICERequest } from "src/services/iotaService/interfaces/IICERequest";
 import { getRandomSeed } from "src/utils";
 import { ChatStatus } from "src/entities/WebRTCConnection";
-import { EncriptionService } from "src/services/encriptionService";
 import { IPublicContact } from "src/services/iotaService/interfaces/IPublicContact";
 import { IContactParameters } from "src/entities/Contact";
 
@@ -201,10 +200,7 @@ export class ContactStore {
     }
 
     public async publishUser() {
-        const keys = await EncriptionService.createKey(settingStore.myName, settingStore.seed)
-        settingStore.privateKey = keys.privateKey
-        settingStore.publicKey = keys.publicKey
-        await settingStore.Iota.publishMyPublicKey(keys.publicKey, settingStore.myName)
+        await settingStore.Iota.publishMyPublicKey(settingStore.publicKey, settingStore.myName)
     }
 
     public dispose() {

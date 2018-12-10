@@ -40,8 +40,8 @@ export class SettingStore {
     set privateKey(key: string){
         window.sessionStorage.setItem('privatePGP', key)
         EncriptionService.getUserPublicKeyAndName(key).then(user => {
-            this._myName = user.name
-            this._publicKey = user.publicKey
+            this.myName = user.name
+            this.publicKey = user.publicKey
         })
         this._privateKey = key
     }

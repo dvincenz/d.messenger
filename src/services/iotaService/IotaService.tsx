@@ -169,7 +169,7 @@ export class Iota extends EventHandler {
         let trytesMessage: any
         let inputTag = asciiToTrytes(message.method.toString())
         if(message.method === MessageMethod.AddressPublish){
-            inputTag = asciiToTrytes(((message as IPublicContact).name)).substring(0, 27)
+            inputTag = asciiToTrytes(((message as IPublicContact).name)).substring(0, 26)
         }
         if(message.isEncripted){
             trytesMessage = asciiToTrytes(await EncriptionService.encript(this.stringify(message), addr));
@@ -253,7 +253,7 @@ export class Iota extends EventHandler {
     private async getFromTangle(addr: string[], tags: string[], ignoreCache = false) {
         const query: any = {
             addresses: addr,
-            tags: tags.length > 0 !== undefined ? tags.map(t => asciiToTrytes(t)) : undefined
+            tags: tags.length > 0 !== undefined ? tags.map(t => asciiToTrytes(t).substring(0,26)) : undefined
         };
         let trytes: any = []
         try {

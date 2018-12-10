@@ -182,7 +182,7 @@ export class ContactStore {
                     return
                 }
                 if (contact.updateTime <= i.time && i.address === settingStore.myAddress) {
-                    contact.setStatus(ChatStatus.online, i)
+                    contact.getOnline(i)
                 }
             })
             

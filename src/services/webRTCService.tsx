@@ -46,12 +46,16 @@ export class WebRtcClient {
     private reciveData = (data: any) => {
         const dataObject = JSON.parse(data)
         if(dataObject !== undefined && dataObject.status !== undefined){
-            this.contact.status = dataObject.status
+            this.contact.setStatus(dataObject.status)
         }
     }
 
     private connectionHandling = () => {
         this.peer.send(JSON.stringify({status: ChatStatus.online}))
+    }
+
+    public sendStatus = (status: ChatStatus) => {
+        this.peer.send(JSON.stringify({status}))
     }
     
     private errorHandling = (err: any) => {

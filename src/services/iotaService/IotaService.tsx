@@ -97,6 +97,9 @@ export class Iota extends EventHandler {
     }
 
     public async searchContactByName(name: string){
+        if(name === undefined || name === '') {
+            return []
+        }
         const contacts = await this.getFromTangle([this.broadcastAddress], [name], true);
         return contacts.filter(c => (c as IPublicContact).name !== undefined && (c as IPublicContact).myAddress !== undefined); 
     }

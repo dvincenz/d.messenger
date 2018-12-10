@@ -84,7 +84,7 @@ class TitleBaarComponent extends React.Component<IPorps, IState> {
     public render() {
         const { classes } = this.props
         const contact = contactStore.currentContact
-        const status = contact !== undefined && !contact.isGroup ? contact.status >= 1 ? contact.status === 1 ? 'offline' : 'writes...' : 'online' : ''
+        const status = contact !== undefined && !contact.isGroup ? contact.status >= 1 ? contact.status === 1 ? 'offline' : 'is writing...' : 'online' : ''
         
         const renderStatus = (
             <span className={classes.smallText}>{status}</span>

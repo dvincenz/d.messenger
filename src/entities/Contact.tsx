@@ -21,6 +21,7 @@ export class Contact {
     private _name: string;
     private _address: string;
     private _publicKey: string;
+    private _remoteStatus: ChatStatus;
     @observable public isActivated?: boolean;
     public isMyRequest: boolean;
     public secret: string;
@@ -58,8 +59,27 @@ export class Contact {
         this.isMyRequest = contact.isMyRequest
     }
 
+    public sendStatus(chatStatus: ChatStatus){
+        if(this.status === ChatStatus.offline){
+            return
+        }
+        try{
+            if(this._remoteStatus !== chatStatus){
+                this.webRtcClient.sendStatus(chatStatus);
+                this._remoteStatus = chatStatus
+            }
+        }catch (ex){
+            console.error('error setting status' + ex)
+        }
+    }
 
-    public setStatus(chatStatus: ChatStatus, iceReqeust?: IICERequest) {
+    public setStatus (chatStatus: ChatStatus){
+        this.status = chatStatus
+
+    }
+
+
+    public getOnline(iceReqeust?: IICERequest) {
         // tslint:disable-next-line:no-unnecessary-initializer
         let ice = undefined
         try {

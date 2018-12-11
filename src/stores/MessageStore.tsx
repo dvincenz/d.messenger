@@ -5,7 +5,6 @@ import { Contact } from '../entities';
 import { toMessage } from '../utils/Mapper'
 import { ITextMessage } from '../services/iotaService/interfaces';
 import { contactStore } from './ContactStore';
-import { ChatStatus } from 'src/entities/WebRTCConnection';
 
 export class MessageStore {
     @computed get getMessagesFromAddress () {
@@ -31,7 +30,7 @@ export class MessageStore {
             yield settingStore.Iota.getMessages(address)
             const contact = contactStore.getContactByAddress(address)
             if (contact.webRtcClient === undefined && !contact.isGroup){
-                contact.setStatus(ChatStatus.online);
+                contact.getOnline();
             }            
             this.state = MessageStoreState.updated
         } catch (error) {

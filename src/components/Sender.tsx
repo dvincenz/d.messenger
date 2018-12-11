@@ -3,6 +3,7 @@ import { Button, TextField, withStyles, StyleRulesCallback} from '@material-ui/c
 import { messageStore } from '../stores/MessageStore';
 import { contactStore } from '../stores/ContactStore';
 import { Contact } from '../entities';
+import { ChatStatus } from 'src/entities/WebRTCConnection';
 
 
 interface IPorps {
@@ -25,6 +26,7 @@ const styles: StyleRulesCallback = theme => ({
 })
 
 export class SenderComponent extends React.Component<IPorps, IState> {
+    private setStatusTimeout: any = 0;
     constructor (props: IPorps){
         super(props);
         this.state = {
@@ -68,6 +70,17 @@ export class SenderComponent extends React.Component<IPorps, IState> {
     
     private handleInputChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
         this.setState({message: event.target.value})
+        if (this.setStatusTimeout) {
+            clearTimeout(this.setStatusTimeout);
+        }
+        if(contactStore.currentContact.status === ChatStatus.offline){
+            return
+        }
+        contactStore.currentContact.sendStatus(ChatStatus.writing)
+        this.setStatusTimeout = setTimeout(() => {
+            contactStore.currentContact.sendStatus(ChatStatus.online)
+        }, 500)
+
     }
 
     private handleReturn = (event: React.KeyboardEvent): void => {
@@ -75,6 +88,7 @@ export class SenderComponent extends React.Component<IPorps, IState> {
             this.handleSubmit();
         }
     }
+
 }
 
 export const Sender = withStyles(styles)(SenderComponent);

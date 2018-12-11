@@ -5,7 +5,6 @@ import { IContactRequest, IContactResponse, Permission } from "../services/iotaS
 import { toContact } from "../utils/Mapper";
 import { IICERequest } from "src/services/iotaService/interfaces/IICERequest";
 import { getRandomSeed } from "src/utils";
-import { ChatStatus } from "src/entities/WebRTCConnection";
 import { IPublicContact } from "src/services/iotaService/interfaces/IPublicContact";
 import { IContactParameters } from "src/entities/Contact";
 
@@ -182,7 +181,7 @@ export class ContactStore {
                     return
                 }
                 if (contact.updateTime <= i.time && i.address === settingStore.myAddress) {
-                    contact.setStatus(ChatStatus.online, i)
+                    contact.getOnline(i)
                 }
             })
             

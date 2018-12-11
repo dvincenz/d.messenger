@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Sender} from '../components';
 import { MessageDisplayer } from '../components/MessageDisplayer';
 import { AddContact } from '../components/AddContact';
-import { Button, StyleRulesCallback, withStyles } from '@material-ui/core';
+import { Button, StyleRulesCallback, withStyles, CircularProgress } from '@material-ui/core';
 import { Contacts } from '../components/Contacts';
 import { contactStore } from '../stores/ContactStore';
 import {ActiveDialog, settingStore} from '../stores/SettingStore';
@@ -41,6 +41,19 @@ const styles: StyleRulesCallback = theme => ({
     left: 0,
     top: 64,
     width: 300,
+  },
+  center:{
+    position: 'absolute',
+    margin: 'auto',
+    top: '0',
+    right: '0',
+    bottom: '0',
+    left: '0',
+    width: '100px',
+    height: '100px'
+  },
+  progress:{
+    margin: theme.spacing.unit * 2,
   }
 })
 
@@ -61,7 +74,9 @@ class ChatComponent extends React.Component<IProps, IState> {
     if (!settingStore.ready){
       return (
         <React.Fragment>
-          Loading... (todo: make some crazy fancy loading bar or what ever)
+            <div className={classes.center}>
+              <CircularProgress className={classes.progress} size={100} />
+            </div>
         </React.Fragment>
       )
     }

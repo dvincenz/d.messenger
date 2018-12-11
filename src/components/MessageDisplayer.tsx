@@ -127,6 +127,7 @@ export class MessageDisplayerComponent extends React.Component<IPorps, {}> {
             </div>
         );
     }
+
 }
 
 function MessageComponent(props: any) {

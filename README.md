@@ -5,7 +5,10 @@ This is a messenger that is able to communicate without using a server connectio
 
 Feel free to fork the project or contribute to this project to make it usable as opensource independently messenger.
 
-Right now you should be able to send and resive messages. Check the feature list or simply clone the porject and try it your self. **Messages will not be encripted, every one can read your messages - feature need to be implemented**
+## Deployment
+On following link you can test the messenger. IOTA dev net is using for sending messages. https://dvincenz.github.io/d.messenger/
+
+Not all the features are implemented right now. **Group messages will not be encrypted, everyone can read your group messages - feature need to be implemented for groups as well**
 
 ## Features
 - [x] send and store messages in the tangle
@@ -24,7 +27,7 @@ Right now you should be able to send and resive messages. Check the feature list
 - [ ] implement a suitable ui
 - [x] encryption 
 - [ ] security audit
-- [ ] handle IOTA snapthots
+- [ ] handle IOTA snapshots
 
 ## Installation
 
